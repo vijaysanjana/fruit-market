@@ -24,6 +24,10 @@ class Core {
     private static Scanner sc = new Scanner(System.in);
     private static User user;
 
+    /**
+     * Main method for the marketplace system. Arranges login/signup and customer/seller menus.
+     * @param args
+     */
     public static void main(String[] args) {
         system_loop:
         while (true) {
@@ -55,14 +59,18 @@ class Core {
                         }
                     }
 
-                    if (AccountManager.login(email, password) instanceof Customer) {
+                    if (user instanceof Customer) {
                         System.out.println(separator);
                         System.out.println("Welcome customer: " + user.getUsername());
-                        customerMenu();
-                    } else if (AccountManager.login(email, password) instanceof Seller) {
+                        customerMainMenu();
+                    } else if (user instanceof Seller) {
                         System.out.println(separator);
                         System.out.println("Welcome seller: " + user.getUsername());
-                        sellerMenu();
+                        sellerMainMenu();
+                    } else {
+                        throw new RuntimeException(
+                                new Exception("FATAL ERROR OCCURRED! LOGGED IN USER IS NEITHER CUSTOMER NOR SELLER!"));
+                        // TODO: NEED TESTING
                     }
                 } else if (loginSignup.equals("2")) { // THIS IS THE SIGNUP PART
                     System.out.println(separator);
@@ -80,11 +88,35 @@ class Core {
                         customerSeller = sc.nextLine();
 
                         if (customerSeller.equals("1")) {
-                            AccountManager.signup(email, password, username, "customer");
-                            break customer_seller;
+                            if(AccountManager.signup(email, password, username, "customer") != null) {
+                                System.out.println("Successfully signed up! Logging you in...");
+                                user = AccountManager.login(email, password);
+                                if (user instanceof Customer) {
+                                    System.out.println(separator);
+                                    System.out.println("Welcome customer: " + user.getUsername());
+                                    customerMainMenu();
+                                } else {
+                                    throw new RuntimeException(new Exception("FATAL ERROR OCCURRED! REGISTERED CUSTOMER IS NOT A CUSTOMER!"));
+                                }
+                            } else {
+                                throw new RuntimeException(new Exception("FATAL ERROR OCCURRED! CUSTOMER REGISTRATION FAILED!"));
+                                // TODO: NEED TESTING
+                            }
                         } else if (customerSeller.equals("2")) {
-                            AccountManager.signup(email, password, username, "seller");
-                            break customer_seller;
+                            if(AccountManager.signup(email, password, username, "seller") != null) {
+                                System.out.println("Successfully signed up! Logging you in...");
+                                user = AccountManager.login(email, password);
+                                if (user instanceof Seller) {
+                                    System.out.println(separator);
+                                    System.out.println("Welcome seller: " + user.getUsername());
+                                    sellerMainMenu();
+                                } else {
+                                    throw new RuntimeException(new Exception("FATAL ERROR OCCURRED! REGISTERED SELLER IS NOT A SELLER!"));
+                                }
+                            } else {
+                                throw new RuntimeException(new Exception("FATAL ERROR OCCURRED! SELLER REGISTRATION FAILED!"));
+                                // TODO: NEED TESTING
+                            }
                         } else {
                             if (!tryAgain("Invalid customer/seller selection!")) {
                                 break system_loop;
@@ -119,7 +151,7 @@ class Core {
      * Prints out the customer main menu for users to view.
      * Allows for navigation of the menu to see marketplace; view, search, and purchase products; and view history.
      */
-    public static void customerMenu() {
+    public static void customerMainMenu() {
         String action;
 
         System.out.println("What would you like to do today?");
@@ -133,14 +165,14 @@ class Core {
         if (action.equalsIgnoreCase("m")) {
             marketplaceMenu(true);
         } else if (action.equalsIgnoreCase("s")) {
-
+            searchMenu();
         } else if (action.equalsIgnoreCase("p")) {
-
+            purchaseMenu();
         } else if (action.equalsIgnoreCase("q")) {
 
         } else {
             if(tryAgain("Invalid menu selection!")) {
-                customerMenu();
+                customerMainMenu();
             } else {
                 printFarewell();
             }
@@ -180,7 +212,7 @@ class Core {
             System.out.println("To view more info, please enter the number corresponding to the product. " +
                     "Otherwise, enter anything else to go back to the customer menu.");
         } else {
-            System.out.println("Please enter a product number.");
+            System.out.println("Please enter a product number: ");
         }
         productPick = sc.nextLine();
         if (productPick.matches("-?\\d+(\\.\\d+)?")) {
@@ -199,19 +231,25 @@ class Core {
                 }
             }
         } else {
-            customerMenu();
+            customerMainMenu();
         }
     }
 
     public static void searchMenu() {
+        String searchParam;
+        MarketPlace mp = new MarketPlace();
+
+        System.out.println(separator);
+        System.out.println("Please enter your search parameter: ");
+        searchParam = sc.nextLine();
 
     }
 
-    public static void historyMenu() {
+    public static void purchaseMenu() {
 
     }
 
-    public static void sellerMenu() {
+    public static void sellerMainMenu() {
         String action;
     }
 
