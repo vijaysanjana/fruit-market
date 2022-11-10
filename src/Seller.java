@@ -1,4 +1,5 @@
 import java.io.*;
+import java.nio.*;
 import java.lang.reflect.Array;
 import java.util.*;
 
@@ -23,6 +24,16 @@ public class Seller extends User {
         this.stores = stores;
     }
 
+    public void pushToFile(String fileName) {
+        try {
+            File f = new File(fileName);
+            List<String> lines = Files.readAllLines(f.toPath(), StandardCharsets.UTF_8);
+            lines.add(String.format("S:%s;%s;%s", getUsername(), getEmail(), getPassword()));
+            Files.write(f.toPath(), lines, StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     //Getter and Setter
     public ArrayList<Store> getStores() {
@@ -37,15 +48,55 @@ public class Seller extends User {
     //Equals
     @Override
     public boolean equals(Object o) {
-
-        if ((o == null) || !(o instanceof Seller)) {
+        if (!(o instanceof Seller)) {
             return false;
         }
         Seller seller = (Seller) o;
-        return (this.getUsername().equals(seller.getUsername()) && this.getEmail().equals(seller.getEmail()) &&
-                this.getPassword().equals(seller.getPassword()) && stores.equals(seller.getStores()));
+        return (super.equals(seller) && stores.equals(seller.getStores()));
     }
 
+    /**
+     * Adds a new store to the seller
+     *
+     * @param store the store to add to the seller
+     */
+    public void addStore(Store store) {
+        stores.add(store);
+    }
+
+    /**
+     * Gets the specified store from the seller
+     *
+     * @param index the index of the desired store
+     * @return the desired store
+     */
+    public Store getStore(int index) {
+        return stores.get(index);
+    }
+
+    /**
+     * Removes the specified store from the seller
+     *
+     * @param index the index of the desired store
+     * @return the removed store
+     */
+    public Store removeStore(int index) {
+        return stores.remove(index);
+    }
+
+    /**
+     * Removes the specified store from the seller
+     *
+     * @param store the desired store
+     * @return the removed store
+     */
+    public Store removeStore(Store store) {
+        if (stores.contains(store)) {
+            return stores.remove(stores.indexOf(store));
+        }
+        return null;
+    }
+  
     public void importProduct(Store s) {
         Scanner sc = new Scanner(System.in);
         System.out.println("Enter file path of the file containing products to be imported: ");
