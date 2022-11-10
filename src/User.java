@@ -52,10 +52,7 @@ public class User {
         try {
             File f = new File(fileName);
             List<String> lines = Files.readAllLines(f.toPath(), StandardCharsets.UTF_8);
-            lines.add("User Type: User");
-            lines.add(String.format("Username: %s", getUsername()));
-            lines.add(String.format("Email: %s", getEmail()));
-            lines.add(String.format("Password: %s", getPassword()));
+            lines.add(String.format("U:%s;%s;%s", getUsername(), getEmail(), getPassword()));
             Files.write(f.toPath(), lines, StandardCharsets.UTF_8);
         } catch (IOException e) {
             e.printStackTrace();

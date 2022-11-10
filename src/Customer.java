@@ -35,17 +35,7 @@ public class Customer extends User {
         try {
             File f = new File(fileName);
             List<String> lines = Files.readAllLines(f.toPath(), StandardCharsets.UTF_8);
-            lines.add("User Type: Customer");
-            lines.add(String.format("Username: %s", getUsername()));
-            lines.add(String.format("Email: %s", getEmail()));
-            lines.add(String.format("Password: %s", getPassword()));
-            String allPurchases = "";
-            for (Sale item : getPurchases()) {
-                allPurchases += item + ", ";
-            }
-            if (allPurchases.equals(""))
-                allPurchases = "none";
-            lines.add(String.format("Purchases: %s", allPurchases));
+            lines.add(String.format("C:%s;%s;%s", getUsername(), getEmail(), getPassword()));
             Files.write(f.toPath(), lines, StandardCharsets.UTF_8);
         } catch (IOException e) {
             e.printStackTrace();

@@ -29,17 +29,7 @@ public class Seller extends User {
         try {
             File f = new File(fileName);
             List<String> lines = Files.readAllLines(f.toPath(), StandardCharsets.UTF_8);
-            lines.add("User Type: Seller");
-            lines.add(String.format("Username: %s", getUsername()));
-            lines.add(String.format("Email: %s", getEmail()));
-            lines.add(String.format("Password: %s", getPassword()));
-            String allStores = "";
-            for (Store store : getStores()) {
-                allStores += store + ", "; //fix this later
-            }
-            if (allStores.equals(""))
-                allStores = "none";
-            lines.add(String.format("Stores: %s", allStores));
+            lines.add(String.format("S:%s;%s;%s", getUsername(), getEmail(), getPassword()));
             Files.write(f.toPath(), lines, StandardCharsets.UTF_8);
         } catch (IOException e) {
             e.printStackTrace();
