@@ -1,4 +1,5 @@
 import java.io.*;
+import java.lang.reflect.Array;
 import java.util.*;
 
 
@@ -60,7 +61,8 @@ public class Seller extends User {
             }
             for (int i = 0; i < list.size(); i++) {
                 String[] arr = list.get(i).split(",");
-                Product p = new Product(arr[0], arr[1], s, Double.parseDouble(arr[3]), Integer.parseInt(arr[4]));
+                Product p = new Product(arr[0], arr[1], Double.parseDouble(arr[3]), Integer.parseInt(arr[4]));
+                //Needs to be changed when Product constructor is edited
             }
         } catch (FileNotFoundException e) {
             System.out.println("File not found - please enter a valid file path!");
@@ -69,31 +71,29 @@ public class Seller extends User {
         }
     }
 
-    public void exportProducts(Store s) {
-        Scanner sc = new Scanner(System.in);
-        String fileName = s.getSeller() + ".csv";
-        try {
-            FileReader fr = new FileReader(fileName);
-            BufferedReader bfr = new BufferedReader(fr);
-            ArrayList<String> list = new ArrayList<>();
-            String line = bfr.readLine();
-            while (line != null) {
-                if (line.split(",")[2].equals(s.getName())) {
-                    list.add(line);
-                    line = bfr.readLine();
-                }
-            }
-            String newFile = s.getName() + ".csv";
-            File f = new File(newFile);
-            FileOutputStream fos = new FileOutputStream(f, false);
-            PrintWriter pw = new PrintWriter(fos);
-            for (String i : list) {
-                pw.println(i);
-            }
-            System.out.println("A file containing your store's products has been created!");
-        } catch (IOException e) {
-            e.printStackTrace();
+    public void exportProducts() throws IOException {
+        ArrayList<Product> products = this.getAllProducts();
+        String fileName = this.getUsername() + ".csv";
+        File f = new File(fileName);
+        FileOutputStream fos = new FileOutputStream(f, false);
+        PrintWriter pw = new PrintWriter(fos);
+        for (Product p : products) {
+            pw.println(p.toString());
         }
+        fos.close();
+        pw.close();
+        System.out.println("A file titled " + this.getUsername() + ".csv has been created with your products!");
+    }
+
+    public ArrayList<Product> getAllProducts() {
+        ArrayList<Product> allProducts = null;
+        for (Store s : stores) {
+            ArrayList<Product> products = s.getProducts();
+            for (Product p : products) {
+                allProducts.add(p);
+            }
+        }
+        return allProducts;
     }
 
 }

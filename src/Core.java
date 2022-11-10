@@ -20,7 +20,7 @@ import java.io.*;
 
 // IMPORTANT: THIS CLASS IS VERY FRAGILE. PLEASE DON'T BREAK!
 class Core {
-    private static final String separator = "---------------------------";\
+    private static final String separator = "---------------------------";
 
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
