@@ -18,7 +18,7 @@ import java.io.*;
  * - All loops will repeat until user cancels it.
  */
 
-// IMPORTANT: THIS CLASS IS VERY FRAGILE. PLEASE DON'T BREAK!
+// IMPORTANT: THIS CLASS IS NO LONGER AS FRAGILE. BUT PLEASE STILL DON'T BREAK!
 class Core {
     private static final String separator = "---------------------------";
     private static Scanner sc = new Scanner(System.in);
