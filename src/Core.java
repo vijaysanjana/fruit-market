@@ -20,204 +20,122 @@ import java.io.*;
 
 // IMPORTANT: THIS CLASS IS VERY FRAGILE. PLEASE DON'T BREAK!
 class Core {
-    private static final String separator = "---------------------------";\
+    private static final String separator = "---------------------------";
+    public static Scanner sc = new Scanner(System.in);
 
     public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-
         system_loop:
-        while(true) {
+        while (true) {
             String email;
             String password;
-            String response;
+            String loginSignup;
+            String customerSeller;
+            String username;
 
             System.out.println("Welcome to The Marketplace!");
             System.out.println(separator);
             System.out.println("Login or signup to use our service.");
-            System.out.println("Please enter" + "\n[1] to Login" + "\n[2] to Signup");
-            response = sc.nextLine();
+            System.out.println("Please enter" + "\n[1] Login" + "\n[2] Signup");
+            loginSignup = sc.nextLine();
 
-            // THIS IS THE ACCOUNT LOOP
-            // WILL REPEAT UNTIL USER MAKES SELECTION BETWEEN [LOGIN] or [SIGNUP]
-            // CAN BE CANCELLED TO QUIT PROGRAM
-            account_loop:
-            while(true) {
-                System.out.println(separator);
-                System.out.println("Are you a Customer or Seller?");
-                System.out.println("Please enter" + "\n[1] for Customer" + "\n[2] for Seller");
-                response = sc.nextLine();
+            login_signup:
+            while (true) {
+                if (loginSignup.equals("1")) { // THIS IS THE LOGIN PART
+                    System.out.println(separator);
+                    System.out.println("Please enter your email: ");
+                    email = sc.nextLine();
+                    System.out.println("Please enter your password: ");
+                    password = sc.nextLine();
 
-                if(response.equals("1")) { // login
-                    // THIS IS THE LOGIN SYSTEM LOOP
-                    // WILL REPEAT UNTIL USER MAKES SELECTION BETWEEN [CUSTOMER] or [SELLER] LOGIN TYPES
-                    // CAN BE CANCELLED TO RETURN TO PREVIOUS LOOP (account_loop)
-                    login_type_loop:
-                    while(true) {
-                        if(response.equals("1")) { // login as customer
-                            System.out.println(separator);
-                            System.out.println("Logging in as a Customer...");
-                            System.out.println("Please enter your email: ");
-                            email = sc.nextLine();
-                            System.out.println("Please enter your password: ");
-                            password = sc.nextLine();
-
-                            // TODO: insert login system here
-
-                            // THIS IS THE CUSTOMER LOGIN LOOP
-                            // WILL REPEAT UNTIL USER SUCCESSFULLY [LOGS IN]
-                            // CAN BE CANCELLED TO RETURN TO PREVIOUS LOOP (login_type_loop)
-                            customer_login_loop:
-                            while(true) {
-                                if(AccountManager.login(email, password)) {
-                                    System.out.println("Customer login successful!");
-                                    break customer_login_loop;
-                                } else {
-                                    System.out.println("Invalid email and password combination. Try again?");
-                                    System.out.println("Enter [Y or Yes] to try again, or anything else to cancel.");
-                                    response = sc.nextLine();
-                                    if(!response.equalsIgnoreCase("y") && !response.equalsIgnoreCase("yes")) {
-                                        break system_loop;
-                                    }
-                                }
-                            }
-
-                            // THIS ONLY OCCURS IF LOGIN IS SUCCESSFUL
-                            Customer customer = new Customer(email, password);
-                            // TODO: add customer stuff
-                            //  Core.customerMenu(customer);
-                        } if(response.equals("2")) { // login as seller
-                            System.out.println(separator);
-                            System.out.println("Logging in as a Seller...");
-                            System.out.println("Please enter your email: ");
-                            email = sc.nextLine();
-                            System.out.println("Please enter your password: ");
-                            password = sc.nextLine();
-
-                            // TODO: insert login system here
-
-                            // THIS IS THE SELLER LOGIN LOOP
-                            // WILL REPEAT UNTIL USER SUCCESSFULLY [LOGS IN]
-                            // CAN BE CANCELLED TO RETURN TO PREVIOUS LOOP (login_type_loop)
-                            seller_login_loop:
-                            while(true) {
-                                if(AccountManager.login(email, password)) {
-                                    System.out.println("Seller login successful!");
-                                    break seller_login_loop;
-                                } else {
-                                    System.out.println("Invalid email and password combination. Try again?");
-                                    System.out.println("Enter [Y or Yes] to try again, or anything else to cancel.");
-                                    response = sc.nextLine();
-                                    if(!response.equalsIgnoreCase("y") && !response.equalsIgnoreCase("yes")) {
-                                        break system_loop;
-                                    }
-                                }
-                            }
-
-                            // THIS ONLY OCCURS IF LOGIN IS SUCCESSFUL
-                            Seller seller = new Seller(email, password);
-                            // TODO: add seller stuff
-                            //  Core.sellerMenu(seller);
-                        } else {
-                            System.out.println("Invalid selection. Try again?");
-                            System.out.println("Enter [Y or Yes] to try again, or anything else to cancel.");
-                            response = sc.nextLine();
-                            if(!response.equalsIgnoreCase("y") && !response.equalsIgnoreCase("yes")) {
-                                break system_loop;
-                            }
+                    User user = AccountManager.login(email, password);
+                    if (user == null) {
+                        if(!tryAgain(sc.nextLine(), "Email and password combinations are invalid!", false)) {
+                            break system_loop;
                         }
                     }
-                } else if(response.equals("2")) { // signup
-                    // THIS IS THE SIGNUP SYSTEM LOOP
-                    // WILL REPEAT UNTIL USER MAKES SELECTION BETWEEN [CUSTOMER] or [SELLER] SIGNUP TYPES
-                    // CAN BE CANCELLED TO RETURN TO PREVIOUS LOOP (account_loop)
-                    signup_type_loop:
+
+                    if (AccountManager.login(email, password) instanceof Customer) {
+                        System.out.println(separator);
+                        System.out.println("Welcome customer: " + user.getUsername());
+                        customerMenu((Customer) user);
+                    } else if (AccountManager.login(email, password) instanceof Seller) {
+                        System.out.println(separator);
+                        System.out.println("Welcome seller: " + user.getUsername());
+                        sellerMenu((Seller) user);
+                    }
+                } else if (loginSignup.equals("2")) { // THIS IS THE SIGNUP PART
+                    System.out.println(separator);
+                    System.out.println("Please enter your email: ");
+                    email = sc.nextLine();
+                    System.out.println("Please enter your password: ");
+                    password = sc.nextLine();
+                    System.out.println("Please enter your username: ");
+                    username = sc.nextLine();
+
+                    customer_seller:
                     while(true) {
-                        if(response.equals("1")) { // signup as customer
-                            // THIS IS THE CUSTOMER SIGNUP LOOP
-                            // WILL REPEAT UNTIL USER SUCCESSFULLY [SIGNS IN]
-                            // CAN BE CANCELLED TO RETURN TO PREVIOUS LOOP (signup_type_loop)
-                            customer_login_loop:
-                            while(true) {
-                                System.out.println(separator);
-                                System.out.println("Signing up as a Customer...");
-                                System.out.println("Please enter your email: ");
-                                email = sc.nextLine();
-                                System.out.println("Please enter your password: ");
-                                password = sc.nextLine();
+                        System.out.println("Are you signing up to be a customer or seller?");
+                        System.out.println("Please enter" + "\n[1] Customer" + "\n[2] Seller");
+                        customerSeller = sc.nextLine();
 
-                                // TODO: insert signup system here
-
-                                if(AccountManager.signup(email, password)) {
-                                    System.out.println(separator);
-                                    System.out.println("Sign up successful! Returning to main menu...");
-                                    break account_loop;
-                                } else {
-                                    System.out.println("An error occurred! Try again?");
-                                    System.out.println("Enter [Y or Yes] to try again, or anything else to cancel.");
-                                    response = sc.nextLine();
-                                    if(!response.equalsIgnoreCase("y") && !response.equalsIgnoreCase("yes")) {
-                                        break system_loop;
-                                    }
-                                }
-                            }
-                        } if(response.equals("2")) { // signup as seller
-                            // THIS IS THE SELLER LOGIN LOOP
-                            // WILL REPEAT UNTIL USER SUCCESSFULLY [LOGS IN]
-                            // CAN BE CANCELLED TO RETURN TO PREVIOUS LOOP (signup_type_loop)
-                            seller_login_loop:
-                            while(true) {
-                                System.out.println(separator);
-                                System.out.println("Signing up as a Seller...");
-                                System.out.println("Please enter your email: ");
-                                email = sc.nextLine();
-                                System.out.println("Please enter your password: ");
-                                password = sc.nextLine();
-
-                                // TODO: insert signup system here
-
-                                if(AccountManager.signup(email, password)) {
-                                    System.out.println(separator);
-                                    System.out.println("Sign up successful! Returning to main menu...");
-                                    break account_loop;
-                                } else {
-                                    System.out.println("An error occurred! Try again?");
-                                    System.out.println("Enter [Y or Yes] to try again, or anything else to cancel.");
-                                    response = sc.nextLine();
-                                    if(!response.equalsIgnoreCase("y") && !response.equalsIgnoreCase("yes")) {
-                                        break system_loop;
-                                    }
-                                }
-                            }
+                        if(customerSeller.equals("1")) {
+                            AccountManager.signup(email, password, username, "customer");
+                            break customer_seller;
+                        } else if(customerSeller.equals("2")) {
+                            AccountManager.signup(email, password, username, "seller");
+                            break customer_seller;
                         } else {
-                            System.out.println("Invalid selection. Try again?");
-                            System.out.println("Enter [Y or Yes] to try again, or anything else to cancel.");
-                            response = sc.nextLine();
-                            if(!response.equalsIgnoreCase("y") && !response.equalsIgnoreCase("yes")) {
+                            if(!tryAgain(sc.nextLine(), "Invalid customer/seller selection!", false)) {
                                 break system_loop;
                             }
                         }
                     }
                 } else {
-                    System.out.println("Invalid selection. Try again?");
-                    System.out.println("Enter [Y or Yes] to try again, or anything else to cancel.");
-                    response = sc.nextLine();
-                    if(!response.equalsIgnoreCase("y") && !response.equalsIgnoreCase("yes")) {
+                    if(!tryAgain(sc.nextLine(), "Invalid login/signup selection!", false)) {
                         break system_loop;
                     }
                 }
             }
+        }
+    }
 
-            System.out.println("Thank you for using The Marketplace!");
-            System.out.println("Please come back another time!");
+    public static boolean tryAgain(String str, String message, boolean menu) {
+        System.out.println(separator);
+        System.out.println(message);
+        if(!menu) {
+            System.out.println("Please enter 'Y' or 'Yes' to try again, or anything else to cancel.");
+            return (str.equalsIgnoreCase("y") || str.equalsIgnoreCase("yes"));
+        } else {
+            return true;
         }
     }
 
     public static void customerMenu(Customer customer) {
-        // TODO
+        String action;
+
+        System.out.println("What would you like to do today?");
+        System.out.println("Please enter");
+        System.out.println("[M] Open Marketplace");
+        System.out.println("[S] Search for Product");
+        System.out.println("[P] View Purchase History");
+        System.out.println("[Q] Logout & Quit");
+
+        action = sc.nextLine();
+        if (action.equalsIgnoreCase("m")) {
+
+        } else if(action.equalsIgnoreCase("s")) {
+
+        } else if(action.equalsIgnoreCase("p")) {
+
+        } else if(action.equalsIgnoreCase("q")) {
+
+        } else {
+            tryAgain("", "Invalid selection! Please try again.", true);
+        }
     }
 
     public static void sellerMenu(Seller seller) {
-        // TODO
+        String action;
     }
 
     public static void updateSeller(Seller s) {
@@ -261,6 +179,5 @@ class Core {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 }
