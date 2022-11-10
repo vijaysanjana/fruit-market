@@ -21,7 +21,8 @@ import java.io.*;
 // IMPORTANT: THIS CLASS IS VERY FRAGILE. PLEASE DON'T BREAK!
 class Core {
     private static final String separator = "---------------------------";
-    public static Scanner sc = new Scanner(System.in);
+    private static Scanner sc = new Scanner(System.in);
+    private static User user;
 
     public static void main(String[] args) {
         system_loop:
@@ -47,9 +48,9 @@ class Core {
                     System.out.println("Please enter your password: ");
                     password = sc.nextLine();
 
-                    User user = AccountManager.login(email, password);
+                    user = AccountManager.login(email, password);
                     if (user == null) {
-                        if(!tryAgain(sc.nextLine(), "Email and password combinations are invalid!", false)) {
+                        if (!tryAgain("Email and password combinations are invalid!")) {
                             break system_loop;
                         }
                     }
@@ -57,11 +58,11 @@ class Core {
                     if (AccountManager.login(email, password) instanceof Customer) {
                         System.out.println(separator);
                         System.out.println("Welcome customer: " + user.getUsername());
-                        customerMenu((Customer) user);
+                        customerMenu();
                     } else if (AccountManager.login(email, password) instanceof Seller) {
                         System.out.println(separator);
                         System.out.println("Welcome seller: " + user.getUsername());
-                        sellerMenu((Seller) user);
+                        sellerMenu();
                     }
                 } else if (loginSignup.equals("2")) { // THIS IS THE SIGNUP PART
                     System.out.println(separator);
@@ -73,44 +74,52 @@ class Core {
                     username = sc.nextLine();
 
                     customer_seller:
-                    while(true) {
+                    while (true) {
                         System.out.println("Are you signing up to be a customer or seller?");
                         System.out.println("Please enter" + "\n[1] Customer" + "\n[2] Seller");
                         customerSeller = sc.nextLine();
 
-                        if(customerSeller.equals("1")) {
+                        if (customerSeller.equals("1")) {
                             AccountManager.signup(email, password, username, "customer");
                             break customer_seller;
-                        } else if(customerSeller.equals("2")) {
+                        } else if (customerSeller.equals("2")) {
                             AccountManager.signup(email, password, username, "seller");
                             break customer_seller;
                         } else {
-                            if(!tryAgain(sc.nextLine(), "Invalid customer/seller selection!", false)) {
+                            if (!tryAgain("Invalid customer/seller selection!")) {
                                 break system_loop;
                             }
                         }
                     }
                 } else {
-                    if(!tryAgain(sc.nextLine(), "Invalid login/signup selection!", false)) {
+                    if (!tryAgain("Invalid login/signup selection!")) {
                         break system_loop;
                     }
                 }
             }
         }
+
+        printFarewell();
     }
 
-    public static boolean tryAgain(String str, String message, boolean menu) {
+    /**
+     * Asks user to try again if their choice is invalid and returns true/false based on their choice.
+     * @param message
+     * @return boolean
+     */
+    public static boolean tryAgain(String message) {
         System.out.println(separator);
         System.out.println(message);
-        if(!menu) {
-            System.out.println("Please enter 'Y' or 'Yes' to try again, or anything else to cancel.");
-            return (str.equalsIgnoreCase("y") || str.equalsIgnoreCase("yes"));
-        } else {
-            return true;
-        }
+        System.out.println("Please enter 'Y' or 'Yes' to try again, or anything else to quit.");
+        String yn = sc.nextLine();
+        return (yn.equalsIgnoreCase("y") || yn.equalsIgnoreCase("yes"));
     }
 
-    public static void customerMenu(Customer customer) {
+    /**
+     * Prints out the customer main menu for users to view.
+     * Allows for navigation of the menu to see marketplace; view, search, and purchase products; and view history.
+     */
+    public static void customerMenu() {
         String action;
 
         System.out.println("What would you like to do today?");
@@ -122,19 +131,87 @@ class Core {
 
         action = sc.nextLine();
         if (action.equalsIgnoreCase("m")) {
+            marketplaceMenu(true);
+        } else if (action.equalsIgnoreCase("s")) {
 
-        } else if(action.equalsIgnoreCase("s")) {
+        } else if (action.equalsIgnoreCase("p")) {
 
-        } else if(action.equalsIgnoreCase("p")) {
-
-        } else if(action.equalsIgnoreCase("q")) {
+        } else if (action.equalsIgnoreCase("q")) {
 
         } else {
-            tryAgain("", "Invalid selection! Please try again.", true);
+            if(tryAgain("Invalid menu selection!")) {
+                customerMenu();
+            } else {
+                printFarewell();
+            }
         }
     }
 
-    public static void sellerMenu(Seller seller) {
+    public static void marketplaceMenu(boolean printProducts) {
+        String productPick;
+        MarketPlace mp = new MarketPlace();
+        ArrayList<Store> stores = mp.getStores();
+        ArrayList<Product> products = new ArrayList<Product>();
+
+        if (printProducts) {
+            System.out.println(separator);
+            System.out.println("All available stores:");
+        }
+
+        for (Store s : stores) {
+            int counter = 0;
+            ArrayList<Product> tempProds = s.getProducts();
+            System.out.println("- " + s.getName());
+            if (stores.isEmpty()) {
+                if (printProducts) {
+                    System.out.println("--- No products");
+                }
+            } else {
+                for (Product p : tempProds) {
+                    products.add(p);
+                    if (printProducts) {
+                        System.out.println("--- #" + (counter + 1) + " " +
+                                p.getName() + " (Price: " + p.getPrice() + ")");
+                    }
+                }
+            }
+        }
+        if (printProducts) {
+            System.out.println("To view more info, please enter the number corresponding to the product. " +
+                    "Otherwise, enter anything else to go back to the customer menu.");
+        } else {
+            System.out.println("Please enter a product number.");
+        }
+        productPick = sc.nextLine();
+        if (productPick.matches("-?\\d+(\\.\\d+)?")) {
+            Product p = products.get(Integer.parseInt(productPick) - 1);
+            if (p != null) {
+                System.out.println(separator);
+                System.out.println("Product: " + p.getName());
+                System.out.println("Price: " + p.getPrice());
+                System.out.println("Quantity: " + p.getQuantity());
+                System.out.println("Description: " + p.getDescription());
+            } else {
+                if(tryAgain("Invalid product selection!")) {
+                    marketplaceMenu(false);
+                } else {
+                    printFarewell();
+                }
+            }
+        } else {
+            customerMenu();
+        }
+    }
+
+    public static void searchMenu() {
+
+    }
+
+    public static void historyMenu() {
+
+    }
+
+    public static void sellerMenu() {
         String action;
     }
 
@@ -179,5 +256,13 @@ class Core {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Prints the farewell message.
+     */
+    public static void printFarewell() {
+        System.out.println("Thank you for visiting The MarketPlace!");
+        System.out.println("Come again another day.");
     }
 }
