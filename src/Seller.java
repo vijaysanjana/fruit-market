@@ -1,7 +1,6 @@
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
+import java.io.*;
+import java.nio.*;
+import java.lang.reflect.Array;
 import java.util.*;
 
 
@@ -56,7 +55,6 @@ public class Seller extends User {
         return (super.equals(seller) && stores.equals(seller.getStores()));
     }
 
-
     /**
      * Adds a new store to the seller
      *
@@ -97,6 +95,56 @@ public class Seller extends User {
             return stores.remove(stores.indexOf(store));
         }
         return null;
+    }
+  
+    public void importProduct(Store s) {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Enter file path of the file containing products to be imported: ");
+        String filePath = sc.nextLine();
+        try {
+            FileReader f = new FileReader(filePath);
+            BufferedReader bfr = new BufferedReader(f);
+            ArrayList<String> list = new ArrayList<>();
+            String line = bfr.readLine();
+            while (line != null) {
+                list.add(line);
+                line = bfr.readLine();
+            }
+            for (int i = 0; i < list.size(); i++) {
+                String[] arr = list.get(i).split(",");
+                Product p = new Product(arr[0], arr[1], Double.parseDouble(arr[3]), Integer.parseInt(arr[4]));
+                //Needs to be changed when Product constructor is edited
+            }
+        } catch (FileNotFoundException e) {
+            System.out.println("File not found - please enter a valid file path!");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void exportProducts() throws IOException {
+        ArrayList<Product> products = this.getAllProducts();
+        String fileName = this.getUsername() + ".csv";
+        File f = new File(fileName);
+        FileOutputStream fos = new FileOutputStream(f, false);
+        PrintWriter pw = new PrintWriter(fos);
+        for (Product p : products) {
+            pw.println(p.toString());
+        }
+        fos.close();
+        pw.close();
+        System.out.println("A file titled " + this.getUsername() + ".csv has been created with your products!");
+    }
+
+    public ArrayList<Product> getAllProducts() {
+        ArrayList<Product> allProducts = null;
+        for (Store s : stores) {
+            ArrayList<Product> products = s.getProducts();
+            for (Product p : products) {
+                allProducts.add(p);
+            }
+        }
+        return allProducts;
     }
 
 }
