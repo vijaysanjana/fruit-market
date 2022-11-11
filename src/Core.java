@@ -71,7 +71,7 @@ class Core {
                         sellerMainMenu();
                     } else {
                         throw new RuntimeException(
-                                new Exception("FATAL ERROR OCCURRED! LOGGED IN USER IS NEITHER CUSTOMER NOR SELLER!"));
+                                new AccountException("FATAL ERROR OCCURRED! LOGGED IN USER IS NEITHER CUSTOMER NOR SELLER!"));
                         // TODO: NEED TESTING
                     }
                 } else if (loginSignup.equals("2")) { // THIS IS THE SIGNUP PART
@@ -99,10 +99,12 @@ class Core {
                                     shoppingCart = ((Customer) user).getShoppingCart();
                                     customerMainMenu();
                                 } else {
-                                    throw new RuntimeException(new Exception("FATAL ERROR OCCURRED! REGISTERED CUSTOMER IS NOT A CUSTOMER!"));
+                                    throw new RuntimeException(
+                                            new AccountException("FATAL ERROR OCCURRED! REGISTERED CUSTOMER IS NOT A CUSTOMER!"));
                                 }
                             } else {
-                                throw new RuntimeException(new Exception("FATAL ERROR OCCURRED! CUSTOMER REGISTRATION FAILED!"));
+                                throw new RuntimeException(
+                                        new AccountException("FATAL ERROR OCCURRED! CUSTOMER REGISTRATION FAILED!"));
                                 // TODO: NEED TESTING
                             }
                         } else if (customerSeller.equals("2")) {
@@ -114,10 +116,12 @@ class Core {
                                     System.out.println("Welcome seller: " + user.getUsername());
                                     sellerMainMenu();
                                 } else {
-                                    throw new RuntimeException(new Exception("FATAL ERROR OCCURRED! REGISTERED SELLER IS NOT A SELLER!"));
+                                    throw new RuntimeException(
+                                            new AccountException("FATAL ERROR OCCURRED! REGISTERED SELLER IS NOT A SELLER!"));
                                 }
                             } else {
-                                throw new RuntimeException(new Exception("FATAL ERROR OCCURRED! SELLER REGISTRATION FAILED!"));
+                                throw new RuntimeException(
+                                        new AccountException("FATAL ERROR OCCURRED! SELLER REGISTRATION FAILED!"));
                                 // TODO: NEED TESTING
                             }
                         } else {
