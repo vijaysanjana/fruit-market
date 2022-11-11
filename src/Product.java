@@ -84,4 +84,9 @@ public class Product {
                 store.equals(product.getStore()) && quantity == product.getQuantity() &&
                 price == product.getPrice());
     }
+
+    public String toString() {
+        String s = name + "," + description + "," + quantity + "," + price;
+        return s;
+    }
 }

@@ -18,206 +18,380 @@ import java.io.*;
  * - All loops will repeat until user cancels it.
  */
 
-// IMPORTANT: THIS CLASS IS VERY FRAGILE. PLEASE DON'T BREAK!
+// IMPORTANT: THIS CLASS IS NO LONGER AS FRAGILE. BUT PLEASE STILL DON'T BREAK!
 class Core {
-    private static final String separator = "---------------------------";\
+    private static final String separator = "---------------------------";
+    private static Scanner sc = new Scanner(System.in);
+    private static User user;
+    private static ShoppingCart shoppingCart;
 
+    /**
+     * Main method for the marketplace system. Arranges login/signup and customer/seller menus.
+     * @param args
+     */
     public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-
         system_loop:
-        while(true) {
+        while (true) {
             String email;
             String password;
-            String response;
+            String loginSignup;
+            String customerSeller;
+            String username;
 
             System.out.println("Welcome to The Marketplace!");
             System.out.println(separator);
             System.out.println("Login or signup to use our service.");
-            System.out.println("Please enter" + "\n[1] to Login" + "\n[2] to Signup");
-            response = sc.nextLine();
+            System.out.println("Please enter" + "\n[1] Login" + "\n[2] Signup");
+            loginSignup = sc.nextLine();
 
-            // THIS IS THE ACCOUNT LOOP
-            // WILL REPEAT UNTIL USER MAKES SELECTION BETWEEN [LOGIN] or [SIGNUP]
-            // CAN BE CANCELLED TO QUIT PROGRAM
-            account_loop:
-            while(true) {
-                System.out.println(separator);
-                System.out.println("Are you a Customer or Seller?");
-                System.out.println("Please enter" + "\n[1] for Customer" + "\n[2] for Seller");
-                response = sc.nextLine();
+            login_signup:
+            while (true) {
+                if (loginSignup.equals("1")) { // THIS IS THE LOGIN PART
+                    System.out.println(separator);
+                    System.out.println("Please enter your email: ");
+                    email = sc.nextLine();
+                    System.out.println("Please enter your password: ");
+                    password = sc.nextLine();
 
-                if(response.equals("1")) { // login
-                    // THIS IS THE LOGIN SYSTEM LOOP
-                    // WILL REPEAT UNTIL USER MAKES SELECTION BETWEEN [CUSTOMER] or [SELLER] LOGIN TYPES
-                    // CAN BE CANCELLED TO RETURN TO PREVIOUS LOOP (account_loop)
-                    login_type_loop:
-                    while(true) {
-                        if(response.equals("1")) { // login as customer
-                            System.out.println(separator);
-                            System.out.println("Logging in as a Customer...");
-                            System.out.println("Please enter your email: ");
-                            email = sc.nextLine();
-                            System.out.println("Please enter your password: ");
-                            password = sc.nextLine();
-
-                            // TODO: insert login system here
-
-                            // THIS IS THE CUSTOMER LOGIN LOOP
-                            // WILL REPEAT UNTIL USER SUCCESSFULLY [LOGS IN]
-                            // CAN BE CANCELLED TO RETURN TO PREVIOUS LOOP (login_type_loop)
-                            customer_login_loop:
-                            while(true) {
-                                if(AccountManager.login(email, password)) {
-                                    System.out.println("Customer login successful!");
-                                    break customer_login_loop;
-                                } else {
-                                    System.out.println("Invalid email and password combination. Try again?");
-                                    System.out.println("Enter [Y or Yes] to try again, or anything else to cancel.");
-                                    response = sc.nextLine();
-                                    if(!response.equalsIgnoreCase("y") && !response.equalsIgnoreCase("yes")) {
-                                        break system_loop;
-                                    }
-                                }
-                            }
-
-                            // THIS ONLY OCCURS IF LOGIN IS SUCCESSFUL
-                            Customer customer = new Customer(email, password);
-                            // TODO: add customer stuff
-                            //  Core.customerMenu(customer);
-                        } if(response.equals("2")) { // login as seller
-                            System.out.println(separator);
-                            System.out.println("Logging in as a Seller...");
-                            System.out.println("Please enter your email: ");
-                            email = sc.nextLine();
-                            System.out.println("Please enter your password: ");
-                            password = sc.nextLine();
-
-                            // TODO: insert login system here
-
-                            // THIS IS THE SELLER LOGIN LOOP
-                            // WILL REPEAT UNTIL USER SUCCESSFULLY [LOGS IN]
-                            // CAN BE CANCELLED TO RETURN TO PREVIOUS LOOP (login_type_loop)
-                            seller_login_loop:
-                            while(true) {
-                                if(AccountManager.login(email, password)) {
-                                    System.out.println("Seller login successful!");
-                                    break seller_login_loop;
-                                } else {
-                                    System.out.println("Invalid email and password combination. Try again?");
-                                    System.out.println("Enter [Y or Yes] to try again, or anything else to cancel.");
-                                    response = sc.nextLine();
-                                    if(!response.equalsIgnoreCase("y") && !response.equalsIgnoreCase("yes")) {
-                                        break system_loop;
-                                    }
-                                }
-                            }
-
-                            // THIS ONLY OCCURS IF LOGIN IS SUCCESSFUL
-                            Seller seller = new Seller(email, password);
-                            // TODO: add seller stuff
-                            //  Core.sellerMenu(seller);
-                        } else {
-                            System.out.println("Invalid selection. Try again?");
-                            System.out.println("Enter [Y or Yes] to try again, or anything else to cancel.");
-                            response = sc.nextLine();
-                            if(!response.equalsIgnoreCase("y") && !response.equalsIgnoreCase("yes")) {
-                                break system_loop;
-                            }
+                    user = AccountManager.login(email, password); // TODO: needs testing
+                    if (user == null) { // TODO: needs testing (invalid logins)
+                        if (!tryAgain("Email and password combinations are invalid!")) {
+                            break system_loop;
                         }
                     }
-                } else if(response.equals("2")) { // signup
-                    // THIS IS THE SIGNUP SYSTEM LOOP
-                    // WILL REPEAT UNTIL USER MAKES SELECTION BETWEEN [CUSTOMER] or [SELLER] SIGNUP TYPES
-                    // CAN BE CANCELLED TO RETURN TO PREVIOUS LOOP (account_loop)
-                    signup_type_loop:
-                    while(true) {
-                        if(response.equals("1")) { // signup as customer
-                            // THIS IS THE CUSTOMER SIGNUP LOOP
-                            // WILL REPEAT UNTIL USER SUCCESSFULLY [SIGNS IN]
-                            // CAN BE CANCELLED TO RETURN TO PREVIOUS LOOP (signup_type_loop)
-                            customer_login_loop:
-                            while(true) {
-                                System.out.println(separator);
-                                System.out.println("Signing up as a Customer...");
-                                System.out.println("Please enter your email: ");
-                                email = sc.nextLine();
-                                System.out.println("Please enter your password: ");
-                                password = sc.nextLine();
 
-                                // TODO: insert signup system here
+                    if (user instanceof Customer) {
+                        System.out.println(separator);
+                        System.out.println("Welcome customer: " + user.getUsername());
+                        shoppingCart = ((Customer) user).getShoppingCart();
+                        customerMainMenu();
+                    } else if (user instanceof Seller) {
+                        System.out.println(separator);
+                        System.out.println("Welcome seller: " + user.getUsername());
+                        sellerMainMenu();
+                    } else {
+                        throw new RuntimeException(
+                                new AccountException("FATAL ERROR OCCURRED! LOGGED IN USER IS NEITHER CUSTOMER NOR SELLER!"));
+                    }
+                } else if (loginSignup.equals("2")) { // THIS IS THE SIGNUP PART
+                    System.out.println(separator);
+                    System.out.println("Please enter your email: ");
+                    email = sc.nextLine();
+                    System.out.println("Please enter your password: ");
+                    password = sc.nextLine();
+                    System.out.println("Please enter your username: ");
+                    username = sc.nextLine();
 
-                                if(AccountManager.signup(email, password)) {
+                    customer_seller:
+                    while (true) {
+                        System.out.println("Are you signing up to be a customer or seller?");
+                        System.out.println("Please enter" + "\n[1] Customer" + "\n[2] Seller");
+                        customerSeller = sc.nextLine();
+
+                        if (customerSeller.equals("1")) { // TODO: needs testing
+                            if(AccountManager.signup(email, password, username, "customer") != null) {
+                                System.out.println("Successfully signed up! Logging you in...");
+                                user = AccountManager.login(email, password);
+                                if (user instanceof Customer) {
                                     System.out.println(separator);
-                                    System.out.println("Sign up successful! Returning to main menu...");
-                                    break account_loop;
+                                    System.out.println("Welcome customer: " + user.getUsername());
+                                    shoppingCart = ((Customer) user).getShoppingCart();
+                                    customerMainMenu();
                                 } else {
-                                    System.out.println("An error occurred! Try again?");
-                                    System.out.println("Enter [Y or Yes] to try again, or anything else to cancel.");
-                                    response = sc.nextLine();
-                                    if(!response.equalsIgnoreCase("y") && !response.equalsIgnoreCase("yes")) {
-                                        break system_loop;
-                                    }
+                                    throw new RuntimeException(
+                                            new AccountException("FATAL ERROR OCCURRED! REGISTERED CUSTOMER IS NOT A CUSTOMER!"));
                                 }
+                            } else {
+                                throw new RuntimeException(
+                                        new AccountException("FATAL ERROR OCCURRED! CUSTOMER REGISTRATION FAILED!"));
                             }
-                        } if(response.equals("2")) { // signup as seller
-                            // THIS IS THE SELLER LOGIN LOOP
-                            // WILL REPEAT UNTIL USER SUCCESSFULLY [LOGS IN]
-                            // CAN BE CANCELLED TO RETURN TO PREVIOUS LOOP (signup_type_loop)
-                            seller_login_loop:
-                            while(true) {
-                                System.out.println(separator);
-                                System.out.println("Signing up as a Seller...");
-                                System.out.println("Please enter your email: ");
-                                email = sc.nextLine();
-                                System.out.println("Please enter your password: ");
-                                password = sc.nextLine();
-
-                                // TODO: insert signup system here
-
-                                if(AccountManager.signup(email, password)) {
+                        } else if (customerSeller.equals("2")) { // TODO: needs testing
+                            if(AccountManager.signup(email, password, username, "seller") != null) {
+                                System.out.println("Successfully signed up! Logging you in...");
+                                user = AccountManager.login(email, password);
+                                if (user instanceof Seller) {
                                     System.out.println(separator);
-                                    System.out.println("Sign up successful! Returning to main menu...");
-                                    break account_loop;
+                                    System.out.println("Welcome seller: " + user.getUsername());
+                                    sellerMainMenu();
                                 } else {
-                                    System.out.println("An error occurred! Try again?");
-                                    System.out.println("Enter [Y or Yes] to try again, or anything else to cancel.");
-                                    response = sc.nextLine();
-                                    if(!response.equalsIgnoreCase("y") && !response.equalsIgnoreCase("yes")) {
-                                        break system_loop;
-                                    }
+                                    throw new RuntimeException(
+                                            new AccountException("FATAL ERROR OCCURRED! REGISTERED SELLER IS NOT A SELLER!"));
                                 }
+                            } else {
+                                throw new RuntimeException(
+                                        new AccountException("FATAL ERROR OCCURRED! SELLER REGISTRATION FAILED!"));
                             }
                         } else {
-                            System.out.println("Invalid selection. Try again?");
-                            System.out.println("Enter [Y or Yes] to try again, or anything else to cancel.");
-                            response = sc.nextLine();
-                            if(!response.equalsIgnoreCase("y") && !response.equalsIgnoreCase("yes")) {
+                            if (!tryAgain("Invalid customer/seller selection!")) { // TODO: needs testing
                                 break system_loop;
                             }
                         }
                     }
                 } else {
-                    System.out.println("Invalid selection. Try again?");
-                    System.out.println("Enter [Y or Yes] to try again, or anything else to cancel.");
-                    response = sc.nextLine();
-                    if(!response.equalsIgnoreCase("y") && !response.equalsIgnoreCase("yes")) {
+                    if (!tryAgain("Invalid login/signup selection!")) { // TODO: needs testing
                         break system_loop;
                     }
                 }
             }
+        }
+        printFarewell();
+    }
 
-            System.out.println("Thank you for using The Marketplace!");
-            System.out.println("Please come back another time!");
+    /**
+     * Asks user to try again if their choice is invalid and returns true/false based on their choice.
+     * @param message
+     * @return boolean
+     */
+    public static boolean tryAgain(String message) {
+        System.out.println(separator);
+        System.out.println(message);
+        System.out.println("Please enter [Y] or [Yes] to try again, or [Anything Else] to quit: ");
+        String yn = sc.nextLine();
+        return (yn.equalsIgnoreCase("y") || yn.equalsIgnoreCase("yes"));
+    }
+
+    private static void showProductInfo(Product product) {
+        System.out.println(separator);
+        System.out.println("Product: " + product.getName());
+        System.out.println("Price: " + product.getPrice());
+        System.out.println("Quantity: " + product.getQuantity());
+        System.out.println("Description: " + product.getDescription());
+    }
+
+    /**
+     * Prints out the customer main menu for users to view.
+     * Allows for navigation of the menu to see marketplace; view, search, and purchase products; and view history.
+     */
+    public static void customerMainMenu() {
+        System.out.println("What would you like to do today?");
+        System.out.println("Please enter");
+        System.out.println("[M] Open Marketplace");
+        System.out.println("[S] Search for Product");
+        System.out.println("[C] View Shopping Cart (" + shoppingCart.getHeldPurchases().size() + " Products)");
+        System.out.println("[P] View Purchase History");
+        System.out.println("[Q] Logout & Quit");
+
+        String action = sc.nextLine();
+        if (action.equalsIgnoreCase("m")) { // TODO: needs testing
+            marketplaceMenu();
+        } else if (action.equalsIgnoreCase("s")) { // TODO: needs testing
+            searchMenu();
+        } else if(action.equalsIgnoreCase("c")) { // TODO: needs testing
+            cartMenu();
+        } else if (action.equalsIgnoreCase("p")) { // TODO: needs testing
+            historyMenu();
+        } else if (action.equalsIgnoreCase("q")) { // TODO: needs testing
+            printFarewell();
+        } else {
+            if(tryAgain("Invalid menu selection!")) { // TODO: needs testing
+                customerMainMenu();
+            } else { // TODO: needs testing
+                printFarewell();
+            }
         }
     }
 
-    public static void customerMenu(Customer customer) {
-        // TODO
+    public static void marketplaceMenu() {
+        MarketPlace mp = new MarketPlace();
+        ArrayList<Store> stores = mp.getStores();
+        ArrayList<Product> products = new ArrayList<Product>();
+
+        System.out.println(separator);
+        System.out.println("All available stores:");
+
+        for (Store s : stores) {
+            int counter = 0;
+            ArrayList<Product> tempProds = s.getProducts();
+            System.out.println("- " + s.getName());
+            if (stores.isEmpty()) {
+                System.out.println("--- No products");
+            } else {
+                for (Product p : tempProds) {
+                    products.add(p);
+                    System.out.println("--- #" + (counter + 1) + " " +
+                            p.getName() + " (Price: " + p.getPrice() + ")");
+                }
+            }
+        }
+
+        // TODO: add sorted view
+        System.out.println(separator);
+        System.out.println("Please enter");
+        System.out.println("[Correspond #] View Product Info");
+        System.out.println("[Anything Else] Return to Customer Menu");
+
+        String productPick = sc.nextLine();
+        if (productPick.matches("-?\\d+(\\.\\d+)?")) { // TODO: needs testing
+            Product p = products.get(Integer.parseInt(productPick) - 1);
+            if (p != null) { // TODO: needs testing
+                showProductInfo(p);
+                System.out.println(separator);
+                System.out.println("Please enter");
+                System.out.println("[A] Add to Shopping Cart");
+                System.out.println("[Anything Else] Return to All Products Page");
+
+                String productAction = sc.nextLine();
+                if(productAction.equalsIgnoreCase("a")) {
+                    System.out.println(separator);
+                    System.out.println("Please enter a purchase quantity: ");
+                    String purchaseQuantity = sc.nextLine();
+                    do {
+                        System.out.println("Entered quantity is not an integer! Please enter a valid quantity: ");
+                        purchaseQuantity = sc.nextLine();
+                    } while(!purchaseQuantity.matches("-?\\d+(\\.\\d+)?"));
+
+                    shoppingCart.addPurchase(new Sale((Customer) user, p, Integer.parseInt(purchaseQuantity)));
+                    System.out.println("Successfully added " + purchaseQuantity + " to your shopping cart." +
+                            " Returning to available products page...");
+                    marketplaceMenu();
+                } else {
+                    marketplaceMenu();
+                }
+            } else { // TODO: needs testing
+                do {
+                    System.out.println("Entered # is not a valid product! Please enter a valid product #: ");
+                    productPick = sc.nextLine();
+                    if(!productPick.matches("-?\\d+(\\.\\d+)?")) {
+                        continue;
+                    }
+                    p = products.get(Integer.parseInt(productPick) - 1);
+                } while(p == null);
+            }
+        } else { // TODO: needs testing
+            customerMainMenu();
+        }
     }
 
-    public static void sellerMenu(Seller seller) {
-        // TODO
+    public static void searchMenu() {
+        String searchParam;
+        MarketPlace mp = new MarketPlace();
+
+        System.out.println(separator);
+        System.out.println("Please enter your search parameter: ");
+        searchParam = sc.nextLine();
+
+        // TODO: implement this
+    }
+
+    public static void cartMenu() {
+        int counter = 0;
+        double allTotal = 0;
+        System.out.println(separator);
+        System.out.println("Your shopping cart:");
+        if(shoppingCart.getHeldPurchases().size() == 0) { // TODO: needs testing
+            System.out.println("- Empty");
+        } else { // TODO: needs testing
+            for(Sale s : shoppingCart.getHeldPurchases()) {
+                allTotal += s.getTotalCost();
+                String totalPrice = String.format(
+                        String.valueOf(s.getTotalCost()), "%.2f");
+                System.out.println("- #" + (counter+1) + " " + s.getProduct().getName()
+                        + " (" + s.getProduct().getQuantity() + " for $"
+                        + s.getProduct().getPrice() + " each; Product total $"
+                        + totalPrice + ")");
+            }
+        }
+
+        System.out.println(separator);
+        System.out.println("Please enter");
+        System.out.println("[Corresponding #] View Product Info");
+        System.out.println("[C] Purchase & Checkout");
+        System.out.println("[Anything Else] Return to Customer Menu");
+
+        String cartPick = sc.nextLine();
+        if(cartPick.matches("-?\\d+(\\.\\d+)?")) { // TODO: needs testing
+            Sale s = shoppingCart.getHeldPurchases().get(Integer.parseInt(cartPick)-1);
+            Product p = s.getProduct();
+            if(p != null) { // TODO: needs testing
+                showProductInfo(p);
+                System.out.println(separator);
+                System.out.println("Please enter");
+                System.out.println("[R] Remove from Shopping Cart");
+                System.out.println("[K] Change Purchase Quantity");
+                System.out.println("[Anything Else] Return to All Products Page");
+
+                String cartAction = sc.nextLine();
+                if(cartAction.equalsIgnoreCase("r")) { // TODO: needs testing
+                    System.out.println("Successfully removed " + p.getName() + " from your shopping cart." +
+                            " Returning to shopping cart page...");
+                    cartMenu();
+                } else if(cartAction.equalsIgnoreCase("k")) { // TODO: needs testing
+                    System.out.println(separator);
+                    System.out.println("Please enter a new quantity: ");
+                    String changeQuantity = sc.nextLine();
+                    do { // TODO: needs testing
+                        System.out.println("Entered quantity is not an integer! Please enter a valid quantity: ");
+                        changeQuantity = sc.nextLine();
+                    } while(!changeQuantity.matches("-?\\d+(\\.\\d+)?"));
+
+                    shoppingCart.getHeldPurchases().set((Integer.parseInt(cartPick)-1),
+                            new Sale(s.getCustomer(), p, Integer.parseInt(changeQuantity)));
+                    System.out.println("Successfully changed purchase quantity to " + changeQuantity + "." +
+                            " Returning to shopping cart page...");
+                    cartMenu();
+                } else { // TODO: needs testing
+                    cartMenu();
+                }
+            } else {
+                do { // TODO: needs testing
+                    System.out.println("Entered # is not a valid product! Please enter a valid product #: ");
+                    cartPick = sc.nextLine();
+                    if(!cartPick.matches("-?\\d+(\\.\\d+)?")) {
+                        continue;
+                    }
+                    p = shoppingCart.getHeldPurchases().get(Integer.parseInt(cartPick)-1).getProduct();
+                } while(p == null);
+            }
+        } else if(cartPick.equalsIgnoreCase("c")) { // TODO: needs testing
+            String allTotalPrice = String.format(String.valueOf(allTotal), "%.2f");
+
+            System.out.println(separator);
+            System.out.println("You are purchasing " + (counter+1) + " products for $" + allTotalPrice);
+            System.out.println(separator);
+            System.out.println("Would you like to complete the purchase?" +
+                    "\nPlease enter [Y] or [Yes] to purchase, or [Anything Else] to return: ");
+
+            String purchaseAction = sc.nextLine();
+            if(purchaseAction.equalsIgnoreCase("y")
+                    || purchaseAction.equalsIgnoreCase("yes")) { // TODO: needs testing
+                System.out.println(separator);
+                ((Customer) user).setPurchases(shoppingCart.getHeldPurchases());
+                System.out.println("Purchased successfully! Returning to customer menu page...");
+                customerMainMenu();
+            } else { // TODO: needs testing
+                cartMenu();
+            }
+        } else { // TODO: needs testing
+            customerMainMenu();
+        }
+    }
+
+    public static void historyMenu() {
+        // TODO: implement this
+    }
+
+    public static void sellerMainMenu() {
+        System.out.println("What would you like to do today?");
+        System.out.println("Please enter");
+        System.out.println("[S] View Your Stores");
+        System.out.println("[Q] Logout & Quit");
+
+        String action = sc.nextLine();
+        if (action.equalsIgnoreCase("s")) {
+            storesMenu();
+        } else if (action.equalsIgnoreCase("q")) {
+            printFarewell();
+        } else {
+            if(tryAgain("Invalid menu selection!")) {
+                customerMainMenu();
+            } else {
+                printFarewell();
+            }
+        }
+    }
+
+    public static void storesMenu() {
+        // TODO: implement this
     }
 
     public static void updateSeller(Seller s) {
@@ -261,6 +435,13 @@ class Core {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
 
+    /**
+     * Prints the farewell message.
+     */
+    public static void printFarewell() {
+        System.out.println("Thank you for visiting The MarketPlace!");
+        System.out.println("Come again another day.");
     }
 }
