@@ -63,7 +63,7 @@ public class MarketPlace {
     public ArrayList<Product> searchProducts(String type, String str) {
         ArrayList<Product> products = getProducts();
         if(type.equalsIgnoreCase("name")) {
-            ArrayList<Product> results = null;
+            ArrayList<Product> results = new ArrayList<>();
             for(Product p : products) {
                 if(p.getName().contains(str)) {
                     results.add(p);
@@ -71,7 +71,7 @@ public class MarketPlace {
             }
             return results;
         } else if(type.equalsIgnoreCase("desc")) {
-            ArrayList<Product> results = null;
+            ArrayList<Product> results = new ArrayList<>();
             for(Product p : products) {
                 if(p.getDescription().contains(str)) {
                     results.add(p);
@@ -84,7 +84,7 @@ public class MarketPlace {
 
     public ArrayList<Store> searchStores(String str) {
         ArrayList<Store> stores = getStores();
-        ArrayList<Store> results = null;
+        ArrayList<Store> results = new ArrayList<>();
         for (Store s : stores) {
             if (s.getName().contains(str)) {
                 results.add(s);
