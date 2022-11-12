@@ -2,6 +2,8 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.lang.reflect.Array;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.*;
 
 
@@ -25,9 +27,9 @@ public class Seller extends User {
         this.stores = stores;
     }
 
-    public void pushToFile(String fileName) {
+    public void pushToFile() {
         try {
-            File f = new File(fileName);
+            File f = new File("userData");
             List<String> lines = Files.readAllLines(f.toPath(), StandardCharsets.UTF_8);
             lines.add(String.format("S:%s;%s;%s", getUsername(), getEmail(), getPassword()));
             Files.write(f.toPath(), lines, StandardCharsets.UTF_8);
@@ -97,7 +99,7 @@ public class Seller extends User {
         }
         return null;
     }
-  
+
     public void importProduct() {
         Scanner sc = new Scanner(System.in);
         System.out.println("Enter file path of the file containing products to be imported: ");

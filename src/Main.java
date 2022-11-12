@@ -7,6 +7,13 @@ class Main {
 
         Store store = new Store("Denny's", "it's... Denny's");
         store.addProduct(new Product("Gamer Eggs", "Nature's Protein Shake", 19.99));
+        store.addProduct(new Product("Gamer Sausage", "Nature's Protein Shake", 19.99));
+        store.addProduct(new Product("Gamer Pancakes", "Nature's Protein Shake", 19.99));
+
+        new Product("Gamer Eggs", "Nature's Protein Shake", 19.99).pushToFile();
+        new Product("Gamer Sausage", "Nature's Protein Shake", 19.99).pushToFile();
+        new Product("Gamer Pancakes", "Nature's Protein Shake", 19.99).pushToFile();
+        new Product("Gamer Waffles", "Nature's Protein Shake", 19.99).pushToFile();
 
 
         System.out.print("\n\n\n");
@@ -21,6 +28,9 @@ class Main {
         ArrayList<Product> products = new ArrayList<>();
         products.add(product);
         store2.setProducts(products);
+
+        store.pushToFile();
+        store2.pushToFile();
 
         System.out.printf("%s presents,\na brand new %s product:\n%s\n", user.getUsername(), user.getStores().get(0).getName(), user.getStores().get(0).getProducts().get(0).getName());
     }

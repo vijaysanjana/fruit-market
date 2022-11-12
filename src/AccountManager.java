@@ -45,7 +45,6 @@ public class AccountManager {
                         return null;
                     if (line.contains(username))
                         return null;
-
                 }
             }
         } catch (IOException e) {
@@ -53,11 +52,11 @@ public class AccountManager {
         }
         if (userType.equals("customer")) {
             User newUser = new Customer(username, email, password);
-            newUser.pushToFile("userData");
+            newUser.pushToFile();
             return newUser;
         } else if (userType.equals("seller")) {
             User newUser = new Seller(username, email, password);
-            newUser.pushToFile("userData");
+            newUser.pushToFile();
             return newUser;
         }
         return null;

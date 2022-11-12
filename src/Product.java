@@ -1,3 +1,7 @@
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.*;
 
 
@@ -76,5 +80,17 @@ public class Product {
     public String toString() {
         String s = name + "," + description + "," + quantity + "," + price;
         return s;
+    }
+
+    public void pushToFile() {
+        try {
+            File f = new File("productData");
+            List<String> lines = Files.readAllLines(f.toPath(), StandardCharsets.UTF_8);
+            lines.add(String.format("%s:%s;%.2f;%d", getName(), getDescription(), getPrice(), getQuantity()));
+            Files.write(f.toPath(), lines, StandardCharsets.UTF_8);
+        } catch (
+                IOException e) {
+            e.printStackTrace();
+        }
     }
 }
