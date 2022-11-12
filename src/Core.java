@@ -551,6 +551,7 @@ class Core {
                 System.out.println(s.getProduct() + " (" + s.getQuantity() + " ct.) was purchased for " + String.format("$.2f%", s.getTotalCost()));
             }
         }
+        customerMainMenu();
     }
 
     public static void sellerMainMenu() {
