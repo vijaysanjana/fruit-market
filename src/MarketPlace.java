@@ -60,6 +60,16 @@ public class MarketPlace {
         return products;
     }
 
+    public ArrayList<Product> searchProducts(String s) {
+        ArrayList<Product> products = getProducts();
+        ArrayList<Product> results = null;
+        for (Product p : products) {
+            if (p.toString().contains(s))
+                results.add(p);
+        }
+        return results;
+    }
+
     public ArrayList<ShoppingCart> getShoppingCarts() {
         ArrayList<ShoppingCart> shoppingCarts = new ArrayList<>();
         for (Customer customer : customers) {
