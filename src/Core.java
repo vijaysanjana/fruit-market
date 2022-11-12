@@ -29,9 +29,11 @@ class Core {
      * @param args
      */
     public static void main(String[] args) {
-        if(args[0].contains("program_end")) {
-            System.out.println("Thank you for visiting The MarketPlace!");
-            System.out.println("Come again another day.");
+        if(args.length != 0) {
+            if(args[0].contains("program_end")) {
+                System.out.println("Thank you for visiting The MarketPlace!");
+                System.out.println("Come again another day.");
+            }
         } else {
             system_loop:
             while (true) {
@@ -44,7 +46,7 @@ class Core {
                 System.out.println("Welcome to The Marketplace!");
                 System.out.println(separator);
                 System.out.println("Login or signup to use our service.");
-                System.out.println("Please enter" + "\n[1] Login" + "\n[2] Signup");
+                System.out.println("Please enter: " + "\n[1] Login" + "\n[2] Signup");
                 loginSignup = sc.nextLine();
 
                 login_signup:
@@ -88,7 +90,7 @@ class Core {
                         customer_seller:
                         while (true) {
                             System.out.println("Are you signing up to be a customer or seller?");
-                            System.out.println("Please enter" + "\n[1] Customer" + "\n[2] Seller");
+                            System.out.println("Please enter: " + "\n[1] Customer" + "\n[2] Seller");
                             customerSeller = sc.nextLine();
 
                             if (customerSeller.equals("1")) { // TODO: needs testing
@@ -105,8 +107,10 @@ class Core {
                                                 new AccountException("FATAL ERROR OCCURRED! REGISTERED CUSTOMER IS NOT A CUSTOMER!"));
                                     }
                                 } else {
-                                    throw new RuntimeException(
-                                            new AccountException("FATAL ERROR OCCURRED! CUSTOMER REGISTRATION FAILED!"));
+                                    System.out.println(separator);
+                                    if(!tryAgain("User already exists! Please login or use another email and username.")) {
+                                        break system_loop;
+                                    }
                                 }
                             } else if (customerSeller.equals("2")) { // TODO: needs testing
                                 if(AccountManager.signup(email, password, username, "seller") != null) {
@@ -121,8 +125,10 @@ class Core {
                                                 new AccountException("FATAL ERROR OCCURRED! REGISTERED SELLER IS NOT A SELLER!"));
                                     }
                                 } else {
-                                    throw new RuntimeException(
-                                            new AccountException("FATAL ERROR OCCURRED! SELLER REGISTRATION FAILED!"));
+                                    System.out.println(separator);
+                                    if(!tryAgain("User already exists! Please login or use another email and username.")) {
+                                        break system_loop;
+                                    }
                                 }
                             } else {
                                 if (!tryAgain("Invalid customer/seller selection!")) { // TODO: needs testing
@@ -168,7 +174,7 @@ class Core {
      */
     public static void customerMainMenu() {
         System.out.println("What would you like to do today?");
-        System.out.println("Please enter");
+        System.out.println("Please enter: ");
         System.out.println("[M] Open Marketplace");
         System.out.println("[S] Search for Product");
         System.out.println("[C] View Shopping Cart (" + shoppingCart.getHeldPurchases().size() + " Products)");
@@ -220,7 +226,7 @@ class Core {
 
         // TODO: add sorted view
         System.out.println(separator);
-        System.out.println("Please enter");
+        System.out.println("Please enter: ");
         System.out.println("[Correspond #] View Product Info");
         System.out.println("[Anything Else] Return to Customer Menu");
 
@@ -230,7 +236,7 @@ class Core {
             if (p != null) { // TODO: needs testing
                 showProductInfo(p);
                 System.out.println(separator);
-                System.out.println("Please enter");
+                System.out.println("Please enter: ");
                 System.out.println("[A] Add to Shopping Cart");
                 System.out.println("[Anything Else] Return to All Products Page");
 
@@ -273,7 +279,7 @@ class Core {
 
         System.out.println(separator);
         System.out.println("What would you like to search for?");
-        System.out.println("Please enter");
+        System.out.println("Please enter: ");
         System.out.println("[N] Product Name");
         System.out.println("[D] Product Description");
         System.out.println("[S] Store Name");
@@ -337,7 +343,7 @@ class Core {
 
     public static void addSearchProduct(ArrayList<Product> productsFound) {
         System.out.println(separator);
-        System.out.println("Please enter");
+        System.out.println("Please enter: ");
         System.out.println("[Correspond #] View Product Info");
         System.out.println("[Anything Else] Return to Customer Menu");
 
@@ -347,7 +353,7 @@ class Core {
             if (p != null) { // TODO: needs testing
                 showProductInfo(p);
                 System.out.println(separator);
-                System.out.println("Please enter");
+                System.out.println("Please enter: ");
                 System.out.println("[A] Add to Shopping Cart");
                 System.out.println("[Anything Else] Return to Search Page");
 
@@ -403,7 +409,7 @@ class Core {
         }
 
         System.out.println(separator);
-        System.out.println("Please enter");
+        System.out.println("Please enter: ");
         System.out.println("[Corresponding #] View Product Info");
         System.out.println("[C] Purchase & Checkout");
         System.out.println("[Anything Else] Return to Customer Menu");
@@ -415,7 +421,7 @@ class Core {
             if(p != null) { // TODO: needs testing
                 showProductInfo(p);
                 System.out.println(separator);
-                System.out.println("Please enter");
+                System.out.println("Please enter: ");
                 System.out.println("[R] Remove from Shopping Cart");
                 System.out.println("[K] Change Purchase Quantity");
                 System.out.println("[Anything Else] Return to All Products Page");
@@ -486,7 +492,7 @@ class Core {
 
     public static void sellerMainMenu() {
         System.out.println("What would you like to do today?");
-        System.out.println("Please enter");
+        System.out.println("Please enter: ");
         System.out.println("[S] View Your Stores");
         System.out.println("[Q] Logout & Quit");
 
