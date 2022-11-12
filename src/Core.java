@@ -29,29 +29,25 @@ class Core {
      * @param args
      */
     public static void main(String[] args) {
-        if(args.length != 0) {
-            if(args[0].contains("program_end")) {
-                System.out.println("Thank you for visiting The MarketPlace!");
-                System.out.println("Come again another day.");
-            }
-        } else {
-            system_loop:
+        system_loop:
+        while (true) {
+            String email;
+            String password;
+            String loginSignup;
+            String customerSeller;
+            String username;
+
+            System.out.println("Welcome to The Marketplace!");
+            System.out.println(separator);
+            System.out.println("Login or signup to use our service.");
+            System.out.println("Please enter: " + "\n[1] Login" + "\n[2] Signup");
+            loginSignup = sc.nextLine();
+
+            login_signup:
             while (true) {
-                String email;
-                String password;
-                String loginSignup;
-                String customerSeller;
-                String username;
-
-                System.out.println("Welcome to The Marketplace!");
-                System.out.println(separator);
-                System.out.println("Login or signup to use our service.");
-                System.out.println("Please enter: " + "\n[1] Login" + "\n[2] Signup");
-                loginSignup = sc.nextLine();
-
-                login_signup:
-                while (true) {
-                    if (loginSignup.equals("1")) { // THIS IS THE LOGIN PART
+                if (loginSignup.equals("1")) { // THIS IS THE LOGIN PART
+                    login_loop:
+                    while(true) {
                         System.out.println(separator);
                         System.out.println("Please enter your email: ");
                         email = sc.nextLine();
@@ -61,89 +57,103 @@ class Core {
                         user = AccountManager.login(email, password); // TODO: needs testing
                         if (user == null) { // TODO: needs testing (invalid logins)
                             if (!tryAgain("Email and password combinations are invalid!")) {
+                                printFarewell();
                                 break system_loop;
                             }
-                        }
-
-                        if (user instanceof Customer) {
-                            System.out.println(separator);
-                            System.out.println("Welcome customer: " + user.getUsername());
-                            shoppingCart = ((Customer) user).getShoppingCart();
-                            customerMainMenu();
-                        } else if (user instanceof Seller) {
-                            System.out.println(separator);
-                            System.out.println("Welcome seller: " + user.getUsername());
-                            sellerMainMenu();
                         } else {
-                            throw new RuntimeException(
-                                    new AccountException("FATAL ERROR OCCURRED! LOGGED IN USER IS NEITHER CUSTOMER NOR SELLER!"));
+                            break;
                         }
-                    } else if (loginSignup.equals("2")) { // THIS IS THE SIGNUP PART
+                    }
+
+                    if (user instanceof Customer) {
                         System.out.println(separator);
-                        System.out.println("Please enter your email: ");
-                        email = sc.nextLine();
-                        System.out.println("Please enter your password: ");
-                        password = sc.nextLine();
-                        System.out.println("Please enter your username: ");
-                        username = sc.nextLine();
+                        System.out.println("Welcome customer: " + user.getUsername());
+                        shoppingCart = ((Customer) user).getShoppingCart();
+                        customerMainMenu();
+                        break system_loop;
+                    } else if (user instanceof Seller) {
+                        System.out.println(separator);
+                        System.out.println("Welcome seller: " + user.getUsername());
+                        sellerMainMenu();
+                        break system_loop;
+                    } else {
+                        throw new RuntimeException(
+                                new AccountException("FATAL ERROR OCCURRED! LOGGED IN USER IS NEITHER CUSTOMER NOR SELLER!"));
+                    }
+                } else if (loginSignup.equals("2")) { // THIS IS THE SIGNUP PART
+                    System.out.println(separator);
+                    System.out.println("Please enter your email: ");
+                    email = sc.nextLine();
+                    System.out.println("Please enter your password: ");
+                    password = sc.nextLine();
+                    System.out.println("Please enter your username: ");
+                    username = sc.nextLine();
 
-                        customer_seller:
-                        while (true) {
-                            System.out.println("Are you signing up to be a customer or seller?");
-                            System.out.println("Please enter: " + "\n[1] Customer" + "\n[2] Seller");
-                            customerSeller = sc.nextLine();
+                    customer_seller:
+                    while (true) {
+                        System.out.println("Are you signing up to be a customer or seller?");
+                        System.out.println("Please enter: " + "\n[1] Customer" + "\n[2] Seller");
+                        customerSeller = sc.nextLine();
 
-                            if (customerSeller.equals("1")) { // TODO: needs testing
-                                if(AccountManager.signup(email, password, username, "customer") != null) {
-                                    System.out.println("Successfully signed up! Logging you in...");
-                                    user = AccountManager.login(email, password);
-                                    if (user instanceof Customer) {
-                                        System.out.println(separator);
-                                        System.out.println("Welcome customer: " + user.getUsername());
-                                        shoppingCart = ((Customer) user).getShoppingCart();
-                                        customerMainMenu();
-                                    } else {
-                                        throw new RuntimeException(
-                                                new AccountException("FATAL ERROR OCCURRED! REGISTERED CUSTOMER IS NOT A CUSTOMER!"));
-                                    }
-                                } else {
+                        if (customerSeller.equals("1")) { // TODO: needs testing
+                            if(AccountManager.signup(email, password, username, "customer") != null) {
+                                System.out.println("Successfully signed up! Logging you in...");
+                                user = AccountManager.login(email, password);
+                                if (user instanceof Customer) {
                                     System.out.println(separator);
-                                    if(!tryAgain("User already exists! Please login or use another email and username.")) {
-                                        break system_loop;
-                                    }
-                                }
-                            } else if (customerSeller.equals("2")) { // TODO: needs testing
-                                if(AccountManager.signup(email, password, username, "seller") != null) {
-                                    System.out.println("Successfully signed up! Logging you in...");
-                                    user = AccountManager.login(email, password);
-                                    if (user instanceof Seller) {
-                                        System.out.println(separator);
-                                        System.out.println("Welcome seller: " + user.getUsername());
-                                        sellerMainMenu();
-                                    } else {
-                                        throw new RuntimeException(
-                                                new AccountException("FATAL ERROR OCCURRED! REGISTERED SELLER IS NOT A SELLER!"));
-                                    }
+                                    System.out.println("Welcome customer: " + user.getUsername());
+                                    shoppingCart = ((Customer) user).getShoppingCart();
+                                    customerMainMenu();
+                                    break system_loop;
                                 } else {
-                                    System.out.println(separator);
-                                    if(!tryAgain("User already exists! Please login or use another email and username.")) {
-                                        break system_loop;
-                                    }
+                                    throw new RuntimeException(
+                                            new AccountException("FATAL ERROR OCCURRED! REGISTERED CUSTOMER IS NOT A CUSTOMER!"));
                                 }
                             } else {
-                                if (!tryAgain("Invalid customer/seller selection!")) { // TODO: needs testing
+                                if(!tryAgain("User already exists! Please login or use another email and username.")) {
+                                    printFarewell();
+                                    break system_loop;
+                                } else {
+                                    main(new String[0]);
                                     break system_loop;
                                 }
                             }
+                        } else if (customerSeller.equals("2")) { // TODO: needs testing
+                            if(AccountManager.signup(email, password, username, "seller") != null) {
+                                System.out.println("Successfully signed up! Logging you in...");
+                                user = AccountManager.login(email, password);
+                                if (user instanceof Seller) {
+                                    System.out.println(separator);
+                                    System.out.println("Welcome seller: " + user.getUsername());
+                                    sellerMainMenu();
+                                    break system_loop;
+                                } else {
+                                    throw new RuntimeException(
+                                            new AccountException("FATAL ERROR OCCURRED! REGISTERED SELLER IS NOT A SELLER!"));
+                                }
+                            } else {
+                                if(!tryAgain("User already exists! Please login or use another email and username.")) {
+                                    printFarewell();
+                                    break system_loop;
+                                } else {
+                                    main(new String[0]);
+                                    break system_loop;
+                                }
+                            }
+                        } else {
+                            if (!tryAgain("Invalid customer/seller selection!")) { // TODO: needs testing
+                                printFarewell();
+                                break system_loop;
+                            }
                         }
-                    } else {
-                        if (!tryAgain("Invalid login/signup selection!")) { // TODO: needs testing
-                            break system_loop;
-                        }
+                    }
+                } else {
+                    if (!tryAgain("Invalid login/signup selection!")) { // TODO: needs testing
+                        printFarewell();
+                        break system_loop;
                     }
                 }
             }
-            endProgram();
         }
     }
 
@@ -191,12 +201,10 @@ class Core {
         } else if (action.equalsIgnoreCase("p")) { // TODO: needs testing
             historyMenu();
         } else if (action.equalsIgnoreCase("q")) { // TODO: needs testing
-            endProgram();
+            printFarewell();
         } else {
             if(tryAgain("Invalid menu selection!")) { // TODO: needs testing
                 customerMainMenu();
-            } else { // TODO: needs testing
-                endProgram();
             }
         }
     }
@@ -500,12 +508,12 @@ class Core {
         if (action.equalsIgnoreCase("s")) {
             storesMenu();
         } else if (action.equalsIgnoreCase("q")) {
-            endProgram();
+            printFarewell();
         } else {
             if(tryAgain("Invalid menu selection!")) {
                 customerMainMenu();
             } else {
-                endProgram();
+                printFarewell();
             }
         }
     }
@@ -518,7 +526,8 @@ class Core {
     /**
      * Prints the farewell message.
      */
-    public static void endProgram() {
-        main(new String[]{"program_end"});
+    public static void printFarewell() {
+        System.out.println("Thank you for visiting The MarketPlace!");
+        System.out.println("Come again another day.");
     }
 }
