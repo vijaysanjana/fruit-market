@@ -1,3 +1,4 @@
+import java.lang.reflect.Array;
 import java.util.*;
 
 
@@ -47,6 +48,44 @@ public class MarketPlace {
             }
         }
         return stores;
+    }
+
+    public ArrayList<Product> getProducts() {
+        ArrayList<Product> products = new ArrayList<>();
+        for (Store store : getStores()) {
+            for (Product product : store.getProducts()) {
+                products.add(product);
+            }
+        }
+        return products;
+    }
+
+    public ArrayList<Product> searchProducts(String s) {
+        ArrayList<Product> products = getProducts();
+        ArrayList<Product> results = null;
+        for (Product p : products) {
+            if (p.toString().contains(s))
+                results.add(p);
+        }
+        return results;
+    }
+
+    public ArrayList<ShoppingCart> getShoppingCarts() {
+        ArrayList<ShoppingCart> shoppingCarts = new ArrayList<>();
+        for (Customer customer : customers) {
+            shoppingCarts.add(customer.getShoppingCart());
+        }
+        return shoppingCarts;
+    }
+
+    public ArrayList<Sale> getPurchases() {
+        ArrayList<Sale> purchases = new ArrayList<>();
+        for (Customer customer : customers) {
+            for (Sale purchase : customer.getPurchases()) {
+                purchases.add(purchase);
+            }
+        }
+        return purchases;
     }
 
 
