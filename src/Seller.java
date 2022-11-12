@@ -98,7 +98,7 @@ public class Seller extends User {
         return null;
     }
   
-    public void importProduct(Store s) {
+    public void importProduct() {
         Scanner sc = new Scanner(System.in);
         System.out.println("Enter file path of the file containing products to be imported: ");
         String filePath = sc.nextLine();
@@ -114,7 +114,6 @@ public class Seller extends User {
             for (int i = 0; i < list.size(); i++) {
                 String[] arr = list.get(i).split(",");
                 Product p = new Product(arr[0], arr[1], Double.parseDouble(arr[3]), Integer.parseInt(arr[4]));
-                //Needs to be changed when Product constructor is edited
             }
         } catch (FileNotFoundException e) {
             System.out.println("File not found - please enter a valid file path!");
@@ -146,6 +145,43 @@ public class Seller extends User {
             }
         }
         return allProducts;
+    }
+
+    public void updateSeller() {
+        try {
+            File f = new File(this.getUsername() + ".csv");
+            if (f.createNewFile()) {
+                FileOutputStream fos = new FileOutputStream(f, false);
+                PrintWriter pw = new PrintWriter(fos);
+                ArrayList<Product> products = this.getAllProducts();
+                for (Product p : products) {
+                    pw.println(p.toString());
+                }
+                pw.close();
+            } else {
+                FileReader fr = new FileReader(f);
+                BufferedReader bfr = new BufferedReader(fr);
+                ArrayList<String> list = new ArrayList<>();
+                String line = bfr.readLine();
+                while (line != null) {
+                    list.add(line);
+                    line = bfr.readLine();
+                }
+                bfr.close();
+                FileOutputStream fos = new FileOutputStream(f, false);
+                PrintWriter pw = new PrintWriter(fos);
+                for (String i : list) {
+                    pw.println(i);
+                }
+                ArrayList<Product> products = this.getAllProducts();
+                for (Product p : products) {
+                    pw.println(p.toString());
+                }
+                pw.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }
