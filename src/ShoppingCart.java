@@ -77,4 +77,21 @@ public class ShoppingCart {
         }
         return null;
     }
+
+    /**
+     * Removes the specified sale from the ShoppingCart
+     * @param product the product of the desired sale
+     * @return the removed sale
+     */
+    public Sale removePurchase(Product product) {
+        for (Sale purchase : heldPurchases) {
+            if (purchase.getProduct().equals(product)) {
+                return heldPurchases.remove(heldPurchases.indexOf(purchase));
+            }
+        }
+        return null;
+    }
+
+
+
 }
