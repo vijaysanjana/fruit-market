@@ -1,3 +1,4 @@
+import java.lang.reflect.Array;
 import java.util.*;
 
 /**
@@ -495,7 +496,14 @@ class Core {
     }
 
     public static void historyMenu() {
-        // TODO: implement this
+        ArrayList<Sale> history = ((Customer) user).getPurchases();
+        if (history == null) {
+            System.out.println("You have not purchased anything yet!");
+        } else {
+            for (Sale s : history) {
+                System.out.println(s.getProduct() + " (" + s.getQuantity() + " ct.) was purchased for " + String.format("$.2f%", s.getTotalCost()));
+            }
+        }
     }
 
     public static void sellerMainMenu() {
