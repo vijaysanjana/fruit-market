@@ -169,6 +169,7 @@ class Core {
         System.out.println("[S] Search for Product");
         System.out.println("[C] View Shopping Cart (" + shoppingCart.getHeldPurchases().size() + " Products)");
         System.out.println("[P] View Purchase History");
+        System.out.println("[D] View Dashboard");
         System.out.println("[Q] Logout & Quit");
 
         String action = sc.nextLine();
@@ -180,6 +181,8 @@ class Core {
             cartMenu();
         } else if (action.equalsIgnoreCase("p")) { // TODO: needs testing
             historyMenu();
+        } else if (action.equalsIgnoreCase("d")) { // TODO: needs testing
+            dashboardMenu();
         } else if (action.equalsIgnoreCase("q")) { // TODO: needs testing
             printFarewell();
         } else {
@@ -372,6 +375,10 @@ class Core {
 
     public static void historyMenu() {
         // TODO: implement this
+    }
+
+    public static void dashboardMenu() {
+
     }
 
     public static void sellerMainMenu() {
