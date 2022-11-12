@@ -566,7 +566,15 @@ class Core {
     }
 
     public static void storesMenu() {
-        // TODO: implement this
+        MarketPlace mp = new MarketPlace();
+        ArrayList<Store> stores = new ArrayList<>();
+
+        for(Store s : mp.getStores()) {
+        }
+
+        System.out.println(separator);
+        System.out.println("Your stores:");
+
     }
 
 
