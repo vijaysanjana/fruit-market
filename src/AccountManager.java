@@ -53,6 +53,7 @@ public class AccountManager {
                     if(tempName.equalsIgnoreCase(username)) {
                         return null;
                     }
+                    line = br.readLine();
                 }
             }
         } catch(Exception e) {
