@@ -15,7 +15,6 @@ public class Customer extends User {
     private ArrayList<
             Sale> purchases; //ArrayList of the Customer's past purchases (Sale objects)
 
-
     //Constructor
     public Customer(String username, String email, String password) {
         super(username, email, password);
@@ -31,9 +30,9 @@ public class Customer extends User {
         this.purchases = purchases;
     }
 
-    public void pushToFile(String fileName) {
+    public void pushToFile() {
         try {
-            File f = new File(fileName);
+            File f = new File("userData");
             List<String> lines = Files.readAllLines(f.toPath(), StandardCharsets.UTF_8);
             lines.add(String.format("C:%s;%s;%s", getUsername(), getEmail(), getPassword()));
             Files.write(f.toPath(), lines, StandardCharsets.UTF_8);

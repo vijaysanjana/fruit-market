@@ -1,3 +1,7 @@
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.*;
 
 
@@ -92,6 +96,23 @@ public class ShoppingCart {
         return null;
     }
 
-
+    public void pushToFile() {
+        try {
+            File f = new File("storeData");
+            List<String> lines = Files.readAllLines(f.toPath(), StandardCharsets.UTF_8);
+            StringBuffer heldSales = new StringBuffer();
+            String temp;
+            String user = getPurchase(0).getCustomer().getUsername();
+            for (Sale s : getHeldPurchases()) {
+                heldSales.append(s.getName());
+                if (getHeldPurchases().indexOf(s) < getHeldPurchases().size() - 1)
+                    heldSales.append(",");
+            }
+            lines.add(String.format("%s:%s", user, heldSales));
+            Files.write(f.toPath(), lines, StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
 }
