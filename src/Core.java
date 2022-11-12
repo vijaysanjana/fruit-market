@@ -394,48 +394,6 @@ class Core {
         // TODO: implement this
     }
 
-    public static void updateSeller(Seller s) {
-        try {
-            File f = new File(s + ".csv");
-            if (f.createNewFile()) {
-                FileOutputStream fos = new FileOutputStream(f, false);
-                PrintWriter pw = new PrintWriter(fos);
-                ArrayList<Store> stores = s.getStores();
-                for (Store i : stores) {
-                    ArrayList<Product> p = i.getProducts();
-                    for (Product j : p) {
-                        pw.println(j.getName() + "," + j.getDescription() + "," + j.getStore() + "," + j.getPrice() + "," + j.getQuantity());
-                    }
-                }
-                pw.close();
-            } else {
-                FileReader fr = new FileReader(f);
-                BufferedReader bfr = new BufferedReader(fr);
-                ArrayList<String> list = new ArrayList<>();
-                String line = bfr.readLine();
-                while (line != null) {
-                    list.add(line);
-                    line = bfr.readLine();
-                }
-                bfr.close();
-                FileOutputStream fos = new FileOutputStream(f, false);
-                PrintWriter pw = new PrintWriter(fos);
-                for (String i : list) {
-                    pw.println(i);
-                }
-                ArrayList<Store> stores = s.getStores();
-                for (Store i : stores) {
-                    ArrayList<Product> p = i.getProducts();
-                    for (Product j : p) {
-                        pw.println(j.getName() + "," + j.getDescription() + "," + j.getStore() + "," + j.getPrice() + "," + j.getQuantity());
-                    }
-                }
-                pw.close();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     /**
      * Prints the farewell message.
