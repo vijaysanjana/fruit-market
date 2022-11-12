@@ -60,12 +60,35 @@ public class MarketPlace {
         return products;
     }
 
-    public ArrayList<Product> searchProducts(String s) {
+    public ArrayList<Product> searchProducts(String type, String str) {
         ArrayList<Product> products = getProducts();
-        ArrayList<Product> results = null;
-        for (Product p : products) {
-            if (p.toString().contains(s))
-                results.add(p);
+        if(type.equalsIgnoreCase("name")) {
+            ArrayList<Product> results = new ArrayList<>();
+            for(Product p : products) {
+                if(p.getName().contains(str)) {
+                    results.add(p);
+                }
+            }
+            return results;
+        } else if(type.equalsIgnoreCase("desc")) {
+            ArrayList<Product> results = new ArrayList<>();
+            for(Product p : products) {
+                if(p.getDescription().contains(str)) {
+                    results.add(p);
+                }
+            }
+            return results;
+        }
+        return null;
+    }
+
+    public ArrayList<Store> searchStores(String str) {
+        ArrayList<Store> stores = getStores();
+        ArrayList<Store> results = new ArrayList<>();
+        for (Store s : stores) {
+            if (s.getName().contains(str)) {
+                results.add(s);
+            }
         }
         return results;
     }
