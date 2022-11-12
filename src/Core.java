@@ -312,6 +312,7 @@ class Core {
 
                 String cartAction = sc.nextLine();
                 if(cartAction.equalsIgnoreCase("r")) { // TODO: needs testing
+                    shoppingCart.removePurchase(p);
                     System.out.println("Successfully removed " + p.getName() + " from your shopping cart." +
                             " Returning to shopping cart page...");
                     cartMenu();
@@ -355,7 +356,10 @@ class Core {
             if(purchaseAction.equalsIgnoreCase("y")
                     || purchaseAction.equalsIgnoreCase("yes")) { // TODO: needs testing
                 System.out.println(separator);
-                ((Customer) user).setPurchases(shoppingCart.getHeldPurchases());
+                for (Sale heldPurchase : shoppingCart.getHeldPurchases()) {
+                    ((Customer) user).addSale(heldPurchase);
+                }
+                shoppingCart.setHeldPurchases(new ArrayList<>());
                 System.out.println("Purchased successfully! Returning to customer menu page...");
                 customerMainMenu();
             } else { // TODO: needs testing
