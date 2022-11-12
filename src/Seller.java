@@ -1,4 +1,7 @@
 import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.lang.reflect.Array;
 import java.util.*;
 
 
@@ -22,6 +25,16 @@ public class Seller extends User {
         this.stores = stores;
     }
 
+    public void pushToFile(String fileName) {
+        try {
+            File f = new File(fileName);
+            List<String> lines = Files.readAllLines(f.toPath(), StandardCharsets.UTF_8);
+            lines.add(String.format("S:%s;%s;%s", getUsername(), getEmail(), getPassword()));
+            Files.write(f.toPath(), lines, StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     //Getter and Setter
     public ArrayList<Store> getStores() {
@@ -36,16 +49,56 @@ public class Seller extends User {
     //Equals
     @Override
     public boolean equals(Object o) {
-
-        if ((o == null) || !(o instanceof Seller)) {
+        if (!(o instanceof Seller)) {
             return false;
         }
         Seller seller = (Seller) o;
-        return (this.getUsername().equals(seller.getUsername()) && this.getEmail().equals(seller.getEmail()) &&
-                this.getPassword().equals(seller.getPassword()) && stores.equals(seller.getStores()));
+        return (super.equals(seller) && stores.equals(seller.getStores()));
     }
 
-    public void importProduct(Store s) {
+    /**
+     * Adds a new store to the seller
+     *
+     * @param store the store to add to the seller
+     */
+    public void addStore(Store store) {
+        stores.add(store);
+    }
+
+    /**
+     * Gets the specified store from the seller
+     *
+     * @param index the index of the desired store
+     * @return the desired store
+     */
+    public Store getStore(int index) {
+        return stores.get(index);
+    }
+
+    /**
+     * Removes the specified store from the seller
+     *
+     * @param index the index of the desired store
+     * @return the removed store
+     */
+    public Store removeStore(int index) {
+        return stores.remove(index);
+    }
+
+    /**
+     * Removes the specified store from the seller
+     *
+     * @param store the desired store
+     * @return the removed store
+     */
+    public Store removeStore(Store store) {
+        if (stores.contains(store)) {
+            return stores.remove(stores.indexOf(store));
+        }
+        return null;
+    }
+  
+    public void importProduct() {
         Scanner sc = new Scanner(System.in);
         System.out.println("Enter file path of the file containing products to be imported: ");
         String filePath = sc.nextLine();
@@ -60,7 +113,7 @@ public class Seller extends User {
             }
             for (int i = 0; i < list.size(); i++) {
                 String[] arr = list.get(i).split(",");
-                Product p = new Product(arr[0], arr[1], s, Double.parseDouble(arr[3]), Integer.parseInt(arr[4]));
+                Product p = new Product(arr[0], arr[1], Double.parseDouble(arr[3]), Integer.parseInt(arr[4]));
             }
         } catch (FileNotFoundException e) {
             System.out.println("File not found - please enter a valid file path!");
@@ -69,28 +122,63 @@ public class Seller extends User {
         }
     }
 
-    public void exportProducts(Store s) {
-        Scanner sc = new Scanner(System.in);
-        String fileName = s.getSeller() + ".csv";
+    public void exportProducts() throws IOException {
+        ArrayList<Product> products = this.getAllProducts();
+        String fileName = this.getUsername() + ".csv";
+        File f = new File(fileName);
+        FileOutputStream fos = new FileOutputStream(f, false);
+        PrintWriter pw = new PrintWriter(fos);
+        for (Product p : products) {
+            pw.println(p.toString());
+        }
+        fos.close();
+        pw.close();
+        System.out.println("A file titled " + this.getUsername() + ".csv has been created with your products!");
+    }
+
+    public ArrayList<Product> getAllProducts() {
+        ArrayList<Product> allProducts = null;
+        for (Store s : stores) {
+            ArrayList<Product> products = s.getProducts();
+            for (Product p : products) {
+                allProducts.add(p);
+            }
+        }
+        return allProducts;
+    }
+
+    public void updateSeller() {
         try {
-            FileReader fr = new FileReader(fileName);
-            BufferedReader bfr = new BufferedReader(fr);
-            ArrayList<String> list = new ArrayList<>();
-            String line = bfr.readLine();
-            while (line != null) {
-                if (line.split(",")[2].equals(s.getName())) {
+            File f = new File(this.getUsername() + ".csv");
+            if (f.createNewFile()) {
+                FileOutputStream fos = new FileOutputStream(f, false);
+                PrintWriter pw = new PrintWriter(fos);
+                ArrayList<Product> products = this.getAllProducts();
+                for (Product p : products) {
+                    pw.println(p.toString());
+                }
+                pw.close();
+            } else {
+                FileReader fr = new FileReader(f);
+                BufferedReader bfr = new BufferedReader(fr);
+                ArrayList<String> list = new ArrayList<>();
+                String line = bfr.readLine();
+                while (line != null) {
                     list.add(line);
                     line = bfr.readLine();
                 }
+                bfr.close();
+                FileOutputStream fos = new FileOutputStream(f, false);
+                PrintWriter pw = new PrintWriter(fos);
+                for (String i : list) {
+                    pw.println(i);
+                }
+                ArrayList<Product> products = this.getAllProducts();
+                for (Product p : products) {
+                    pw.println(p.toString());
+                }
+                pw.close();
             }
-            String newFile = s.getName() + ".csv";
-            File f = new File(newFile);
-            FileOutputStream fos = new FileOutputStream(f, false);
-            PrintWriter pw = new PrintWriter(fos);
-            for (String i : list) {
-                pw.println(i);
-            }
-            System.out.println("A file containing your store's products has been created!");
         } catch (IOException e) {
             e.printStackTrace();
         }
