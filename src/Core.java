@@ -183,22 +183,23 @@ class Core {
      * Allows for navigation of the menu to see marketplace; view, search, and purchase products; and view history.
      */
     public static void customerMainMenu() {
+        System.out.println(separator);
         System.out.println("What would you like to do today?");
         System.out.println("Please enter: ");
-        System.out.println("[M] Open Marketplace");
-        System.out.println("[S] Search for Product");
-        System.out.println("[C] View Shopping Cart (" + shoppingCart.getHeldPurchases().size() + " Products)");
-        System.out.println("[P] View Purchase History");
+        System.out.println("[1] Open Marketplace");
+        System.out.println("[2] Search for Product");
+        System.out.println("[3] View Shopping Cart (" + shoppingCart.getHeldPurchases().size() + " Products)");
+        System.out.println("[4] View Purchase History");
         System.out.println("[Q] Logout & Quit");
 
         String action = sc.nextLine();
-        if (action.equalsIgnoreCase("m")) { // TODO: needs testing
+        if (action.equalsIgnoreCase("1")) { // TODO: needs testing
             marketplaceMenu();
-        } else if (action.equalsIgnoreCase("s")) { // TODO: needs testing
+        } else if (action.equalsIgnoreCase("2")) { // TODO: needs testing
             searchMenu();
-        } else if(action.equalsIgnoreCase("c")) { // TODO: needs testing
+        } else if(action.equalsIgnoreCase("3")) { // TODO: needs testing
             cartMenu();
-        } else if (action.equalsIgnoreCase("p")) { // TODO: needs testing
+        } else if (action.equalsIgnoreCase("4")) { // TODO: needs testing
             historyMenu();
         } else if (action.equalsIgnoreCase("q")) { // TODO: needs testing
             printFarewell();
@@ -233,50 +234,65 @@ class Core {
         }
 
         // TODO: add sorted view
-        System.out.println(separator);
-        System.out.println("Please enter: ");
-        System.out.println("[Correspond #] View Product Info");
-        System.out.println("[Anything Else] Return to Customer Menu");
+        if(!products.isEmpty()) {
+            System.out.println(separator);
+            System.out.println("Please enter: ");
+            System.out.println("[Correspond #] View Product Info");
+            System.out.println("[Anything Else] Return to Customer Menu");
 
-        String productPick = sc.nextLine();
-        if (productPick.matches("-?\\d+(\\.\\d+)?")) { // TODO: needs testing
-            Product p = products.get(Integer.parseInt(productPick) - 1);
-            if (p != null) { // TODO: needs testing
-                showProductInfo(p);
-                System.out.println(separator);
-                System.out.println("Please enter: ");
-                System.out.println("[A] Add to Shopping Cart");
-                System.out.println("[Anything Else] Return to All Products Page");
-
-                String productAction = sc.nextLine();
-                if(productAction.equalsIgnoreCase("a")) {
+            String productPick = sc.nextLine();
+            if (productPick.matches("-?\\d+(\\.\\d+)?")) { // TODO: needs testing
+                Product p = products.get(Integer.parseInt(productPick) - 1);
+                if (p != null) { // TODO: needs testing
+                    showProductInfo(p);
                     System.out.println(separator);
-                    System.out.println("Please enter a purchase quantity: ");
-                    String purchaseQuantity = sc.nextLine();
-                    while(!purchaseQuantity.matches("-?\\d+(\\.\\d+)?")) {
-                        System.out.println("Entered quantity is not an integer! Please enter a valid quantity: ");
-                        purchaseQuantity = sc.nextLine();
-                    }
+                    System.out.println("Please enter: ");
+                    System.out.println("[1] Add to Shopping Cart");
+                    System.out.println("[Anything Else] Return to All Products Page");
 
-                    shoppingCart.addPurchase(new Sale((Customer) user, p, Integer.parseInt(purchaseQuantity)));
-                    System.out.println("Successfully added " + purchaseQuantity + " to your shopping cart." +
-                            " Returning to available products page...");
-                    marketplaceMenu();
-                } else {
-                    marketplaceMenu();
+                    String productAction = sc.nextLine();
+                    if(productAction.equalsIgnoreCase("1")) {
+                        System.out.println(separator);
+                        System.out.println("Please enter a purchase quantity: ");
+                        String purchaseQuantity = sc.nextLine();
+                        while(!purchaseQuantity.matches("-?\\d+(\\.\\d+)?")) {
+                            System.out.println("Entered quantity is not an integer! Please enter a valid quantity: ");
+                            purchaseQuantity = sc.nextLine();
+                        }
+
+                        shoppingCart.addPurchase(new Sale((Customer) user, p, Integer.parseInt(purchaseQuantity)));
+                        System.out.println("Successfully added " + purchaseQuantity + " to your shopping cart." +
+                                " Returning to available products page...");
+                        marketplaceMenu();
+                    } else {
+                        marketplaceMenu();
+                    }
+                } else { // TODO: needs testing
+                    while(p == null) {
+                        System.out.println("Entered # is not a valid product! Please enter a valid product #: ");
+                        productPick = sc.nextLine();
+                        if(!productPick.matches("-?\\d+(\\.\\d+)?")) {
+                            continue;
+                        }
+                        p = products.get(Integer.parseInt(productPick) - 1);
+                    }
                 }
             } else { // TODO: needs testing
-                while(p == null) {
-                    System.out.println("Entered # is not a valid product! Please enter a valid product #: ");
-                    productPick = sc.nextLine();
-                    if(!productPick.matches("-?\\d+(\\.\\d+)?")) {
-                        continue;
-                    }
-                    p = products.get(Integer.parseInt(productPick) - 1);
-                }
+                customerMainMenu();
             }
-        } else { // TODO: needs testing
-            customerMainMenu();
+        } else {
+            System.out.println(separator);
+            System.out.println("No products available.");
+            System.out.println("Please enter: ");
+            System.out.println("[1] Return to Customer Menu");
+            System.out.println("[Anything Else] Logout & Quit");
+
+            String noProdAction = sc.nextLine();
+            if(noProdAction.equalsIgnoreCase("1")) {
+                customerMainMenu();
+            } else {
+                printFarewell();
+            }
         }
     }
 
@@ -288,12 +304,13 @@ class Core {
         System.out.println(separator);
         System.out.println("What would you like to search for?");
         System.out.println("Please enter: ");
-        System.out.println("[N] Product Name");
-        System.out.println("[D] Product Description");
-        System.out.println("[S] Store Name");
+        System.out.println("[1] Product Name");
+        System.out.println("[2] Product Description");
+        System.out.println("[3] Store Name");
+        System.out.println("[Anything Else] Return to Customer Menu");
 
         String searchAction = sc.nextLine();
-        if(searchAction.equalsIgnoreCase("n")) {
+        if(searchAction.equalsIgnoreCase("1")) {
             System.out.println(separator);
             System.out.println("Please enter your search parameter: ");
             String searchParam = sc.nextLine();
@@ -301,14 +318,18 @@ class Core {
             ArrayList<Product> result = mp.searchProducts("name", searchParam);
             System.out.println(separator);
             System.out.println("Your search results (via Product Name):");
-            for(Product p : result) {
-                productsFound.add(p);
-                System.out.println("--- #" + (counter + 1) + " " +
-                        p.getName() + " (Price: " + p.getPrice() + ")");
-            }
 
+            if(result.isEmpty()) {
+                System.out.println("- No results found");
+            } else {
+                for(Product p : result) {
+                    productsFound.add(p);
+                    System.out.println("- #" + (counter + 1) + " " +
+                            p.getName() + " (Price: " + p.getPrice() + ")");
+                }
+            }
             addSearchProduct(productsFound);
-        } else if(searchAction.equalsIgnoreCase("d")) {
+        } else if(searchAction.equalsIgnoreCase("2")) {
             System.out.println(separator);
             System.out.println("Please enter your search parameter: ");
             String searchParam = sc.nextLine();
@@ -316,14 +337,18 @@ class Core {
             ArrayList<Product> result = mp.searchProducts("desc", searchParam);
             System.out.println(separator);
             System.out.println("Your search results (via Product Description):");
-            for(Product p : result) {
-                productsFound.add(p);
-                System.out.println("--- #" + (counter + 1) + " " +
-                        p.getName() + " (Price: " + p.getPrice() + ")");
-            }
 
+            if(result.isEmpty()) {
+                System.out.println("- No results found");
+            } else {
+                for(Product p : result) {
+                    productsFound.add(p);
+                    System.out.println("- #" + (counter + 1) + " " +
+                            p.getName() + " (Price: " + p.getPrice() + ")");
+                }
+            }
             addSearchProduct(productsFound);
-        } else if(searchAction.equalsIgnoreCase("s")) {
+        } else if(searchAction.equalsIgnoreCase("3")) {
             System.out.println(separator);
             System.out.println("Please enter your search parameter: ");
             String searchParam = sc.nextLine();
@@ -332,68 +357,90 @@ class Core {
             System.out.println(separator);
             System.out.println("Your search results (via Store Name):");
 
-            for(Store s : result) {
-                System.out.println("- " + s.getName());
-                if(result.isEmpty()) {
-                    System.out.println("--- No products");
-                } else {
-                    for(Product p : s.getProducts()) {
-                        productsFound.add(p);
-                        System.out.println("--- #" + (counter+1) + " "
-                                + p.getName() + " (Price: " + p.getPrice() + ")");
+            if(result.isEmpty()) {
+                System.out.println("- No results found");
+            } else {
+                for(Store s : result) {
+                    System.out.println("- " + s.getName());
+                    if(result.isEmpty()) {
+                        System.out.println("--- No products");
+                        System.out.println("Returning to search menu...");
+                        searchMenu();
+                    } else {
+                        for(Product p : s.getProducts()) {
+                            productsFound.add(p);
+                            System.out.println("--- #" + (counter+1) + " "
+                                    + p.getName() + " (Price: " + p.getPrice() + ")");
+                        }
                     }
                 }
             }
-
             addSearchProduct(productsFound);
+        } else {
+            customerMainMenu();
         }
     }
 
     public static void addSearchProduct(ArrayList<Product> productsFound) {
-        System.out.println(separator);
-        System.out.println("Please enter: ");
-        System.out.println("[Correspond #] View Product Info");
-        System.out.println("[Anything Else] Return to Customer Menu");
+        if(!productsFound.isEmpty()) {
+            System.out.println(separator);
+            System.out.println("Please enter: ");
+            System.out.println("[Correspond #] View Product Info");
+            System.out.println("[Anything Else] Return to Customer Menu");
 
-        String productPick = sc.nextLine();
-        if (productPick.matches("-?\\d+(\\.\\d+)?")) { // TODO: needs testing
-            Product p = productsFound.get(Integer.parseInt(productPick) - 1);
-            if (p != null) { // TODO: needs testing
-                showProductInfo(p);
-                System.out.println(separator);
-                System.out.println("Please enter: ");
-                System.out.println("[A] Add to Shopping Cart");
-                System.out.println("[Anything Else] Return to Search Page");
-
-                String productAction = sc.nextLine();
-                if(productAction.equalsIgnoreCase("a")) {
+            String productPick = sc.nextLine();
+            if (productPick.matches("-?\\d+(\\.\\d+)?")) { // TODO: needs testing
+                Product p = productsFound.get(Integer.parseInt(productPick) - 1);
+                if (p != null) { // TODO: needs testing
+                    showProductInfo(p);
                     System.out.println(separator);
-                    System.out.println("Please enter a purchase quantity: ");
-                    String purchaseQuantity = sc.nextLine();
-                    while(!purchaseQuantity.matches("-?\\d+(\\.\\d+)?")) {
-                        System.out.println("Entered quantity is not an integer! Please enter a valid quantity: ");
-                        purchaseQuantity = sc.nextLine();
-                    }
+                    System.out.println("Please enter: ");
+                    System.out.println("[1] Add to Shopping Cart");
+                    System.out.println("[Anything Else] Return to Search Page");
 
-                    shoppingCart.addPurchase(new Sale((Customer) user, p, Integer.parseInt(purchaseQuantity)));
-                    System.out.println("Successfully added " + purchaseQuantity + " to your shopping cart." +
-                            " Returning to search page...");
-                    searchMenu();
-                } else {
-                    searchMenu();
+                    String productAction = sc.nextLine();
+                    if(productAction.equalsIgnoreCase("1")) {
+                        System.out.println(separator);
+                        System.out.println("Please enter a purchase quantity: ");
+                        String purchaseQuantity = sc.nextLine();
+                        while(!purchaseQuantity.matches("-?\\d+(\\.\\d+)?")) {
+                            System.out.println("Entered quantity is not an integer! Please enter a valid quantity: ");
+                            purchaseQuantity = sc.nextLine();
+                        }
+
+                        shoppingCart.addPurchase(new Sale((Customer) user, p, Integer.parseInt(purchaseQuantity)));
+                        System.out.println("Successfully added " + purchaseQuantity + " to your shopping cart." +
+                                " Returning to search page...");
+                        searchMenu();
+                    } else {
+                        searchMenu();
+                    }
+                } else { // TODO: needs testing
+                    while(p == null) {
+                        System.out.println("Entered # is not a valid product! Please enter a valid product #: ");
+                        productPick = sc.nextLine();
+                        if(!productPick.matches("-?\\d+(\\.\\d+)?")) {
+                            continue;
+                        }
+                        p = productsFound.get(Integer.parseInt(productPick) - 1);
+                    }
                 }
             } else { // TODO: needs testing
-                while(p == null) {
-                    System.out.println("Entered # is not a valid product! Please enter a valid product #: ");
-                    productPick = sc.nextLine();
-                    if(!productPick.matches("-?\\d+(\\.\\d+)?")) {
-                        continue;
-                    }
-                    p = productsFound.get(Integer.parseInt(productPick) - 1);
-                }
+                customerMainMenu();
             }
-        } else { // TODO: needs testing
-            customerMainMenu();
+        } else {
+            System.out.println(separator);
+            System.out.println("No products available.");
+            System.out.println("Please enter: ");
+            System.out.println("[1] Return to Search Menu");
+            System.out.println("[Anything Else] Logout & Quit");
+
+            String noProdAction = sc.nextLine();
+            if(noProdAction.equalsIgnoreCase("1")) {
+                searchMenu();
+            } else {
+                printFarewell();
+            }
         }
     }
 
@@ -430,17 +477,17 @@ class Core {
                 showProductInfo(p);
                 System.out.println(separator);
                 System.out.println("Please enter: ");
-                System.out.println("[R] Remove from Shopping Cart");
-                System.out.println("[K] Change Purchase Quantity");
+                System.out.println("[1] Remove from Shopping Cart");
+                System.out.println("[2] Change Purchase Quantity");
                 System.out.println("[Anything Else] Return to All Products Page");
 
                 String cartAction = sc.nextLine();
-                if(cartAction.equalsIgnoreCase("r")) { // TODO: needs testing
+                if(cartAction.equalsIgnoreCase("1")) { // TODO: needs testing
                     shoppingCart.removePurchase(p);
                     System.out.println("Successfully removed " + p.getName() + " from your shopping cart." +
                             " Returning to shopping cart page...");
                     cartMenu();
-                } else if(cartAction.equalsIgnoreCase("k")) { // TODO: needs testing
+                } else if(cartAction.equalsIgnoreCase("2")) { // TODO: needs testing
                     System.out.println(separator);
                     System.out.println("Please enter a new quantity: ");
                     String changeQuantity = sc.nextLine();
@@ -501,11 +548,11 @@ class Core {
     public static void sellerMainMenu() {
         System.out.println("What would you like to do today?");
         System.out.println("Please enter: ");
-        System.out.println("[S] View Your Stores");
+        System.out.println("[1] View Your Stores");
         System.out.println("[Q] Logout & Quit");
 
         String action = sc.nextLine();
-        if (action.equalsIgnoreCase("s")) {
+        if (action.equalsIgnoreCase("1")) {
             storesMenu();
         } else if (action.equalsIgnoreCase("q")) {
             printFarewell();
