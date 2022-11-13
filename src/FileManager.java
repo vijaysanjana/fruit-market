@@ -11,22 +11,23 @@ public class FileManager {
     private static String customerDataFolder = "customer_data";
 
     public static void main(String[] args) {
-        Seller s = new Seller("jack", "j@gmail.com", "pw");
-        Store st = new Store("2nd store", "bbb");
-        Product pr = new Product("new prod", "aaa", 1220, 5);
-        //addUserHistory(s, st, pr);
-        ArrayList<ArrayList<Object>> a = getSellerAllData(s);
-        ArrayList<Product> t = getSellerData(s, st);
+        Seller seller = new Seller("jack", "jack@gmail.com", "pw");
+        Store store = new Store("1st store", "this is a really cool 1st store");
+        //Product prod = new Product("gamer tea", "tea just for gamers", 85, 10);
+        Product prod = new Product("iphone x111", "newest iphone ever", 5000, 2);
+        //addSellerData(seller, store, prod);
 
-        for(int i = 0; i < a.size(); i++) {
-            ArrayList<Object> aa = a.get(i);
-            System.out.println((String) aa.get(0));
-            Product pp = (Product) aa.get(1);
-            System.out.println(pp.getName());
-            System.out.println(pp.getDescription());
-            System.out.println(pp.getPrice());
-            System.out.println(pp.getQuantity());
+        int counter = 0;
+        ArrayList<ArrayList<Object>> allStore = getSellerAllData(seller);
+        for(ArrayList<Object> arr : allStore) {
+            for(int i = 1; i < arr.size(); i++) {
+                String s = (String) arr.get(0);
+                Product p = (Product) arr.get(i);
+                System.out.println("NAME: " + s);
+                System.out.println("PRODUCT: " + p.getName() + " " + p.getDescription() + " " + p.getPrice() + " " + p.getQuantity());
+            }
         }
+        Customer customer =  new Customer("bob", "bob@hotmail.com", "p2as");
     }
 
     public static void loadAllFiles(MarketPlace mp) {
@@ -86,9 +87,13 @@ public class FileManager {
         }
     }
 
-    public static ArrayList<ArrayList<String>> getCustomerShoppingCart(Customer customer) {
+    /**
+     * @param customer
+     * @return ArrayList<ArrayList<Object>> => (String)quantity[0], (Product)product_obj[1]
+     */
+    public static ArrayList<ArrayList<Object>> getCustomerShoppingCart(Customer customer) {
         createNecessaryFolders(customer);
-        ArrayList<ArrayList<String>> cart = new ArrayList<>();
+        ArrayList<ArrayList<Object>> cart = new ArrayList<>();
         try {
             int counter = 0;
             File histFile = new File(sellerDataFolder + File.separatorChar
@@ -99,11 +104,9 @@ public class FileManager {
 
             while(line != null) {
                 String[] arr = line.split(";");
-                cart.get(counter).add(arr[0]);
-                cart.get(counter).add(arr[1]);
-                cart.get(counter).add(arr[2]);
-                cart.get(counter).add(arr[3]);
                 cart.get(counter).add(arr[4]);
+                cart.get(counter).add(new Product(arr[0], arr[1],
+                        Double.parseDouble(arr[2]), Integer.parseInt(arr[3])));
                 counter++;
                 line = br.readLine();
             }
@@ -138,6 +141,10 @@ public class FileManager {
         }
     }
 
+    /**
+     * @param seller
+     * @return ArrayList<ArrayList<Object>> => (String)store_name[0], ArrayList<(Product)>product_objects[1-...]
+     */
     public static ArrayList<ArrayList<Object>> getSellerAllData(Seller seller) {
         createNecessaryFolders(seller);
         ArrayList<ArrayList<Object>> products = new ArrayList<>();
@@ -146,7 +153,7 @@ public class FileManager {
 
         for(File f : sellerFolder.listFiles()) {
             ArrayList<Object> temp = new ArrayList<>();
-            temp.add(f.getName());
+            temp.add(f.getName().replace("_data", ""));
             try {
                 File histFile = new File(sellerDataFolder + File.separatorChar
                         + seller.getUsername() + File.separatorChar + f.getName());
@@ -200,21 +207,20 @@ public class FileManager {
 
     public static void removeCustomerShoppingCart(Customer customer, Product product, int quantity) {
         createNecessaryFolders(customer);
-        ArrayList<ArrayList<String>> currentCart = getCustomerShoppingCart(customer);
+        ArrayList<ArrayList<Object>> currentCart = getCustomerShoppingCart(customer);
         File histFile = new File(sellerDataFolder + File.separatorChar
                 + customer.getUsername() + File.separatorChar + "shopping_cart");
 
         for(int i = 0; i < currentCart.size(); i++) {
-            ArrayList<String> arr = currentCart.get(i);
-            Product p = new Product(arr.get(0), arr.get(1),
-                    Double.parseDouble(arr.get(2)), Integer.parseInt(arr.get(3)));
+            ArrayList<Object> arr = currentCart.get(i);
+            Product p = (Product) arr.get(1);
 
             if(quantity != 0) {
                 if(p.getName().equals(product.getName())
                         && p.getDescription().equals(product.getDescription())
                         && p.getPrice() == product.getPrice()
                         && p.getQuantity() == product.getQuantity()) {
-                    arr.set(4, String.valueOf(quantity));
+                    arr.set(1, String.valueOf(quantity));
                 }
             } else {
                 if(p.getName().equals(product.getName())
@@ -229,13 +235,14 @@ public class FileManager {
         replaceShoppingCart(currentCart, histFile);
     }
 
-    public static void replaceShoppingCart(ArrayList<ArrayList<String>> cart, File file) {
+    public static void replaceShoppingCart(ArrayList<ArrayList<Object>> cart, File file) {
         try {
             FileWriter fw = new FileWriter(file, false);
-            for(ArrayList<String> arr : cart) {
+            for(ArrayList<Object> arr : cart) {
                 if(arr != null) {
-                    fw.write(arr.get(0) + ";" + arr.get(1)
-                            + arr.get(2) + ";" + arr.get(3) + ";" + arr.get(4));
+                    Product p = (Product) arr.get(1);
+                    fw.write(arr.get(0) + ";" + p.getName() + ";"
+                            + p.getDescription() + ";" + p.getPrice() + ";" + p.getQuantity());
                 }
             }
             fw.close();
@@ -278,7 +285,7 @@ public class FileManager {
             }
         }
 
-        replaceSellerFile(currentProd, histFile);
+        replaceSellerData(currentProd, histFile);
     }
 
     public static void removeSellerData(Seller seller, Store store, Product product) {
@@ -297,10 +304,10 @@ public class FileManager {
             }
         }
 
-        replaceSellerFile(currentProd, histFile);
+        replaceSellerData(currentProd, histFile);
     }
 
-    public static void replaceSellerFile(ArrayList<Product> product, File file) {
+    public static void replaceSellerData(ArrayList<Product> product, File file) {
         try {
             FileWriter fw = new FileWriter(file, false);
             for(Product p : product) {
