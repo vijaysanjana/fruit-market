@@ -112,8 +112,6 @@ public class MarketPlace {
     }
 
 
-
-
     //Equals
     @Override
     public boolean equals(Object o) {

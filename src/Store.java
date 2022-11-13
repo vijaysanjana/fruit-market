@@ -97,6 +97,63 @@ public class Store {
     }
 
 
+    /**
+     * Sorts a list of every Product in the Store based on price.
+     * @param maxFirst true: sorts from high price to low price, false: sorts from low price to high price
+     * @return the sorted list of Products
+     */
+    public ArrayList<Product> getPriceSortedProducts(boolean maxFirst) {
+        ArrayList<Product> copiedProducts = new ArrayList<>();
+        for (Product product : products) {
+            copiedProducts.add(product);
+        }
+        ArrayList<Product> sortedProducts = new ArrayList<>();
+
+        while (copiedProducts.size() > 0) {
+            Product min = copiedProducts.get(0);
+            for (int i = 1; i < copiedProducts.size(); i++) {
+                if (copiedProducts.get(i).getPrice() < min.getPrice()) {
+                    min = copiedProducts.get(i);
+                }
+            }
+            copiedProducts.remove(min);
+            sortedProducts.add(min);
+        }
+        if (maxFirst) {
+            Collections.reverse(sortedProducts);
+        }
+        return sortedProducts;
+    }
+
+
+    /**
+     * Sorts a list of every Product in the Store based on quantity.
+     * @param maxFirst true: sorts from high quantity to low quantity, false: sorts from low quantity to high quantity
+     * @return the sorted list of Products
+     */
+    public ArrayList<Product> getQuantitySortedProducts(boolean maxFirst) {
+        ArrayList<Product> copiedProducts = new ArrayList<>();
+        for (Product product : products) {
+            copiedProducts.add(product);
+        }
+        ArrayList<Product> sortedProducts = new ArrayList<>();
+
+        while (copiedProducts.size() > 0) {
+            Product min = copiedProducts.get(0);
+            for (int i = 1; i < copiedProducts.size(); i++) {
+                if (copiedProducts.get(i).getQuantity() < min.getQuantity()) {
+                    min = copiedProducts.get(i);
+                }
+            }
+            copiedProducts.remove(min);
+            sortedProducts.add(min);
+        }
+        if (maxFirst) {
+            Collections.reverse(sortedProducts);
+        }
+        return sortedProducts;
+    }
+
 
     //Equals
     @Override
