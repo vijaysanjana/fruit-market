@@ -11,32 +11,59 @@ public class FileManager {
     private static String customerDataFolder = "customer_data";
 
     public static void main(String[] args) {
-        Seller seller = new Seller("jack", "jack@gmail.com", "pw");
-        Store store = new Store("1st store", "this is a really cool 1st store");
-        Product prod = new Product("gamer tea", "tea just for gamers", 85, 10);
-        //Product prod = new Product("game", "some game", 60, 100);
-        //addSellerData(seller, store, prod);
+        Seller dendenMan = new Seller("DendenMan", "denny@dennys.gov", "secret");
+        Store dennys = new Store("Denny's", "it's... Denny's");
+        //addSellerData(dendenMan, dennys, new Product("Gamer Eggs", "Nature's Protein Shake", 19.99));
+        //addSellerData(dendenMan, dennys, new Product("Gamer Sausage", "Nature's Protein... Protein", 5.99));
+        //addSellerData(dendenMan, dennys, new Product("Gamer Pancakes", "Nature's Gluten Shake", 13.99));
 
-        int counter = 0;
-        ArrayList<ArrayList<Object>> allStore = getSellerAllData(seller);
-        for(ArrayList<Object> arr : allStore) {
-            String s = (String) arr.get(0);
-            //System.out.println("STORE: " + s);
-            for(int i = 2; i < arr.size(); i+=2) {
-                int q = Integer.parseInt((String) arr.get(i-1));
-                Product p = (Product) arr.get(i);
-                //System.out.println("QUANT SOLD: " + q);
-                //System.out.println("PRODUCT: " + p.getName() + ";" + p.getDescription() + ";" + p.getPrice() + ";" + p.getQuantity());
+
+        Seller god = new Seller("God", "God@god.cod", "rapture");
+        Store soapStore = new Store("God's Soap Emporium", "Got bored, like soap - God");
+        //addSellerData(god, soapStore, new Product("Dawn PowerWash Dish Spray", "clean up you gross ass plate", 4.99));
+        //addSellerData(god, soapStore, new Product("Lavender Ascent", "Isn't this a good name for soap?", 49.99));
+        //addSellerData(god, soapStore, new Product("Tide Pods", "50% more edible than competitors", 2.49));
+
+        MarketPlace mp = new MarketPlace();
+        loadAllStores(mp);
+        ArrayList<Product> st = mp.getProducts();
+        for(Store s : mp.getStores()) {
+            System.out.println("===============================");
+            System.out.println(s.getName());
+            for(Product p : s.getProducts()) {
+                System.out.println("NAME: " + p.getName());
+                System.out.println("DESC: " + p.getDescription());
+                System.out.println("PRICE: " + p.getPrice());
+                System.out.println("QUANT: " + p.getQuantity());
             }
         }
 
-        ArrayList<Object> specificStore = getSellerData(seller, store);
-        for(int i = 2; i < specificStore.size(); i+=2) {
-            int q = Integer.parseInt((String) specificStore.get(i-1));
-            Product p = (Product) specificStore.get(i);
-            System.out.println("QUANT SOLD: " + q);
-            System.out.println("PRODUCT: " + p.getName() + ";" + p.getDescription() + ";" + p.getPrice() + ";" + p.getQuantity());
-        }
+        //Seller seller = new Seller("jack", "jack@gmail.com", "pw");
+        //Store store = new Store("1st store", "this is a really cool 1st store");
+        //Product prod = new Product("gamer tea", "tea just for gamers", 85, 10);
+        //Product prod = new Product("game", "some game", 60, 100);
+        //addSellerData(seller, store, prod);
+
+        //int counter = 0;
+        //ArrayList<ArrayList<Object>> allStore = getSellerAllData(seller);
+        //for(ArrayList<Object> arr : allStore) {
+            //String s = (String) arr.get(0);
+            //System.out.println("STORE: " + s);
+            //for(int i = 2; i < arr.size(); i+=2) {
+                //int q = Integer.parseInt((String) arr.get(i-1));
+                //Product p = (Product) arr.get(i);
+                //System.out.println("QUANT SOLD: " + q);
+                //System.out.println("PRODUCT: " + p.getName() + ";" + p.getDescription() + ";" + p.getPrice() + ";" + p.getQuantity());
+            //}
+        //}
+
+        //ArrayList<Object> specificStore = getSellerData(seller, store);
+        //for(int i = 2; i < specificStore.size(); i+=2) {
+            //int q = Integer.parseInt((String) specificStore.get(i-1));
+            //Product p = (Product) specificStore.get(i);
+            //System.out.println("QUANT SOLD: " + q);
+            //System.out.println("PRODUCT: " + p.getName() + ";" + p.getDescription() + ";" + p.getPrice() + ";" + p.getQuantity());
+        //}
         //updateSellerData(seller, store, prod, 75, 25);
 
         //Customer customer =  new Customer("bob", "bob@hotmail.com", "p2as");
@@ -62,19 +89,31 @@ public class FileManager {
         //updateCustomerShoppingCart(customer, prod, 69);
     }
 
-    public static void loadAllFiles(MarketPlace mp) {
-        ArrayList<Customer> customers = new ArrayList<>();
-        ArrayList<Seller> sellers = new ArrayList<>();
-        for(ArrayList<String> arr : getUserLogins()) {
-            if(arr.get(0).equalsIgnoreCase("C")) {
-                customers.add(new Customer(arr.get(1), arr.get(2), arr.get(3)));
-            } else if(arr.get(0).equalsIgnoreCase("S")) {
-                sellers.add(new Seller(arr.get(1), arr.get(2), arr.get(3)));
+    public static void loadAllStores(MarketPlace mp) {
+        File sellData = new File(sellerDataFolder + File.separatorChar);
+        if(sellData.listFiles().length != 0) {
+            for(File f : sellData.listFiles()) {
+                String sellerName = f.getName();
+                ArrayList<ArrayList<String>> logins = getUserLogins();
+                for(ArrayList<String> logs : logins) {
+                    if(logs.get(0).equalsIgnoreCase("S") && logs.get(1).equalsIgnoreCase(sellerName)) {
+                        Seller tempSeller = new Seller(logs.get(1), logs.get(2), logs.get(3));
+                        File storeData = new File(sellerDataFolder + File.separatorChar
+                                + sellerName + File.separatorChar);
+                        ArrayList<ArrayList<Object>> allStores = getSellerAllData(tempSeller);
+                        for(ArrayList<Object> arr : allStores) {
+                            Store tempStore = new Store((String) arr.get(0), "");
+                            for(int i = 2; i < arr.size(); i+=2) {
+                                Product p = (Product) arr.get(i);
+                                tempStore.addProduct(p);
+                            }
+                            tempSeller.addStore(tempStore);
+                            mp.addSeller(tempSeller);
+                        }
+                    }
+                }
             }
         }
-
-        mp.setCustomers(customers);
-        mp.setSellers(sellers);
     }
 
     /**
