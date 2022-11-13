@@ -75,18 +75,18 @@ class Core {
                         // TESTING PRODUCTS, STORES, ETC ----------------------------------------------------------------------------------------------------------------
                         Seller dendenMan = new Seller("DendenMan", "denny@dennys.gov", "secret");
                         Store dennys = new Store("Denny's", "it's... Denny's");
-                        dennys.addProduct(new Product("Gamer Eggs", "Nature's Protein Shake", 19.99));
-                        dennys.addProduct(new Product("Gamer Sausage", "Nature's Protein... Protein", 5.99));
-                        dennys.addProduct(new Product("Gamer Pancakes", "Nature's Gluten Shake", 13.99));
+                        dennys.addProduct(new Product("Gamer Eggs", "Nature's Protein Shake", 19.99, 5));
+                        dennys.addProduct(new Product("Gamer Sausage", "Nature's Protein... Protein", 5.99, 10));
+                        dennys.addProduct(new Product("Gamer Pancakes", "Nature's Gluten Shake", 13.99, 1));
                         dendenMan.addStore(dennys);
                         //
 
                         // TESTING PRODUCTS, STORES, ETC
                         Seller god = new Seller("God", "God@god.cod", "rapture");
                         Store soapStore = new Store("God's Soap Emporium", "Got bored, like soap - God");
-                        soapStore.addProduct(new Product("Dawn PowerWash Dish Spray", "clean up you gross ass plate", 4.99));
-                        soapStore.addProduct(new Product("Lavender Ascent", "Isn't this a good name for soap?", 49.99));
-                        soapStore.addProduct(new Product("Tide Pods", "50% more edible than competitors", 2.49));
+                        soapStore.addProduct(new Product("Dawn PowerWash Dish Spray", "clean up you gross ass plate", 4.99, 15));
+                        soapStore.addProduct(new Product("Lavender Ascent", "Isn't this a good name for soap?", 49.99, 2));
+                        soapStore.addProduct(new Product("Tide Pods", "50% more edible than competitors", 2.49, 50));
                         god.addStore(soapStore);
                         //
 
@@ -242,8 +242,9 @@ class Core {
         System.out.println("Please enter: ");
         System.out.println("[1] Open Marketplace");
         System.out.println("[2] Search for Product");
-        System.out.println("[3] View Shopping Cart (" + shoppingCart.getHeldPurchases().size() + " Products)");
+        System.out.println("[3] View Shopping Cart (" + shoppingCart.getTotalheldProducts() + " Products)");
         System.out.println("[4] View Purchase History");
+        System.out.println("[5] View Statistics Dashboard");
         System.out.println("[Q] Logout & Quit");
 
         String action = sc.nextLine();
@@ -563,7 +564,7 @@ class Core {
                         String.valueOf(s.getTotalCost()), "%.2f");
                 System.out.println("- #" + counter + " " + s.getProduct().getName()
                         + " (" + s.getQuantity() + " for $"
-                        + s.getProduct().getPrice() + " each; Product total $"
+                        + s.getProduct().getPrice() + " each; Purchase total $"
                         + totalPrice + ")");
             }
         }
@@ -604,6 +605,7 @@ class Core {
                     //shoppingCart.getHeldPurchases().set((Integer.parseInt(cartPick)-1),
                             //new Sale(s.getCustomer(), p, Integer.parseInt(changeQuantity)));
                     shoppingCart.getPurchase(Integer.parseInt(cartPick) - 1).setQuantity(Integer.parseInt(changeQuantity));
+                    shoppingCart.recalculateTotalHeldProducts();
                     System.out.println("Successfully changed purchase quantity to " + changeQuantity + "." +
                             " Returning to shopping cart page...");
                     cartMenu();
@@ -624,7 +626,7 @@ class Core {
             String allTotalPrice = String.format(String.valueOf(allTotal), "%.2f");
 
             System.out.println(separator);
-            System.out.println("You are purchasing " + counter + " products for $" + allTotalPrice);
+            System.out.println("You are purchasing " + shoppingCart.getTotalheldProducts() + " products for $" + allTotalPrice);
             System.out.println(separator);
             System.out.println("Would you like to complete the purchase?" +
                     "\nPlease enter [Y] or [Yes] to purchase, or [Anything Else] to return: ");
@@ -637,6 +639,11 @@ class Core {
                     if (heldPurchase.getQuantity() <= heldPurchase.getProduct().getQuantity()) {
                         ((Customer) user).addSale(heldPurchase);
                         heldPurchase.getProduct().setQuantity(heldPurchase.getProduct().getQuantity() - heldPurchase.getQuantity());
+                        for (Store store : mp.getStores()) {
+                            if (store.getProducts().contains(heldPurchase.getProduct())) {
+                                store.addSale(heldPurchase);
+                            }
+                        }
                         System.out.println("Purchased " + heldPurchase.getProduct().getName() + "!");
                     } else {
                         System.out.println("Failed to purchase " + heldPurchase.getProduct().getName() + ": You ordered more products than were available.");
@@ -658,8 +665,10 @@ class Core {
         if (history == null || history.size() == 0) {
             System.out.println("You have not purchased anything yet!");
         } else {
+            System.out.println(separator);
+            System.out.println("You have purchased " + ((Customer) user).getTotalPurchasedProducts() + " products:");
             for (Sale s : history) {
-                System.out.println(s.getProduct().getName() + " (" + s.getQuantity() + " ct.) was purchased for $" + String.format("%.2f", s.getTotalCost()));
+                System.out.println(s.getProduct().getName() + " (" + s.getQuantity() + " ct.) purchased for $" + String.format("%.2f", s.getTotalCost()));
             }
         }
         customerMainMenu();

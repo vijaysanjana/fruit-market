@@ -13,6 +13,7 @@ public class Store {
     private String description; //Store's description
     private ArrayList<Product> products; //ArrayList of products owned by the Store
     private ArrayList<Sale> sales; // ArrayList of sales made at the Store
+    private int totalSoldProducts = 0; //The number of products sold by the Store
 
 
     //Constructors
@@ -35,6 +36,11 @@ public class Store {
         this.description = description;
         this.products = products;
         this.sales = sales;
+        int totalSoldProducts = 0;
+        for (Sale sale : sales) {
+            totalSoldProducts += sale.getQuantity();
+        }
+        this.totalSoldProducts = totalSoldProducts;
     }
 
     public void pushToFile() {
@@ -94,8 +100,20 @@ public class Store {
 
     public void setSales(ArrayList<Sale> sales) {
         this.sales = sales;
+        int totalSoldProducts = 0;
+        for (Sale sale : sales) {
+            totalSoldProducts += sale.getQuantity();
+        }
+        this.totalSoldProducts = totalSoldProducts;
     }
 
+    public int getTotalSoldProducts() {
+        return totalSoldProducts;
+    }
+
+    public void setTotalSoldProducts(int totalSoleProducts) {
+        this.totalSoldProducts = totalSoleProducts;
+    }
 
     /**
      * Sorts a list of every Product in the Store based on price.
@@ -211,6 +229,7 @@ public class Store {
      * @param sale the sale to add to the ShoppingCart
      */
     public void addSale(Sale sale) {
+        totalSoldProducts += sale.getQuantity();
         sales.add(sale);
     }
 

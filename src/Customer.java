@@ -14,6 +14,7 @@ public class Customer extends User {
     private ShoppingCart shoppingCart; //ShoppingCart owned by the Customer
     private ArrayList<
             Sale> purchases; //ArrayList of the Customer's past purchases (Sale objects)
+    private int totalPurchasedProducts = 0; //The number of products purchased by the Customer
 
     //Constructor
     public Customer(String username, String email, String password) {
@@ -55,8 +56,20 @@ public class Customer extends User {
 
     public void setPurchases(ArrayList<Sale> purchases) {
         this.purchases = purchases;
+        int totalPurchasedProducts = 0;
+        for (Sale sale : purchases) {
+            totalPurchasedProducts += sale.getQuantity();
+        }
+        this.totalPurchasedProducts = totalPurchasedProducts;
     }
 
+    public int getTotalPurchasedProducts() {
+        return totalPurchasedProducts;
+    }
+
+    public void setTotalPurchasedProducts(int totalPurchasedProducts) {
+        this.totalPurchasedProducts = totalPurchasedProducts;
+    }
 
     //Equals
     @Override
@@ -75,6 +88,7 @@ public class Customer extends User {
      * @param sale the sale to add to the purchase history
      */
     public void addSale(Sale sale) {
+        totalPurchasedProducts += sale.getQuantity();
         purchases.add(sale);
     }
 

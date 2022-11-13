@@ -11,6 +11,7 @@ import java.util.*;
 public class ShoppingCart {
 
     private ArrayList<Sale> heldPurchases; //The current purchases waiting to be made.
+    private int totalHeldProducts = 0; //The number of products in the ShoppingCart
 
 
     //Constructors
@@ -20,18 +21,35 @@ public class ShoppingCart {
 
     public ShoppingCart(ArrayList<Sale> heldPurchases) {
         this.heldPurchases = heldPurchases;
+        int totalHeldProducts = 0;
+        for (Sale sale : heldPurchases) {
+            totalHeldProducts += sale.getQuantity();
+        }
+        this.totalHeldProducts = totalHeldProducts;
     }
 
 
-    //Getter and Setter
+    //Getters and Setters
     public ArrayList<Sale> getHeldPurchases() {
         return heldPurchases;
     }
 
     public void setHeldPurchases(ArrayList<Sale> heldPurchases) {
         this.heldPurchases = heldPurchases;
+        int totalHeldProducts = 0;
+        for (Sale sale : heldPurchases) {
+            totalHeldProducts += sale.getQuantity();
+        }
+        this.totalHeldProducts = totalHeldProducts;
     }
 
+    public int getTotalheldProducts() {
+        return totalHeldProducts;
+    }
+
+    public void setTotalheldProducts(int totalheldProducts) {
+        this.totalHeldProducts = totalheldProducts;
+    }
 
     //Equals
     @Override
@@ -50,6 +68,7 @@ public class ShoppingCart {
      */
     public void addPurchase(Sale sale) {
         heldPurchases.add(sale);
+        totalHeldProducts += sale.getQuantity();
     }
 
     /**
@@ -67,6 +86,7 @@ public class ShoppingCart {
      * @return the removed sale
      */
     public Sale removePurchase(int index) {
+        totalHeldProducts -= getPurchase(index).getQuantity();
         return heldPurchases.remove(index);
     }
 
@@ -77,6 +97,7 @@ public class ShoppingCart {
      */
     public Sale removePurchase(Sale sale) {
         if (heldPurchases.contains(sale)) {
+            totalHeldProducts -= sale.getQuantity();
             return heldPurchases.remove(heldPurchases.indexOf(sale));
         }
         return null;
@@ -90,10 +111,19 @@ public class ShoppingCart {
     public Sale removePurchase(Product product) {
         for (Sale purchase : heldPurchases) {
             if (purchase.getProduct().equals(product)) {
+                totalHeldProducts -= purchase.getQuantity();
                 return heldPurchases.remove(heldPurchases.indexOf(purchase));
             }
         }
         return null;
+    }
+
+    public void recalculateTotalHeldProducts() {
+        int totalHeldProducts = 0;
+        for (Sale purchase : heldPurchases) {
+            totalHeldProducts += purchase.getQuantity();
+        }
+        this.totalHeldProducts = totalHeldProducts;
     }
 
     public void pushToFile() {
