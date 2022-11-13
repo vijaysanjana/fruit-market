@@ -89,6 +89,10 @@ public class FileManager {
         //updateCustomerShoppingCart(customer, prod, 69);
     }
 
+    /**
+     * Loads in all stores that have been saved and initializes it into the provided MarketPlace object
+     * @param mp
+     */
     public static void loadAllStores(MarketPlace mp) {
         File sellData = new File(sellerDataFolder + File.separatorChar);
         if(sellData.listFiles().length != 0) {
