@@ -1,3 +1,4 @@
+import java.lang.reflect.Array;
 import java.util.*;
 
 /**
@@ -78,7 +79,7 @@ class Core {
                         break system_loop;
                     } else {
                         throw new RuntimeException(
-                                new AccountException("FATAL ERROR OCCURRED! LOGGED IN USER IS NEITHER CUSTOMER NOR SELLER!"));
+                                new AccountException("LOGGED IN USER IS NEITHER CUSTOMER NOR SELLER!"));
                     }
                 } else if (loginSignup.equals("2")) { // THIS IS THE SIGNUP PART
                     System.out.println(separator);
@@ -96,7 +97,7 @@ class Core {
                         customerSeller = sc.nextLine();
 
                         if (customerSeller.equals("1")) { // TODO: needs testing
-                            if(AccountManager.signup(email, password, username, "customer") != null) {
+                            if(AccountManager.signup(username, email, password, "customer") != null) {
                                 System.out.println("Successfully signed up! Logging you in...");
                                 user = AccountManager.login(email, password);
                                 if (user instanceof Customer) {
@@ -107,7 +108,7 @@ class Core {
                                     break system_loop;
                                 } else {
                                     throw new RuntimeException(
-                                            new AccountException("FATAL ERROR OCCURRED! REGISTERED CUSTOMER IS NOT A CUSTOMER!"));
+                                            new AccountException("REGISTERED CUSTOMER IS NOT A CUSTOMER!"));
                                 }
                             } else {
                                 if(!tryAgain("User already exists! Please login or use another email and username.")) {
@@ -119,7 +120,7 @@ class Core {
                                 }
                             }
                         } else if (customerSeller.equals("2")) { // TODO: needs testing
-                            if(AccountManager.signup(email, password, username, "seller") != null) {
+                            if(AccountManager.signup(username, email, password, "seller") != null) {
                                 System.out.println("Successfully signed up! Logging you in...");
                                 user = AccountManager.login(email, password);
                                 if (user instanceof Seller) {
@@ -129,7 +130,7 @@ class Core {
                                     break system_loop;
                                 } else {
                                     throw new RuntimeException(
-                                            new AccountException("FATAL ERROR OCCURRED! REGISTERED SELLER IS NOT A SELLER!"));
+                                            new AccountException("REGISTERED SELLER IS NOT A SELLER!"));
                                 }
                             } else {
                                 if(!tryAgain("User already exists! Please login or use another email and username.")) {
@@ -592,7 +593,15 @@ class Core {
     }
 
     public static void historyMenu() {
-        // TODO: implement this
+        ArrayList<Sale> history = ((Customer) user).getPurchases();
+        if (history == null) {
+            System.out.println("You have not purchased anything yet!");
+        } else {
+            for (Sale s : history) {
+                System.out.println(s.getProduct() + " (" + s.getQuantity() + " ct.) was purchased for " + String.format("$.2f%", s.getTotalCost()));
+            }
+        }
+        customerMainMenu();
     }
 
     public static void sellerMainMenu() {
