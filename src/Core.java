@@ -24,6 +24,7 @@ class Core {
     private static Scanner sc = new Scanner(System.in);
     private static User user;
     private static ShoppingCart shoppingCart;
+    private static MarketPlace mp = new MarketPlace();
 
     /**
      * Main method for the marketplace system. Arranges login/signup and customer/seller menus.
@@ -70,6 +71,31 @@ class Core {
                         System.out.println(separator);
                         System.out.println("Welcome customer: " + user.getUsername());
                         shoppingCart = ((Customer) user).getShoppingCart();
+
+                        // TESTING PRODUCTS, STORES, ETC ----------------------------------------------------------------------------------------------------------------
+                        Seller dendenMan = new Seller("DendenMan", "denny@dennys.gov", "secret");
+                        Store dennys = new Store("Denny's", "it's... Denny's");
+                        dennys.addProduct(new Product("Gamer Eggs", "Nature's Protein Shake", 19.99));
+                        dennys.addProduct(new Product("Gamer Sausage", "Nature's Protein... Protein", 5.99));
+                        dennys.addProduct(new Product("Gamer Pancakes", "Nature's Gluten Shake", 13.99));
+                        dendenMan.addStore(dennys);
+                        //
+
+                        // TESTING PRODUCTS, STORES, ETC
+                        Seller god = new Seller("God", "God@god.cod", "rapture");
+                        Store soapStore = new Store("God's Soap Emporium", "Got bored, like soap - God");
+                        soapStore.addProduct(new Product("Dawn PowerWash Dish Spray", "clean up you gross ass plate", 4.99));
+                        soapStore.addProduct(new Product("Lavender Ascent", "Isn't this a good name for soap?", 49.99));
+                        soapStore.addProduct(new Product("Tide Pods", "50% more edible than competitors", 2.49));
+                        god.addStore(soapStore);
+                        //
+
+                        // TESTING PRODUCTS, STORES, ETC
+                        mp.addSeller(dendenMan);
+                        mp.addSeller(god);
+                        mp.addCustomer((Customer) user);
+                        //------------------------------------------------------------------------------------------------------------------------------------------------
+
                         customerMainMenu();
                         break system_loop;
                     } else if (user instanceof Seller) {
@@ -104,6 +130,33 @@ class Core {
                                     System.out.println(separator);
                                     System.out.println("Welcome customer: " + user.getUsername());
                                     shoppingCart = ((Customer) user).getShoppingCart();
+
+
+                                    // TESTING PRODUCTS, STORES, ETC ----------------------------------------------------------------------------------------------------------------
+                                    Seller dendenMan = new Seller("DendenMan", "denny@dennys.gov", "secret");
+                                    Store dennys = new Store("Denny's", "it's... Denny's");
+                                    dennys.addProduct(new Product("Gamer Eggs", "Nature's Protein Shake", 19.99));
+                                    dennys.addProduct(new Product("Gamer Sausage", "Nature's Protein... Protein", 5.99));
+                                    dennys.addProduct(new Product("Gamer Pancakes", "Nature's Gluten Shake", 13.99));
+                                    dendenMan.addStore(dennys);
+                                    //
+
+                                    // TESTING PRODUCTS, STORES, ETC
+                                    Seller god = new Seller("God", "God@god.cod", "rapture");
+                                    Store soapStore = new Store("God's Soap Emporium", "Got bored, like soap - God");
+                                    soapStore.addProduct(new Product("Dawn PowerWash Dish Spray", "clean up you gross ass plate", 4.99));
+                                    soapStore.addProduct(new Product("Lavender Ascent", "Isn't this a good name for soap?", 49.99));
+                                    soapStore.addProduct(new Product("Tide Pods", "50% more edible than competitors", 2.49));
+                                    god.addStore(soapStore);
+                                    //
+
+                                    // TESTING PRODUCTS, STORES, ETC
+                                    mp.addSeller(dendenMan);
+                                    mp.addSeller(god);
+                                    mp.addCustomer((Customer) user);
+                                    //------------------------------------------------------------------------------------------------------------------------------------------------
+
+
                                     customerMainMenu();
                                     break system_loop;
                                 } else {
@@ -212,15 +265,41 @@ class Core {
     }
 
     public static void marketplaceMenu() {
+
+        /*// TESTING PRODUCTS, STORES, ETC
+        Seller dendenMan = new Seller("DendenMan", "denny@dennys.gov", "secret");
+        Store dennys = new Store("Denny's", "it's... Denny's");
+        dennys.addProduct(new Product("Gamer Eggs", "Nature's Protein Shake", 19.99));
+        dennys.addProduct(new Product("Gamer Sausage", "Nature's Protein... Protein", 5.99));
+        dennys.addProduct(new Product("Gamer Pancakes", "Nature's Gluten Shake", 13.99));
+        dendenMan.addStore(dennys);
+        //
+
+        // TESTING PRODUCTS, STORES, ETC
+        Seller god = new Seller("God", "God@god.cod", "rapture");
+        Store soapStore = new Store("God's Soap Emporium", "Got bored, like soap - God");
+        soapStore.addProduct(new Product("Dawn PowerWash Dish Spray", "clean up you gross ass plate", 4.99));
+        soapStore.addProduct(new Product("Lavender Ascent", "Isn't this a good name for soap?", 49.99));
+        soapStore.addProduct(new Product("Tide Pods", "50% more edible than competitors", 2.49));
+        god.addStore(soapStore);
+        //
+
         MarketPlace mp = new MarketPlace();
+
+        // TESTING PRODUCTS, STORES, ETC
+        mp.addSeller(dendenMan);
+        mp.addSeller(god);
+        mp.addCustomer((Customer) user);
+        // */
+
         ArrayList<Store> stores = mp.getStores();
         ArrayList<Product> products = new ArrayList<Product>();
 
         System.out.println(separator);
         System.out.println("All available stores:");
 
+        int counter = 0;
         for (Store s : stores) {
-            int counter = 0;
             ArrayList<Product> tempProds = s.getProducts();
             System.out.println("- " + s.getName());
             if (stores.isEmpty()) {
@@ -230,15 +309,19 @@ class Core {
                     products.add(p);
                     System.out.println("--- #" + (counter + 1) + " " +
                             p.getName() + " (Price: " + p.getPrice() + ")");
+                    counter++;
                 }
             }
         }
 
-        // TODO: add sorted view
         if(!products.isEmpty()) {
             System.out.println(separator);
             System.out.println("Please enter: ");
             System.out.println("[Correspond #] View Product Info");
+            System.out.println("[Ph] Sort Products by Price (High to Low)");
+            System.out.println("[Pl] Sort Products by Price (Low to High)");
+            System.out.println("[Qh] Sort Products by Quantity Available (High to Low)");
+            System.out.println("[Ql] Sort Products by Quantity Available (High to Low)");
             System.out.println("[Anything Else] Return to Customer Menu");
 
             String productPick = sc.nextLine();
@@ -252,11 +335,11 @@ class Core {
                     System.out.println("[Anything Else] Return to All Products Page");
 
                     String productAction = sc.nextLine();
-                    if(productAction.equalsIgnoreCase("1")) {
+                    if (productAction.equalsIgnoreCase("1")) {
                         System.out.println(separator);
                         System.out.println("Please enter a purchase quantity: ");
                         String purchaseQuantity = sc.nextLine();
-                        while(!purchaseQuantity.matches("-?\\d+(\\.\\d+)?")) {
+                        while (!purchaseQuantity.matches("-?\\d+(\\.\\d+)?")) {
                             System.out.println("Entered quantity is not an integer! Please enter a valid quantity: ");
                             purchaseQuantity = sc.nextLine();
                         }
@@ -269,15 +352,35 @@ class Core {
                         marketplaceMenu();
                     }
                 } else { // TODO: needs testing
-                    while(p == null) {
+                    while (p == null) {
                         System.out.println("Entered # is not a valid product! Please enter a valid product #: ");
                         productPick = sc.nextLine();
-                        if(!productPick.matches("-?\\d+(\\.\\d+)?")) {
+                        if (!productPick.matches("-?\\d+(\\.\\d+)?")) {
                             continue;
                         }
                         p = products.get(Integer.parseInt(productPick) - 1);
                     }
                 }
+            } else if (productPick.equalsIgnoreCase("ph")) { // TODO: needs testing
+                for (Store store : mp.getStores()) {
+                    store.setProducts(store.getPriceSortedProducts(true));
+                }
+                marketplaceMenu();
+            } else if (productPick.equalsIgnoreCase("pl")) { // TODO: needs testing
+                for (Store store : mp.getStores()) {
+                    store.setProducts(store.getPriceSortedProducts(false));
+                }
+                marketplaceMenu();
+            } else if (productPick.equalsIgnoreCase("qh")) { // TODO: needs testing
+                for (Store store : mp.getStores()) {
+                    store.setProducts(store.getQuantitySortedProducts(true));
+                }
+                marketplaceMenu();
+            } else if (productPick.equalsIgnoreCase("ql")) { // TODO: needs testing
+                for (Store store : mp.getStores()) {
+                    store.setProducts(store.getQuantitySortedProducts(false));
+                }
+                marketplaceMenu();
             } else { // TODO: needs testing
                 customerMainMenu();
             }
@@ -454,11 +557,12 @@ class Core {
             System.out.println("- Empty");
         } else { // TODO: needs testing
             for(Sale s : shoppingCart.getHeldPurchases()) {
+                counter++;
                 allTotal += s.getTotalCost();
                 String totalPrice = String.format(
                         String.valueOf(s.getTotalCost()), "%.2f");
-                System.out.println("- #" + (counter+1) + " " + s.getProduct().getName()
-                        + " (" + s.getProduct().getQuantity() + " for $"
+                System.out.println("- #" + counter + " " + s.getProduct().getName()
+                        + " (" + s.getQuantity() + " for $"
                         + s.getProduct().getPrice() + " each; Product total $"
                         + totalPrice + ")");
             }
@@ -472,7 +576,7 @@ class Core {
 
         String cartPick = sc.nextLine();
         if(cartPick.matches("-?\\d+(\\.\\d+)?")) { // TODO: needs testing
-            Sale s = shoppingCart.getHeldPurchases().get(Integer.parseInt(cartPick)-1);
+            Sale s = shoppingCart.getPurchase(Integer.parseInt(cartPick) - 1);
             Product p = s.getProduct();
             if(p != null) { // TODO: needs testing
                 showProductInfo(p);
@@ -497,8 +601,9 @@ class Core {
                         changeQuantity = sc.nextLine();
                     }
 
-                    shoppingCart.getHeldPurchases().set((Integer.parseInt(cartPick)-1),
-                            new Sale(s.getCustomer(), p, Integer.parseInt(changeQuantity)));
+                    //shoppingCart.getHeldPurchases().set((Integer.parseInt(cartPick)-1),
+                            //new Sale(s.getCustomer(), p, Integer.parseInt(changeQuantity)));
+                    shoppingCart.getPurchase(Integer.parseInt(cartPick) - 1).setQuantity(Integer.parseInt(changeQuantity));
                     System.out.println("Successfully changed purchase quantity to " + changeQuantity + "." +
                             " Returning to shopping cart page...");
                     cartMenu();
@@ -519,7 +624,7 @@ class Core {
             String allTotalPrice = String.format(String.valueOf(allTotal), "%.2f");
 
             System.out.println(separator);
-            System.out.println("You are purchasing " + (counter+1) + " products for $" + allTotalPrice);
+            System.out.println("You are purchasing " + counter + " products for $" + allTotalPrice);
             System.out.println(separator);
             System.out.println("Would you like to complete the purchase?" +
                     "\nPlease enter [Y] or [Yes] to purchase, or [Anything Else] to return: ");
@@ -529,10 +634,16 @@ class Core {
                     || purchaseAction.equalsIgnoreCase("yes")) { // TODO: needs testing
                 System.out.println(separator);
                 for (Sale heldPurchase : shoppingCart.getHeldPurchases()) {
-                    ((Customer) user).addSale(heldPurchase);
+                    if (heldPurchase.getQuantity() <= heldPurchase.getProduct().getQuantity()) {
+                        ((Customer) user).addSale(heldPurchase);
+                        heldPurchase.getProduct().setQuantity(heldPurchase.getProduct().getQuantity() - heldPurchase.getQuantity());
+                        System.out.println("Purchased " + heldPurchase.getProduct().getName() + "!");
+                    } else {
+                        System.out.println("Failed to purchase " + heldPurchase.getProduct().getName() + ": You ordered more products than were available.");
+                    }
                 }
                 shoppingCart.setHeldPurchases(new ArrayList<>());
-                System.out.println("Purchased successfully! Returning to customer menu page...");
+                System.out.println("Returning to customer menu page...");
                 customerMainMenu();
             } else { // TODO: needs testing
                 cartMenu();
@@ -544,11 +655,11 @@ class Core {
 
     public static void historyMenu() {
         ArrayList<Sale> history = ((Customer) user).getPurchases();
-        if (history == null) {
+        if (history == null || history.size() == 0) {
             System.out.println("You have not purchased anything yet!");
         } else {
             for (Sale s : history) {
-                System.out.println(s.getProduct() + " (" + s.getQuantity() + " ct.) was purchased for " + String.format("$.2f%", s.getTotalCost()));
+                System.out.println(s.getProduct().getName() + " (" + s.getQuantity() + " ct.) was purchased for $" + String.format("%.2f", s.getTotalCost()));
             }
         }
         customerMainMenu();
