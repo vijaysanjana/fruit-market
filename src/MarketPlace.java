@@ -169,6 +169,54 @@ public class MarketPlace {
         return sortedStores;
     }
 
+    public ArrayList<Customer> getStoreSalesSortedCustomers(Store store, boolean maxFirst) {
+        ArrayList<Customer> customers = store.getAllCustomers();
+        ArrayList<Customer> copiedCustomers = new ArrayList<>();
+        for (Customer customer : customers) {
+            copiedCustomers.add(customer);
+        }
+        ArrayList<Customer> sortedCustomers = new ArrayList<>();
+
+        while (copiedCustomers.size() > 0) {
+            Customer min = copiedCustomers.get(0);
+            for (int i = 1; i < copiedCustomers.size(); i++) {
+                if (store.getQuantityOfProductsBoughtByCustomer(copiedCustomers.get(i)) < store.getQuantityOfProductsBoughtByCustomer(min)) {
+                    min = copiedCustomers.get(i);
+                }
+            }
+            copiedCustomers.remove(min);
+            sortedCustomers.add(min);
+        }
+        if (maxFirst) {
+            Collections.reverse(sortedCustomers);
+        }
+        return sortedCustomers;
+    }
+
+    public ArrayList<Product> getStoreSalesSortedProducts(Store store, boolean maxFirst) {
+        ArrayList<Product> products = store.getProducts();
+        ArrayList<Product> copiedProducts = new ArrayList<>();
+        for (Product product : products) {
+            copiedProducts.add(product);
+        }
+        ArrayList<Product> sortedProducts = new ArrayList<>();
+
+        while (copiedProducts.size() > 0) {
+            Product min = copiedProducts.get(0);
+            for (int i = 1; i < copiedProducts.size(); i++) {
+                if (store.getNumberOfProductsSold(copiedProducts.get(i)) < store.getNumberOfProductsSold(min)) {
+                    min = copiedProducts.get(i);
+                }
+            }
+            copiedProducts.remove(min);
+            sortedProducts.add(min);
+        }
+        if (maxFirst) {
+            Collections.reverse(sortedProducts);
+        }
+        return sortedProducts;
+    }
+
 
     //Equals
     @Override

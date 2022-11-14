@@ -1,3 +1,4 @@
+import java.lang.reflect.Array;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.*;
@@ -202,6 +203,35 @@ public class Store {
             }
         }
         return soldToCustomer;
+    }
+
+    public ArrayList<Sale> getSalesForProduct(Product product) {
+        ArrayList<Sale> salesForProduct = new ArrayList<>();
+        for (Sale sale : sales) {
+            if (sale.getProduct().equals(product)) {
+                salesForProduct.add(sale);
+            }
+        }
+        return salesForProduct;
+    }
+
+    public int getNumberOfProductsSold(Product product) {
+        ArrayList<Sale> salesForProduct = getSalesForProduct(product);
+        int productsSold = 0;
+        for (Sale sale : salesForProduct) {
+            productsSold += sale.getQuantity();
+        }
+        return productsSold;
+    }
+
+    public ArrayList<Customer> getAllCustomers() {
+        ArrayList<Customer> customers = new ArrayList<>();
+        for (Sale sale : sales) {
+            if (!(customers.contains(sale.getCustomer()))) {
+                customers.add(sale.getCustomer());
+            }
+        }
+        return customers;
     }
 
 
