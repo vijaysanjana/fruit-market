@@ -256,6 +256,8 @@ class Core {
             cartMenu();
         } else if (action.equalsIgnoreCase("4")) { // TODO: needs testing
             historyMenu();
+        } else if (action.equalsIgnoreCase("5")) {  // TODO: needs testing
+            dashboardMenu();
         } else if (action.equalsIgnoreCase("q")) { // TODO: needs testing
             printFarewell();
         } else {
@@ -672,6 +674,46 @@ class Core {
             }
         }
         customerMainMenu();
+    }
+
+    public static void dashboardMenu() {
+        System.out.println(separator);
+        System.out.println("All Available Stores:");
+        for (Store store : mp.getStores()) {
+            int soldToUser = 0;
+            for (Sale sale : store.getSales()) {
+                if (sale.getCustomer().equals((Customer) user)) {
+                    soldToUser += sale.getQuantity();
+                }
+            }
+            System.out.println("- " + store.getName());
+            System.out.println("--- Total Products Sold: " + store.getTotalSoldProducts());
+            System.out.println("--- Total Products Sold to You: " + soldToUser);
+        }
+        System.out.println(separator);
+        System.out.println("Please enter:");
+        System.out.println("[1] Sort Stores by Total Products Sold (High to Low)");
+        System.out.println("[2] Sort Stores by Total Products Sold (Low to High)");
+        System.out.println("[3] Sort Stores by Total Products Sold to You (High to Low)");
+        System.out.println("[4] Sort Stores by Total Products Sold to You (Low to High)");
+        System.out.println("[Anything Else] Return to Customer Menu");
+
+        String productPick = sc.nextLine();
+        if (productPick.equalsIgnoreCase("1")) { // TODO: needs testing
+            // TODO: Dashboard Sort
+            dashboardMenu();
+        } else if (productPick.equalsIgnoreCase("2")) { // TODO: needs testing
+            // TODO: Dashboard Sort
+            dashboardMenu();
+        } else if (productPick.equalsIgnoreCase("3")) { // TODO: needs testing
+            // TODO: Dashboard Sort
+            dashboardMenu();
+        } else if (productPick.equalsIgnoreCase("4")) { // TODO: needs testing
+            // TODO: Dashboard Sort
+            dashboardMenu();
+        } else { // TODO: needs testing
+            customerMainMenu();
+        }
     }
 
     public static void sellerMainMenu() {
