@@ -143,8 +143,15 @@ public class FileManager {
             for(ArrayList<Object> arr : cartData) {
                 for(Product prod : mp.getProducts()) {
                     if(prod.equals(arr.get(1))) {
-                        prod.setQuantity(prod.getQuantity()-Integer.parseInt((String) arr.get(0)));
-                        spc.addPurchase(new Sale(customer, prod, Integer.parseInt((String) arr.get(0))));
+                        if(prod.getQuantity()-Integer.parseInt((String) arr.get(0)) < 0) {
+                            Product tempProd = new Product(prod.getName(),
+                                    prod.getDescription(), prod.getPrice(), prod.getQuantity());
+                            prod.setQuantity(0);
+                            spc.addPurchase(new Sale(customer, prod, tempProd.getQuantity()));
+                        } else {
+                            prod.setQuantity(prod.getQuantity()-Integer.parseInt((String) arr.get(0)));
+                            spc.addPurchase(new Sale(customer, prod, Integer.parseInt((String) arr.get(0))));
+                        }
                     }
                 }
             }
@@ -673,6 +680,25 @@ public class FileManager {
             pw.close();
         } catch(FileNotFoundException e) {
             throw new RuntimeException(new DataException("ACCOUNT DELETION ERROR!"));
+        }
+    }
+
+    /**
+     * Creates an appropriate store file (empty) when making new stores
+     * @param seller
+     * @param store
+     */
+    public static void createStoreFile(Seller seller, Store store) {
+        createNecessaryFolders(seller);
+        try {
+            if(new File(sellerDataFolder + File.separatorChar
+                    + seller.getUsername() + File.separatorChar
+                    + store.getName() + "_data").createNewFile()) {
+                System.out.println("Customer data folder created");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException(new DataException());
         }
     }
 }

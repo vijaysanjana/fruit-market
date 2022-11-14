@@ -81,6 +81,17 @@ class Core {
                     } else if (user instanceof Seller) {
                         System.out.println(separator);
                         System.out.println("Welcome seller: " + user.getUsername());
+
+                        // TESTING
+                        FileManager.loadAllStores(mp, true);
+                        for(Seller seller : mp.getSellers()) {
+                            if(seller.getUsername().equalsIgnoreCase(user.getUsername())
+                                    && seller.getEmail().equalsIgnoreCase(user.getEmail())) {
+                                user = seller;
+                            }
+                        }
+                        // TESTING
+
                         sellerMainMenu();
                         break system_loop;
                     } else {
@@ -771,9 +782,9 @@ class Core {
                 int quant = Integer.parseInt((String) arr.get(0));
                 Product prod = (Product) arr.get(1);
                 System.out.println("- " + prod.getName());
-                System.out.println("---- Price Each: " + prod.getPrice());
-                System.out.println("---- Quantity Purchased: " + quant);
-                System.out.println("---- Total Price: " +
+                System.out.println("--- Price Each: " + prod.getPrice());
+                System.out.println("--- Quantity Purchased: " + quant);
+                System.out.println("--- Total Price: " +
                         String.format("%.2f", (prod.getPrice()*quant)));
             }
         }
@@ -826,15 +837,170 @@ class Core {
     }
 
     public static void storesMenu() {
-        MarketPlace mp = new MarketPlace();
-        ArrayList<Store> stores = new ArrayList<>();
-
-        for(Store s : mp.getStores()) {
-        }
-
+        int counter = 0;
         System.out.println(separator);
         System.out.println("Your stores:");
 
+        if(((Seller) user).getStores().isEmpty()) {
+            System.out.println("- No stores found");
+        } else {
+            for(Store store : ((Seller) user).getStores()) {
+                System.out.println("- #" + (counter+1) + " " + store.getName());
+                counter++;
+            }
+        }
+
+        System.out.println(separator);
+        System.out.println("Please enter: ");
+        System.out.println("[Corresponding #] View Store Info");
+        System.out.println("[AD] Add New Store");
+        System.out.println("[Anything Else] Return to Seller Menu");
+
+        String storeAction = sc.nextLine();
+        if(storeAction.matches("-?\\d+(\\.\\d+)?")) {
+            if(!((Seller) user).getStores().isEmpty()) {
+                try {
+                    int counterAgain = 0;
+                    Store store = ((Seller) user).getStores().get(Integer.parseInt(storeAction)-1);
+                    System.out.println(separator);
+                    System.out.println("Store: " + store.getName());
+                    System.out.println("Products: ");
+                    if(store.getProducts().isEmpty()) {
+                        System.out.println("- No products found");
+                    } else {
+                        for(Product prod : store.getProducts()) {
+                            System.out.println("- #" + (counterAgain+1) + " " + prod.getName());
+                            counterAgain++;
+                        }
+                    }
+
+                    System.out.println(separator);
+                    System.out.println("Please enter: ");
+                    System.out.println("[Corresponding #] View Product Info");
+                    System.out.println("[AD] Add New Product");
+                    System.out.println("[Anything Else] Return to Seller Menu");
+
+                    String productPick = sc.nextLine();
+                    if(productPick.matches("-?\\d+(\\.\\d+)?")) {
+                        if(!store.getProducts().isEmpty()) {
+                            Product prod = store.getProducts().get(Integer.parseInt(productPick)-1);
+                            showProductInfo(prod);
+
+                            System.out.println(separator);
+                            System.out.println("Please enter: ");
+                            System.out.println("[QU] Change Quantity Available");
+                            System.out.println("[PR] Change Price");
+                            System.out.println("[RM] Remove Product");
+                        } else {
+                            sellerMainMenu();
+                        }
+                    } else if(productPick.equalsIgnoreCase("ad")) {
+                        addNewProduct(store);
+                    } else {
+                        sellerMainMenu();
+                    }
+                } catch(Exception e) {
+                    sellerMainMenu();
+                }
+            } else {
+                sellerMainMenu();
+            }
+        } else if(storeAction.equalsIgnoreCase("ad")) {
+            addNewStore();
+        } else {
+            sellerMainMenu();
+        }
+    }
+
+    public static void addNewStore() {
+        System.out.println(separator);
+        System.out.println("Enter new store name: ");
+        String name = sc.nextLine();
+        if(name.contains(",") || name.contains(";")) {
+            if(!tryAgain("Store name cannot contain ',' or ';'!")) {
+                sellerMainMenu();
+            } else {
+                addNewStore();
+            }
+        } else {
+            for(Store s : mp.getStores()) {
+                if(s.getName().equalsIgnoreCase(name)) {
+                    if(!tryAgain("Store name is already used!")) {
+                        sellerMainMenu();
+                    } else {
+                        addNewStore();
+                    }
+                }
+            }
+            Store store =  new Store(name, "");
+            ((Seller) user).addStore(store);
+            FileManager.createStoreFile((Seller) user, store);
+            System.out.println("Successfully added new store! Returning to all stores menu...");
+            storesMenu();
+        }
+    }
+
+    public static void addNewProduct(Store store) {
+        System.out.println(separator);
+        System.out.println("Enter new product name: ");
+        String name = sc.nextLine();
+        if(name.contains(",") || name.contains(";")) {
+            if(!tryAgain("Store name cannot contain ',' or ';'!")) {
+                sellerMainMenu();
+            } else {
+                addNewProduct(store);
+            }
+        } else {
+            for(Product prod : mp.getProducts()) {
+                if(prod.getName().equalsIgnoreCase(name)) {
+                    if(!tryAgain("Product name is already used!")) {
+                        sellerMainMenu();
+                    } else {
+                        addNewProduct(store);
+                    }
+                }
+            }
+            System.out.println("Enter product description: ");
+            String desc = sc.nextLine();
+            if(desc.contains(",") || desc.contains(";")) {
+                if(!tryAgain("Store name cannot contain ',' or ';'!")) {
+                    sellerMainMenu();
+                } else {
+                    addNewStore();
+                }
+            } else {
+                System.out.println("Enter product price: ");
+                double price = 0;
+                String temp = sc.nextLine();
+                try {
+                    price = Double.parseDouble(temp);
+                } catch(Exception e) {
+                    if(!tryAgain("Price must be a double!")) {
+                        sellerMainMenu();
+                    } else {
+                        addNewProduct(store);
+                    }
+                }
+                System.out.println("Enter product available quantity: ");
+                int quant = 0;
+                temp = sc.nextLine();
+                try {
+                    quant = Integer.parseInt(temp);
+                } catch(Exception e) {
+                    if(!tryAgain("Quantity must be an integer!")) {
+                        sellerMainMenu();
+                    } else {
+                        addNewProduct(store);
+                    }
+                }
+
+                Product p = new Product(name, desc, price, quant);
+                store.addProduct(p);
+                System.out.println("Successfully added new product! Returning to all stores menu...");
+                FileManager.addSellerData((Seller) user, store, p);
+                storesMenu();
+            }
+        }
     }
 
 
