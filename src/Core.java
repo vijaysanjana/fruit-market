@@ -786,6 +786,7 @@ class Core {
                 System.out.println("--- Total Price: " +
                         String.format("%.2f", (prod.getPrice()*quant)));
             }
+            System.out.println("You have purchased " + ((Customer) user).getTotalPurchasedProducts() + "fruits in total!");
         }
         System.out.println(separator);
         System.out.println("Type [Anything] to return to Customer Menu: ");
