@@ -54,17 +54,17 @@ class Core {
                     if (user instanceof Customer) {
                         System.out.println(separator);
                         System.out.println("Welcome customer: " + user.getUsername());
-                        shoppingCart = ((Customer) user).getShoppingCart();
 
                         // TESTING
                         FileManager.loadAllStores(mp, true);
-                        FileManager.loadAllCarts((Customer) user, shoppingCart, mp);
                         for(Customer customer : mp.getCustomers()) {
                             if(customer.getUsername().equalsIgnoreCase(user.getUsername())
                                     && customer.getEmail().equalsIgnoreCase(user.getEmail())) {
                                 user = customer;
                             }
                         }
+                        shoppingCart = ((Customer) user).getShoppingCart();
+                        FileManager.loadAllCarts((Customer) user, shoppingCart, mp);
                         // TESTING
 
                         customerMainMenu();

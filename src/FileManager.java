@@ -100,27 +100,26 @@ public class FileManager {
                 for(File f : sellLocation.listFiles()) {
                     String sellerName = f.getName();
                     ArrayList<ArrayList<String>> logins = getUserLogins();
+                    Seller sellerObj = null;
                     for(ArrayList<String> logs : logins) {
-                        if(logs.get(0).equalsIgnoreCase("S") && logs.get(1).equalsIgnoreCase(sellerName)) {
-                            Seller tempSeller = new Seller(logs.get(1), logs.get(2), logs.get(3));
-                            ArrayList<ArrayList<Object>> allStores = getSellerAllData(tempSeller);
-                            for(ArrayList<Object> arr : allStores) {
-                                Store tempStore = new Store((String) arr.get(0), "");
-                                for(int i = 2; i < arr.size(); i+=2) {
-                                    Product p = (Product) arr.get(i);
-                                    if(loadEmpty) {
-                                        tempStore.addProduct(p);
-                                    } else {
-                                        if(p.getQuantity() >= 1) {
-                                            tempStore.addProduct(p);
-                                        }
-                                    }
-                                }
-                                tempSeller.addStore(tempStore);
-                                mp.addSeller(tempSeller);
-                            }
+                        if(logs.get(0).equalsIgnoreCase("S")
+                                && logs.get(1).equalsIgnoreCase(sellerName)) {
+                            sellerObj = new Seller(logs.get(1), logs.get(2), logs.get(3));
                         }
                     }
+
+                    if(sellerObj != null) {
+                        ArrayList<ArrayList<Object>> allStores = getSellerAllData(sellerObj);
+                        for(ArrayList<Object> arr : allStores) {
+                            Store storeObj = new Store((String) arr.get(0), "");
+                            for(int i = 2; i < arr.size(); i+=2) {
+                                Product prodObj = (Product) arr.get(i);
+                                storeObj.addProduct(prodObj);
+                            }
+                            sellerObj.addStore(storeObj);
+                        }
+                    }
+                    mp.addSeller(sellerObj);
                 }
             }
         } catch(Exception e) {
