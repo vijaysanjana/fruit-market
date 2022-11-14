@@ -100,27 +100,26 @@ public class FileManager {
                 for(File f : sellLocation.listFiles()) {
                     String sellerName = f.getName();
                     ArrayList<ArrayList<String>> logins = getUserLogins();
+                    Seller sellerObj = null;
                     for(ArrayList<String> logs : logins) {
-                        if(logs.get(0).equalsIgnoreCase("S") && logs.get(1).equalsIgnoreCase(sellerName)) {
-                            Seller tempSeller = new Seller(logs.get(1), logs.get(2), logs.get(3));
-                            ArrayList<ArrayList<Object>> allStores = getSellerAllData(tempSeller);
-                            for(ArrayList<Object> arr : allStores) {
-                                Store tempStore = new Store((String) arr.get(0), "");
-                                for(int i = 2; i < arr.size(); i+=2) {
-                                    Product p = (Product) arr.get(i);
-                                    if(loadEmpty) {
-                                        tempStore.addProduct(p);
-                                    } else {
-                                        if(p.getQuantity() >= 1) {
-                                            tempStore.addProduct(p);
-                                        }
-                                    }
-                                }
-                                tempSeller.addStore(tempStore);
-                                mp.addSeller(tempSeller);
-                            }
+                        if(logs.get(0).equalsIgnoreCase("S")
+                                && logs.get(1).equalsIgnoreCase(sellerName)) {
+                            sellerObj = new Seller(logs.get(1), logs.get(2), logs.get(3));
                         }
                     }
+
+                    if(sellerObj != null) {
+                        ArrayList<ArrayList<Object>> allStores = getSellerAllData(sellerObj);
+                        for(ArrayList<Object> arr : allStores) {
+                            Store storeObj = new Store((String) arr.get(0), "");
+                            for(int i = 2; i < arr.size(); i+=2) {
+                                Product prodObj = (Product) arr.get(i);
+                                storeObj.addProduct(prodObj);
+                            }
+                            sellerObj.addStore(storeObj);
+                        }
+                    }
+                    mp.addSeller(sellerObj);
                 }
             }
         } catch(Exception e) {
@@ -321,7 +320,7 @@ public class FileManager {
      * @return ArrayList<ArrayList<Object>> => {per store}
      * (String)store_name[0],
      * (String)purchasedQuantity[1 thru n] where n is an odd number
-     * ArrayList<(Product)>product_objects[2 thru n] where n is an even number
+     * (Product)product_objects[2 thru n] where n is an even number
      */
     public static ArrayList<ArrayList<Object>> getSellerAllData(Seller seller) {
         createNecessaryFolders(seller);
@@ -488,36 +487,29 @@ public class FileManager {
     public static void updateSellerData(Seller seller, Store store, Product product, int productQuantity, int soldQuantity) {
         createNecessaryFolders(seller);
         ArrayList<ArrayList<Object>> currentData = getSellerAllData(seller);
+        ArrayList<ArrayList<Object>> tempData = new ArrayList<>(currentData);
         File histFile = new File(sellerDataFolder + File.separatorChar
                 + seller.getUsername() + File.separatorChar + store.getName() + "_data");
 
-        for(int i = 0; i < currentData.size(); i++) {
-            ArrayList<Object> arr = currentData.get(i);
-            //ArrayList<Object> tempArr = new ArrayList<>(currentData.get(i));
-            for(int j = 2; j < arr.size(); j+=2) {
-                String q = (String) arr.get(j-1);
-                Product p = (Product) arr.get(j);
-
-                //if(productQuantity != 0) {
+        int counter = 0;
+        for(ArrayList<Object> arr : currentData) {
+            for(int i = 2; i < arr.size(); i+=2) {
+                if((arr.get(0)).equals(store.getName())) {
+                    Product p = (Product) arr.get(i);
                     if(p.getName().equals(product.getName())
                             && p.getDescription().equals(product.getDescription())
                             && p.getPrice() == product.getPrice()) {
                         p.setQuantity(productQuantity);
-                        arr.set((j-1), Integer.toString(soldQuantity));
+                        arr.set(i-1, String.valueOf(soldQuantity));
                     }
-                //}// else {
-                 //   if(p.getName().equals(product.getName())
-                 //           && p.getDescription().equals(product.getDescription())
-                 //           && p.getPrice() == product.getPrice()) {
-                 //       tempArr.remove(j-1);
-                 //       tempArr.remove(j-1);
-                 //   }
-                //}
+                } else {
+                    tempData.remove(counter);
+                }
             }
-            //currentData.set(i, tempArr);
+            counter++;
         }
 
-        replaceSellerData(currentData, histFile);
+        replaceSellerData(tempData, histFile);
     }
 
     /**

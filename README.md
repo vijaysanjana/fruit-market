@@ -9,8 +9,8 @@ To compile and run the project, run the main method of the **Core** class.
 
 ## Submission
 
-[Student Name] - Submitted Report on Brightspace.
-[Student Name] - Submitted Vocareum Workspace.
+Sanjana Anand - Submitted Report on Brightspace.
+Jack Jiang - Submitted Vocareum Workspace.
 
 # Classes
 
