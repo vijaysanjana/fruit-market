@@ -1,4 +1,4 @@
-﻿# Marketplace
+# Marketplace
 
 A virtual marketplace for Customers and Sellers to buy and list products. 
 
