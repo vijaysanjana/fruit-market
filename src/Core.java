@@ -742,7 +742,7 @@ class Core {
 
                     int quantitySold = FileManager.getCustomerShoppingCartQuantity((Customer) user, p);
                     FileManager.addCustomerData((Customer) user, heldPurchase.getProduct(), quantitySold); //add to history
-                    System.out.println("Purchased " + quantitySold + "!"); //announce purchase
+                    System.out.println("Purchased " + quantitySold + " " + p.getName() + "!"); //announce purchase
                     FileManager.updateCustomerShoppingCart((Customer) user, p, 0); //remove from cart
                     for(Seller seller : mp.getSellers()) {
                         for(Store store : seller.getStores()) {
@@ -858,6 +858,7 @@ class Core {
 
     }
 
+
     public static void deleteAccount(User user) {
         System.out.println(separator);
         System.out.println("WARNING: Are you sure you want to delete your account?");
@@ -884,6 +885,9 @@ class Core {
         System.out.println("What would you like to do today?");
         System.out.println("Please enter: ");
         System.out.println("[1] View Your Stores");
+        System.out.println("[2] View Your Carted Fruits");
+        System.out.println("[3] View Sales History");
+        System.out.println("[4] View Statistics Dashboard");
         System.out.println("[D] Delete & Logout");
         System.out.println("[Q] Logout & Quit");
 
@@ -1072,6 +1076,16 @@ class Core {
                 storesMenu();
             }
         }
+    }
+
+
+    public static void salesMenu() {
+
+    }
+
+
+    public static void cartedProductsMenu() {
+
     }
 
 
