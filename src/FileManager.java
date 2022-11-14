@@ -13,16 +13,16 @@ public class FileManager {
     public static void main(String[] args) {
         Seller dendenMan = new Seller("DendenMan", "denny@dennys.gov", "secret");
         Store dennys = new Store("Denny's", "it's... Denny's");
-        //addSellerData(dendenMan, dennys, new Product("Gamer Eggs", "Nature's Protein Shake", 19.99));
-        //addSellerData(dendenMan, dennys, new Product("Gamer Sausage", "Nature's Protein... Protein", 5.99));
-        //addSellerData(dendenMan, dennys, new Product("Gamer Pancakes", "Nature's Gluten Shake", 13.99));
+        addSellerData(dendenMan, dennys, new Product("Gamer Eggs", "Nature's Protein Shake", 19.99));
+        addSellerData(dendenMan, dennys, new Product("Gamer Sausage", "Nature's Protein... Protein", 5.99));
+        addSellerData(dendenMan, dennys, new Product("Gamer Pancakes", "Nature's Gluten Shake", 13.99));
 
 
         Seller god = new Seller("God", "God@god.cod", "rapture");
         Store soapStore = new Store("God's Soap Emporium", "Got bored, like soap - God");
-        //addSellerData(god, soapStore, new Product("Dawn PowerWash Dish Spray", "clean up you gross ass plate", 4.99));
-        //addSellerData(god, soapStore, new Product("Lavender Ascent", "Isn't this a good name for soap?", 49.99));
-        //addSellerData(god, soapStore, new Product("Tide Pods", "50% more edible than competitors", 2.49));
+        addSellerData(god, soapStore, new Product("Dawn PowerWash Dish Spray", "clean up you gross ass plate", 4.99));
+        addSellerData(god, soapStore, new Product("Lavender Ascent", "Isn't this a good name for soap?", 49.99));
+        addSellerData(god, soapStore, new Product("Tide Pods", "50% more edible than competitors", 2.49));
 
         MarketPlace mp = new MarketPlace();
         loadAllStores(mp, true);
@@ -200,6 +200,7 @@ public class FileManager {
 
             while(line != null) {
                 String[] arr = line.split(";");
+                data.add(new ArrayList<>());
                 data.get(counter).add(arr[0]);
                 data.get(counter).add(new Product(arr[1], arr[2],
                         Double.parseDouble(arr[3]), Integer.parseInt(arr[4])));
@@ -209,6 +210,7 @@ public class FileManager {
 
             return data;
         } catch(Exception e) {
+            e.printStackTrace();
             throw new RuntimeException(new DataException());
         }
     }
@@ -274,8 +276,8 @@ public class FileManager {
      * Returns all of a seller's products in a specified store
      * @param seller
      * @param store
-     * (String)purchasedQuantity[1 thru n] where n is an odd number
-     * (Product)product_objects[2 thru n] where n is an even number
+     * @return (String)purchasedQuantity[1 thru n] where n is an odd number
+     * @return (Product)product_objects[2 thru n] where n is an even number
      */
     public static ArrayList<Object> getSellerData(Seller seller, Store store) {
         createNecessaryFolders(seller);
@@ -309,7 +311,8 @@ public class FileManager {
     /**
      * Returns all of a seller's products in all of their owned stores
      * @param seller
-     * @return ArrayList<ArrayList<Object>> => {per store} (String)store_name[0],
+     * @return ArrayList<ArrayList<Object>> => {per store}
+     * (String)store_name[0],
      * (String)purchasedQuantity[1 thru n] where n is an odd number
      * ArrayList<(Product)>product_objects[2 thru n] where n is an even number
      */
@@ -483,25 +486,28 @@ public class FileManager {
 
         for(int i = 0; i < currentData.size(); i++) {
             ArrayList<Object> arr = currentData.get(i);
+            //ArrayList<Object> tempArr = new ArrayList<>(currentData.get(i));
             for(int j = 2; j < arr.size(); j+=2) {
                 String q = (String) arr.get(j-1);
                 Product p = (Product) arr.get(j);
 
-                if(productQuantity != 0) {
+                //if(productQuantity != 0) {
                     if(p.getName().equals(product.getName())
                             && p.getDescription().equals(product.getDescription())
                             && p.getPrice() == product.getPrice()) {
                         p.setQuantity(productQuantity);
                         arr.set((j-1), Integer.toString(soldQuantity));
                     }
-                } else {
-                    if(p.getName().equals(product.getName())
-                            && p.getDescription().equals(product.getDescription())
-                            && p.getPrice() == product.getPrice()) {
-                        currentData.remove(i);
-                    }
-                }
+                //}// else {
+                 //   if(p.getName().equals(product.getName())
+                 //           && p.getDescription().equals(product.getDescription())
+                 //           && p.getPrice() == product.getPrice()) {
+                 //       tempArr.remove(j-1);
+                 //       tempArr.remove(j-1);
+                 //   }
+                //}
             }
+            //currentData.set(i, tempArr);
         }
 
         replaceSellerData(currentData, histFile);
@@ -625,6 +631,48 @@ public class FileManager {
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException(new AccountException());
+        }
+    }
+
+    /**
+     * Removes a user's account and deletes all of their data
+     * @param user
+     */
+    public static void removeAccount(User user) {
+        File f = null;
+        if(user instanceof Customer) {
+            f = new File(customerDataFolder + File.separatorChar + user.getUsername());
+        } else if(user instanceof Seller) {
+            f = new File(sellerDataFolder + File.separatorChar + user.getUsername());
+        }
+        for(File t : f.listFiles()) {
+            try {
+                PrintWriter pw = new PrintWriter(t);
+                pw.print("");
+                pw.close();
+            } catch(FileNotFoundException e) {
+                throw new RuntimeException(new DataException("ACCOUNT DELETION ERROR!"));
+            }
+        }
+        ArrayList<ArrayList<String>> accounts = getUserLogins();
+        ArrayList<ArrayList<String>> tempAcc = new ArrayList<>(accounts);
+        for(int i = 0; i < accounts.size(); i++) {
+            ArrayList<String> arr = accounts.get(i);
+            if(arr.get(1).equalsIgnoreCase(user.getUsername())
+                    && arr.get(2).equalsIgnoreCase(user.getEmail())) {
+                tempAcc.remove(i);
+            }
+        }
+
+        try {
+            PrintWriter pw = new PrintWriter(userDataFile);
+            for(ArrayList<String> arr : tempAcc) {
+                pw.write(arr.get(0) + ":" + arr.get(1) + ";" + arr.get(2)
+                        + ";" + arr.get(3) + "\n");
+            }
+            pw.close();
+        } catch(FileNotFoundException e) {
+            throw new RuntimeException(new DataException("ACCOUNT DELETION ERROR!"));
         }
     }
 }
