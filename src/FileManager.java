@@ -6,6 +6,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * File manager system for everything stored
+ * @author Jack, Nathan, Sanj, Tommy, Adit
+ * @version 11/14/2022
+ */
 public class FileManager {
     private static File userDataFile = new File("userData");
     private static String sellerDataFolder = "seller_data";

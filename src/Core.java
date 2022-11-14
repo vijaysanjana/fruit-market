@@ -2,6 +2,8 @@ import java.util.*;
 
 /**
  * Marketplace main menu system used for logic control flow and to display login, signup, and user actions
+ * @author Jack, Nathan, Sanj, Tommy, Adit
+ * @version 11/14/2022
  */
 class Core {
     public static final String separator = "---------------------------";

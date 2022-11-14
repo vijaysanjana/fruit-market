@@ -1,5 +1,7 @@
 /**
  * Thrown when data read or write failed
+ * @author Jack, Nathan, Sanj, Tommy, Adit
+ * @version 11/14/2022
  */
 public class DataException extends Exception {
     public DataException(String message) {
