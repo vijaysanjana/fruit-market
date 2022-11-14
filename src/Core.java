@@ -4,21 +4,6 @@ import java.util.*;
 /**
  * Marketplace main menu system used for logic control flow and to display login, signup, and user actions
  */
-
-/**
- * Outline:
- * - Welcome screen -> Select to login or sign up.
- * -- If [login]: Select customer or seller
- * === If [Customer]: Ask for email and password. Calls AccountManager.login(email, password) in customerAccounts.txt list. Return true if login is successful and false if not.
- * === If [Seller]: Ask for email and password. Calls AccountManager.login(email, password) in sellerAccounts.txt list. Return true if login is successful and false if not.
- * -- If [signup]: Select customer or seller
- * === If [Customer]: Ask for email and password. Calls AccountManager.signup(email, password). Attempts to write to customerAccounts.txt file. Return true if successful and false if not.
- * === If [Seller]: Ask for email and password. Calls AccountManager.signup(email, password). Attempts to write to sellerAccounts.txt file. Return true if successful and false if not.
- * - Program displays customer or seller menus if login is successful.
- * - All loops will repeat until user cancels it.
- */
-
-// IMPORTANT: THIS CLASS IS NO LONGER AS FRAGILE. BUT PLEASE STILL DON'T BREAK!
 class Core {
     private static final String separator = "---------------------------";
     private static Scanner sc = new Scanner(System.in);
