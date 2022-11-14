@@ -15,6 +15,13 @@ public class Customer extends User {
             Sale> purchases; //ArrayList of the Customer's past purchases (Sale objects)
     private int totalPurchasedProducts = 0; //The number of products purchased by the Customer
 
+    /**
+     * Constructs customer
+     *
+     * @param username
+     * @param email
+     * @param password
+     */
     //Constructor
     public Customer(String username, String email, String password) {
         super(username, email, password);
@@ -23,8 +30,18 @@ public class Customer extends User {
     }
 
 
+    /**
+     * Constructs customer
+     *
+     * @param username
+     * @param email
+     * @param password
+     * @param shoppingCart
+     * @param purchases
+     */
     //Getters and Setters
-    public Customer(String username, String email, String password, ShoppingCart shoppingCart, ArrayList<Sale> purchases) {
+    public Customer(String username, String email, String password,
+                    ShoppingCart shoppingCart, ArrayList<Sale> purchases) {
         super(username, email, password);
         this.shoppingCart = shoppingCart;
         this.purchases = purchases;
@@ -70,6 +87,12 @@ public class Customer extends User {
         this.totalPurchasedProducts = totalPurchasedProducts;
     }
 
+    /**
+     * Checks if 2 objects equal
+     *
+     * @param o
+     * @return
+     */
     //Equals
     @Override
     public boolean equals(Object o) {
@@ -124,6 +147,11 @@ public class Customer extends User {
         return null;
     }
 
+    /**
+     * Exports a purchase csv
+     *
+     * @throws IOException
+     */
     public void exportPurchases() throws IOException {
         ArrayList<Sale> history = this.getPurchases();
         String fileName = this.getUsername() + ".txt";
