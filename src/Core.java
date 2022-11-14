@@ -927,14 +927,14 @@ class Core {
                     System.out.println("--- " + product.getName() + " (" + store.getNumberOfProductsSold(product) + " Sold)");
                 }
             } else {
-                System.out.println("--- No customers found");
+                System.out.println("--- No products found");
             }
         }
 
         System.out.println(separator);
         System.out.println("Please enter:");
-        System.out.println("[1] Sort Customers by Purchases (High to Low)");
-        System.out.println("[2] Sort Customers by Purchases (Low to High)");
+        System.out.println("[1] Sort Products by Sales (High to Low)");
+        System.out.println("[2] Sort Products by Sales (Low to High)");
         System.out.println("[Anything Else] Return to Statistics Dashboard Menu");
 
         String productPick = sc.nextLine();
@@ -983,6 +983,12 @@ class Core {
         String action = sc.nextLine();
         if (action.equalsIgnoreCase("1")) {
             storesMenu();
+        } else if (action.equalsIgnoreCase("2")) {
+            cartedProductsMenu();
+        } else if (action.equalsIgnoreCase("3")) {
+            historyMenu();
+        } else if (action.equalsIgnoreCase("4")) {
+            dashboardMenu(0);
         } else if (action.equalsIgnoreCase("d")) {
             deleteAccount(user);
         } else if (action.equalsIgnoreCase("q")) {
@@ -1168,12 +1174,11 @@ class Core {
     }
 
 
-    public static void salesMenu() {
+    public static void cartedProductsMenu() {
 
     }
 
-
-    public static void cartedProductsMenu() {
+    public static void salesMenu() {
 
     }
 
