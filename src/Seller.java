@@ -10,6 +10,9 @@ import java.util.*;
 /**
  * Seller class that contains the Stores owned by the Seller.
  * Seller extends User.
+ *
+ * @author Jack, Nathan, Sanj, Tommy, Adit
+ * @version 11/14/2022
  */
 public class Seller extends User {
 

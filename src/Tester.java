@@ -5,6 +5,12 @@ import org.junit.jupiter.api.Assertions.*;
 import java.io.*;
 import java.util.ArrayList;
 
+/**
+ * Testing stuff
+ *
+ * @author Jack, Nathan, Sanj, Tommy, Adit
+ * @version 11/14/2022
+ */
 public class Tester {
 
     //customer class test

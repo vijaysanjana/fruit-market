@@ -7,6 +7,9 @@ import java.util.*;
 
 /**
  * User class contains the Username, Email, and Password associated with the User's account.
+ *
+ * @author Jack, Nathan, Sanj, Tommy, Adit
+ * @version 11/14/2022
  */
 public class User {
 

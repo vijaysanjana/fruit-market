@@ -4,6 +4,9 @@ import java.util.*;
 
 /**
  * MarketPlace class contains the all sellers and customers in the application.
+ *
+ * @author Jack, Nathan, Sanj, Tommy, Adit
+ * @version 11/14/2022
  */
 public class MarketPlace {
 
@@ -62,18 +65,18 @@ public class MarketPlace {
 
     public ArrayList<Product> searchProducts(String type, String str) {
         ArrayList<Product> products = getProducts();
-        if(type.equalsIgnoreCase("name")) {
+        if (type.equalsIgnoreCase("name")) {
             ArrayList<Product> results = new ArrayList<>();
-            for(Product p : products) {
-                if(p.getName().toLowerCase().contains(str.toLowerCase())) {
+            for (Product p : products) {
+                if (p.getName().toLowerCase().contains(str.toLowerCase())) {
                     results.add(p);
                 }
             }
             return results;
-        } else if(type.equalsIgnoreCase("desc")) {
+        } else if (type.equalsIgnoreCase("desc")) {
             ArrayList<Product> results = new ArrayList<>();
-            for(Product p : products) {
-                if(p.getDescription().toLowerCase().contains(str.toLowerCase())) {
+            for (Product p : products) {
+                if (p.getDescription().toLowerCase().contains(str.toLowerCase())) {
                     results.add(p);
                 }
             }
@@ -114,6 +117,7 @@ public class MarketPlace {
 
     /**
      * Sorts a list of every Store in the MarketPlace based on sales.
+     *
      * @param maxFirst true: sorts from high sales to low sales, false: sorts from low sales to high sales
      * @return the sorted list of Stores
      */
@@ -143,6 +147,7 @@ public class MarketPlace {
 
     /**
      * Sorts a list of every Store in the MarketPlace based on sales to a specified user.
+     *
      * @param maxFirst true: sorts from high sales to low sales, false: sorts from low sales to high sales
      * @return the sorted list of Stores
      */
@@ -231,6 +236,7 @@ public class MarketPlace {
 
     /**
      * Adds a new seller to the MarketPlace
+     *
      * @param seller the seller to add to the MarketPlace
      */
     public void addSeller(Seller seller) {
@@ -239,6 +245,7 @@ public class MarketPlace {
 
     /**
      * Gets the specified seller from the MarketPlace
+     *
      * @param index the index of the desired seller
      * @return the desired seller
      */
@@ -248,6 +255,7 @@ public class MarketPlace {
 
     /**
      * Removes the specified seller from the MarketPlace
+     *
      * @param index the index of the desired seller
      * @return the removed seller
      */
@@ -257,6 +265,7 @@ public class MarketPlace {
 
     /**
      * Removes the specified seller from the MarketPlace
+     *
      * @param seller the desired seller
      * @return the removed seller
      */
@@ -270,6 +279,7 @@ public class MarketPlace {
 
     /**
      * Adds a new customer to the MarketPlace
+     *
      * @param customer the customer to add to the MarketPlace
      */
     public void addCustomer(Customer customer) {
@@ -278,6 +288,7 @@ public class MarketPlace {
 
     /**
      * Gets the specified customer from the MarketPlace
+     *
      * @param index the index of the desired customer
      * @return the desired customer
      */
@@ -287,6 +298,7 @@ public class MarketPlace {
 
     /**
      * Removes the specified customer from the MarketPlace
+     *
      * @param index the index of the desired customer
      * @return the removed customer
      */
@@ -296,6 +308,7 @@ public class MarketPlace {
 
     /**
      * Removes the specified customer from the MarketPlace
+     *
      * @param customer the desired customer
      * @return the removed customer
      */

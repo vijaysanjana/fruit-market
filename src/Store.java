@@ -7,6 +7,9 @@ import java.io.*;
 
 /**
  * Store class contains descriptive information, owning Seller, list of Products, and list of Sales of the Store.
+ *
+ * @author Jack, Nathan, Sanj, Tommy, Adit
+ * @version 11/14/2022
  */
 public class Store {
 
@@ -118,6 +121,7 @@ public class Store {
 
     /**
      * Sorts a list of every Product in the Store based on price.
+     *
      * @param maxFirst true: sorts from high price to low price, false: sorts from low price to high price
      * @return the sorted list of Products
      */
@@ -147,6 +151,7 @@ public class Store {
 
     /**
      * Sorts a list of every Product in the Store based on quantity.
+     *
      * @param maxFirst true: sorts from high quantity to low quantity, false: sorts from low quantity to high quantity
      * @return the sorted list of Products
      */
@@ -176,6 +181,7 @@ public class Store {
 
     /**
      * Provides a list of the Store's sales by a specified customer.
+     *
      * @param customer the customer to search for sales from
      * @return list of sales from the specified customer
      */
@@ -191,6 +197,7 @@ public class Store {
 
     /**
      * Provides the number of the Store's products bought by a specified user.
+     *
      * @param customer the customer to search for sales from
      * @return number of products bought by the specified customers
      */
@@ -249,6 +256,7 @@ public class Store {
 
     /**
      * Adds a new product to the store's catalogue
+     *
      * @param product the product to add to the store
      */
     public void addProduct(Product product) {
@@ -257,6 +265,7 @@ public class Store {
 
     /**
      * Gets the specified product from the store's catalogue
+     *
      * @param index the index of the desired product
      * @return the desired product
      */
@@ -266,6 +275,7 @@ public class Store {
 
     /**
      * Removes the specified product from the store's catalogue
+     *
      * @param index the index of the desired product
      * @return the removed product
      */
@@ -275,6 +285,7 @@ public class Store {
 
     /**
      * Removes the specified product from the store's catalogue
+     *
      * @param product the desired product
      * @return the removed product
      */
@@ -288,6 +299,7 @@ public class Store {
 
     /**
      * Adds a new sale to the ShoppingCart
+     *
      * @param sale the sale to add to the ShoppingCart
      */
     public void addSale(Sale sale) {
@@ -297,6 +309,7 @@ public class Store {
 
     /**
      * Gets the specified sale from the ShoppingCart
+     *
      * @param index the index of the desired sale
      * @return the desired sale
      */
@@ -306,6 +319,7 @@ public class Store {
 
     /**
      * Removes the specified sale from the ShoppingCart
+     *
      * @param index the index of the desired sale
      * @return the removed sale
      */
@@ -315,6 +329,7 @@ public class Store {
 
     /**
      * Removes the specified sale from the ShoppingCart
+     *
      * @param sale the desired sale
      * @return the removed sale
      */

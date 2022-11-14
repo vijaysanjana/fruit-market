@@ -7,6 +7,9 @@ import java.util.*;
 
 /**
  * Product class containing descriptive information, owning Store, quantity, and price of the Product.
+ *
+ * @author Jack, Nathan, Sanj, Tommy, Adit
+ * @version 11/14/2022
  */
 public class Product {
 

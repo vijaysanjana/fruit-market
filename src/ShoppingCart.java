@@ -7,6 +7,9 @@ import java.util.*;
 
 /**
  * ShoppingCart class contains the ShoppingCart's owning Customer and the current purchases waiting to be made.
+ *
+ * @author Jack, Nathan, Sanj, Tommy, Adit
+ * @version 11/14/2022
  */
 public class ShoppingCart {
 
@@ -64,6 +67,7 @@ public class ShoppingCart {
 
     /**
      * Adds a new sale to the ShoppingCart
+     *
      * @param sale the sale to add to the ShoppingCart
      */
     public void addPurchase(Sale sale) {
@@ -73,6 +77,7 @@ public class ShoppingCart {
 
     /**
      * Gets the specified sale from the ShoppingCart
+     *
      * @param index the index of the desired sale
      * @return the desired sale
      */
@@ -82,6 +87,7 @@ public class ShoppingCart {
 
     /**
      * Removes the specified sale from the ShoppingCart
+     *
      * @param index the index of the desired sale
      * @return the removed sale
      */
@@ -92,6 +98,7 @@ public class ShoppingCart {
 
     /**
      * Removes the specified sale from the ShoppingCart
+     *
      * @param sale the desired sale
      * @return the removed sale
      */
@@ -105,6 +112,7 @@ public class ShoppingCart {
 
     /**
      * Removes the specified sale from the ShoppingCart
+     *
      * @param product the product of the desired sale
      * @return the removed sale
      */
