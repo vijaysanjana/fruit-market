@@ -65,7 +65,7 @@ public class MarketPlace {
         if(type.equalsIgnoreCase("name")) {
             ArrayList<Product> results = new ArrayList<>();
             for(Product p : products) {
-                if(p.getName().contains(str)) {
+                if(p.getName().toLowerCase().contains(str.toLowerCase())) {
                     results.add(p);
                 }
             }
@@ -73,7 +73,7 @@ public class MarketPlace {
         } else if(type.equalsIgnoreCase("desc")) {
             ArrayList<Product> results = new ArrayList<>();
             for(Product p : products) {
-                if(p.getDescription().contains(str)) {
+                if(p.getDescription().toLowerCase().contains(str.toLowerCase())) {
                     results.add(p);
                 }
             }
@@ -86,7 +86,7 @@ public class MarketPlace {
         ArrayList<Store> stores = getStores();
         ArrayList<Store> results = new ArrayList<>();
         for (Store s : stores) {
-            if (s.getName().contains(str)) {
+            if (s.getName().toLowerCase().contains(str.toLowerCase())) {
                 results.add(s);
             }
         }

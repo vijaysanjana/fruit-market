@@ -72,9 +72,12 @@ public class Product {
         if (!(o instanceof Product)) {
             return false;
         }
-        Product product = (Product) o;
-        return (name.equals(product.getName()) && description.equals(product.getDescription()) &&
-                quantity == product.getQuantity() && price == product.getPrice());
+
+        Product p = (Product) o;
+        String pPrice = String.format("%.2f", p.getPrice());
+        String tPrice = String.format("%.2f", this.getPrice());
+        return ((p.getName().equals(this.getName())) && (p.getDescription().equals(this.getDescription()))
+                && (pPrice.equalsIgnoreCase(tPrice)) && (p.getQuantity() == this.getQuantity()));
     }
 
     public String toString() {
