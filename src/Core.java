@@ -987,7 +987,7 @@ class Core {
         } else if (action.equalsIgnoreCase("2")) {
             cartedProductsMenu();
         } else if (action.equalsIgnoreCase("3")) {
-            historyMenu();
+            salesMenu();
         } else if (action.equalsIgnoreCase("4")) {
             dashboardMenu(0);
         } else if (action.equalsIgnoreCase("d")) {
@@ -1283,12 +1283,33 @@ class Core {
         }
     }
 
-    public static void cartedProductsMenu() {
-
+    public static void cartedProductsMenu() { // TODO: Complete!
+        System.out.println(separator);
+        System.out.println("Your Stores:");
+        for (Store store : ((Seller) user).getStores()) {
+            System.out.println("- " + store.getName());
+        }
     }
 
     public static void salesMenu() {
-
+        System.out.println(separator);
+        System.out.println("Your Stores:");
+        for (Store store : ((Seller) user).getStores()) {
+            System.out.println("- " + store.getName());
+            int counter = 1;
+            if (store.getSales().size() > 0) {
+                for (Sale sale : store.getSales()) {
+                    System.out.println("--- #" + counter + " - " + sale.getCustomer().getUsername() + " (" + sale.getQuantity() + "Items | $" + sale.getTotalCost() + " Total)");
+                    counter++;
+                }
+            } else {
+                System.out.println("No sales found");
+            }
+        }
+        System.out.println(separator);
+        System.out.println("Type [Anything] to return to Seller Menu: ");
+        sc.nextLine();
+        sellerMainMenu();
     }
 
 
