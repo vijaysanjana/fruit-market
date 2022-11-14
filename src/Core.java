@@ -189,6 +189,7 @@ class Core {
         System.out.println("[2] Search for Product");
         System.out.println("[3] View Shopping Cart (" + shoppingCart.getHeldPurchases().size() + " Products)");
         System.out.println("[4] View Purchase History");
+        System.out.println("[D] Delete Account");
         System.out.println("[Q] Logout & Quit");
 
         String action = sc.nextLine();
@@ -200,6 +201,8 @@ class Core {
             cartMenu();
         } else if (action.equalsIgnoreCase("4")) { // TODO: needs testing
             historyMenu();
+        } else if(action.equalsIgnoreCase("d")) {
+            deleteAccount(user);
         } else if (action.equalsIgnoreCase("q")) { // TODO: needs testing
             printFarewell();
         } else {
@@ -715,7 +718,7 @@ class Core {
                     }
                 }
             }
-        } else if(cartPick.equalsIgnoreCase("c")) { // TODO: needs testing
+        } else if(cartPick.equalsIgnoreCase("ch")) { // TODO: needs testing
             String allTotalPrice = String.format("%.2f", allTotal);
 
             System.out.println(separator);
@@ -729,12 +732,20 @@ class Core {
                     || purchaseAction.equalsIgnoreCase("yes")) { // TODO: needs testing
                 System.out.println(separator);
                 for (Sale heldPurchase : shoppingCart.getHeldPurchases()) {
-                    if (heldPurchase.getQuantity() <= heldPurchase.getProduct().getQuantity()) {
-                        ((Customer) user).addSale(heldPurchase);
-                        heldPurchase.getProduct().setQuantity(heldPurchase.getProduct().getQuantity() - heldPurchase.getQuantity());
-                        System.out.println("Purchased " + heldPurchase.getProduct().getName() + "!");
-                    } else {
-                        System.out.println("Failed to purchase " + heldPurchase.getProduct().getName() + ": You ordered more products than were available.");
+                    Product p = heldPurchase.getProduct();
+                    int quantitySold = FileManager.getCustomerShoppingCartQuantity((Customer) user, p);
+                    FileManager.addCustomerData((Customer) user, heldPurchase.getProduct(), quantitySold); //add to history
+                    System.out.println("Purchased " + quantitySold + "!"); //announce purchase
+                    FileManager.updateCustomerShoppingCart((Customer) user, p, 0); //remove from cart
+                    for(Seller seller : mp.getSellers()) {
+                        for(Store store : seller.getStores()) {
+                            for(Product prod : store.getProducts()) {
+                                if(prod.getName().equals(p.getName()) && prod.getDescription().equals(p.getDescription())
+                                        && prod.getPrice()==p.getPrice()) {
+                                    FileManager.updateSellerData(seller, store, p, p.getQuantity(), quantitySold);
+                                }
+                            }
+                        }
                     }
                 }
                 shoppingCart.setHeldPurchases(new ArrayList<>());
@@ -749,15 +760,49 @@ class Core {
     }
 
     public static void historyMenu() {
-        ArrayList<Sale> history = ((Customer) user).getPurchases();
-        if (history == null || history.size() == 0) {
-            System.out.println("You have not purchased anything yet!");
+        ArrayList<ArrayList<Object>> history = FileManager.getCustomerData((Customer) user);
+
+        System.out.println(separator);
+        System.out.println("Your purchase history:");
+        if(history == null || history.size() == 0) {
+            System.out.println("- No purchases found");
         } else {
-            for (Sale s : history) {
-                System.out.println(s.getProduct().getName() + " (" + s.getQuantity() + " ct.) was purchased for $" + String.format("%.2f", s.getTotalCost()));
+            for(ArrayList<Object> arr : history) {
+                int quant = Integer.parseInt((String) arr.get(0));
+                Product prod = (Product) arr.get(1);
+                System.out.println("- " + prod.getName());
+                System.out.println("---- Price Each: " + prod.getPrice());
+                System.out.println("---- Quantity Purchased: " + quant);
+                System.out.println("---- Total Price: " +
+                        String.format("%.2f", (prod.getPrice()*quant)));
             }
         }
+        System.out.println(separator);
+        System.out.println("Type [Anything] to return to Customer Menu: ");
+        sc.nextLine();
         customerMainMenu();
+    }
+
+    public static void deleteAccount(User user) {
+        System.out.println(separator);
+        System.out.println("WARNING: Are you sure you want to delete your account?");
+        System.out.println("WARNING: All user data will be lost and will NOT be recoverable!");
+        System.out.println("WARNING: THIS DECISION IS FINAL!");
+        System.out.println(separator);
+        System.out.println("Please enter: ");
+        System.out.println("[DELETE] Delete Account (All Caps Required)");
+        System.out.println("[Anything Else] Cancel & Return to Main Menu");
+
+        String action = sc.nextLine();
+        if(action.equals("DELETE")) {
+            FileManager.removeAccount(user);
+        } else {
+            if(user instanceof Customer) {
+                customerMainMenu();
+            } else if(user instanceof Seller) {
+                sellerMainMenu();
+            }
+        }
     }
 
     public static void sellerMainMenu() {
