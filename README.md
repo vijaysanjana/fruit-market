@@ -43,6 +43,6 @@ This class contains the ShoppingCart's owning Customer and the current purchases
 ## Store
 The Store class contains the name of the store, the description that the Seller has chosen to give the Store, the products in the Store, and all its Sales. 
 ## Test
-This is a tester class that was created which contains junit tests to make sure the application works as intended. The Class contains local tests to individually test the Customer, Sale, Store, Seller, and Marketplace classes.
+This is a tester class that was created which contains junit tests to make sure the application works as intended. The Class contains local tests to individually test the Customer, Sale, Store, Seller, Marketplace, Product, and User classes. Each class tests majority of the methods in the classes using the assertEquals method to ensure all methods are working properly.
 ## User
 This class creates parameters and their respective getter/setter methods that were common to both Customers and Sellers. These parameters are usernames, emails, and passwords.
