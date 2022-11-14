@@ -189,8 +189,9 @@ class Core {
         System.out.println("Please enter: ");
         System.out.println("[1] Open Marketplace");
         System.out.println("[2] Search for Fruit");
-        System.out.println("[3] View Shopping Cart (" + shoppingCart.getHeldPurchases().size() + " Fruits)");
+        System.out.println("[3] View Shopping Cart (" + shoppingCart.getTotalheldProducts() + " Fruits)");
         System.out.println("[4] View Purchase History");
+        System.out.println("[5] View Statistics Dashboard");
         System.out.println("[D] Delete Account");
         System.out.println("[Q] Logout & Quit");
 
@@ -203,6 +204,8 @@ class Core {
             cartMenu();
         } else if (action.equalsIgnoreCase("4")) { // TODO: needs testing
             historyMenu();
+        } else if (action.equalsIgnoreCase("5")) {  // TODO: needs testing
+            dashboardMenu(0);
         } else if(action.equalsIgnoreCase("d")) {
             deleteAccount(user);
         } else if (action.equalsIgnoreCase("q")) { // TODO: needs testing
@@ -703,6 +706,7 @@ class Core {
                         // TESTING
 
                         shoppingCart.getPurchase(Integer.parseInt(cartPick) - 1).setQuantity(Integer.parseInt(changeQuantity));
+                        shoppingCart.recalculateTotalHeldProducts();
                         System.out.println("Successfully changed purchase quantity to " + changeQuantity + "." +
                                 " Returning to shopping cart page...");
                         cartMenu();
@@ -724,7 +728,7 @@ class Core {
             String allTotalPrice = String.format("%.2f", allTotal);
 
             System.out.println(separator);
-            System.out.println("You are purchasing " + counter + " fruits for $" + allTotalPrice);
+            System.out.println("You are purchasing " + shoppingCart.getTotalheldProducts() + " fruits for $" + allTotalPrice);
             System.out.println(separator);
             System.out.println("Would you like to complete the purchase?" +
                     "\nPlease enter [Y] or [Yes] to purchase, or [Anything Else] to return: ");
@@ -735,12 +739,16 @@ class Core {
                 System.out.println(separator);
                 for (Sale heldPurchase : shoppingCart.getHeldPurchases()) {
                     Product p = heldPurchase.getProduct();
+
                     int quantitySold = FileManager.getCustomerShoppingCartQuantity((Customer) user, p);
                     FileManager.addCustomerData((Customer) user, heldPurchase.getProduct(), quantitySold); //add to history
-                    System.out.println("Purchased " + quantitySold + "!"); //announce purchase
+                    System.out.println("Purchased " + quantitySold + " " + p.getName() + "!"); //announce purchase
                     FileManager.updateCustomerShoppingCart((Customer) user, p, 0); //remove from cart
                     for(Seller seller : mp.getSellers()) {
                         for(Store store : seller.getStores()) {
+                            if (store.getProducts().contains(p)) {
+                                store.addSale(heldPurchase);
+                            }
                             for(Product prod : store.getProducts()) {
                                 if(prod.getName().equals(p.getName()) && prod.getDescription().equals(p.getDescription())
                                         && prod.getPrice()==p.getPrice()) {
@@ -778,12 +786,79 @@ class Core {
                 System.out.println("--- Total Price: " +
                         String.format("%.2f", (prod.getPrice()*quant)));
             }
+            System.out.println("You have purchased " + ((Customer) user).getTotalPurchasedProducts() + "fruits in total!");
         }
         System.out.println(separator);
         System.out.println("Type [Anything] to return to Customer Menu: ");
         sc.nextLine();
         customerMainMenu();
     }
+
+    public static void dashboardMenu(int sortMode) {
+        if (user instanceof Customer) {
+            System.out.println(separator);
+            System.out.println("All Available Stores:");
+            ArrayList<Store> stores = new ArrayList<>();
+            switch (sortMode) {
+                case 1:
+                    stores = mp.getSalesSortedStores(true);
+                    break;
+                case 2:
+                    stores = mp.getSalesSortedStores(false);
+                    break;
+                case 3:
+                    stores = mp.getUserSalesSortedStores(user, true);
+                    break;
+                case 4:
+                    stores = mp.getUserSalesSortedStores(user, false);
+                    break;
+                default:
+                    stores = mp.getStores();
+            }
+
+            for (Store store : stores) {
+                int soldToUser = store.getQuantityOfProductsBoughtByCustomer((Customer) user);
+                System.out.println("- " + store.getName());
+                System.out.println("--- Total Products Sold: " + store.getTotalSoldProducts());
+                System.out.println("--- Total Products Sold to You: " + soldToUser);
+            }
+            System.out.println(separator);
+            System.out.println("Please enter:");
+            System.out.println("[1] Sort Stores by Total Products Sold (High to Low)");
+            System.out.println("[2] Sort Stores by Total Products Sold (Low to High)");
+            System.out.println("[3] Sort Stores by Total Products Sold to You (High to Low)");
+            System.out.println("[4] Sort Stores by Total Products Sold to You (Low to High)");
+            System.out.println("[Anything Else] Return to Customer Menu");
+
+            String productPick = sc.nextLine();
+            if (productPick.equalsIgnoreCase("1")) { // TODO: needs testing
+                // TODO: Dashboard Sort
+                dashboardMenu(1);
+            } else if (productPick.equalsIgnoreCase("2")) { // TODO: needs testing
+                // TODO: Dashboard Sort
+                dashboardMenu(2);
+            } else if (productPick.equalsIgnoreCase("3")) { // TODO: needs testing
+                // TODO: Dashboard Sort
+                dashboardMenu(3);
+            } else if (productPick.equalsIgnoreCase("4")) { // TODO: needs testing
+                // TODO: Dashboard Sort
+                dashboardMenu(4);
+            } else { // TODO: needs testing
+                customerMainMenu();
+            }
+        } else if (user instanceof Seller) {
+
+        }
+    }
+
+    public static void customerSalesStatsDashboard() {
+
+    }
+
+    public static void productSalesStatsDashboard() {
+
+    }
+
 
     public static void deleteAccount(User user) {
         System.out.println(separator);
@@ -811,6 +886,9 @@ class Core {
         System.out.println("What would you like to do today?");
         System.out.println("Please enter: ");
         System.out.println("[1] View Your Stores");
+        System.out.println("[2] View Your Carted Fruits");
+        System.out.println("[3] View Sales History");
+        System.out.println("[4] View Statistics Dashboard");
         System.out.println("[D] Delete & Logout");
         System.out.println("[Q] Logout & Quit");
 
@@ -999,6 +1077,16 @@ class Core {
                 storesMenu();
             }
         }
+    }
+
+
+    public static void salesMenu() {
+
+    }
+
+
+    public static void cartedProductsMenu() {
+
     }
 
 
