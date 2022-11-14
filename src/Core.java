@@ -5,7 +5,7 @@ import java.util.*;
  * Marketplace main menu system used for logic control flow and to display login, signup, and user actions
  */
 class Core {
-    private static final String separator = "---------------------------";
+    public static final String separator = "---------------------------";
     private static Scanner sc = new Scanner(System.in);
     private static User user;
     private static ShoppingCart shoppingCart;
@@ -737,6 +737,7 @@ class Core {
                 System.out.println(separator);
                 for (Sale heldPurchase : shoppingCart.getHeldPurchases()) {
                     Product p = heldPurchase.getProduct();
+
                     int quantitySold = FileManager.getCustomerShoppingCartQuantity((Customer) user, p);
                     ((Customer) user).addSale(heldPurchase);
                     FileManager.addCustomerData((Customer) user, heldPurchase.getProduct(), quantitySold); //add to history
@@ -790,10 +791,18 @@ class Core {
                 System.out.println("--- Total Price: " +
                         String.format("%.2f", (prod.getPrice()*quant)));
             }
+            System.out.println("You have purchased " + ((Customer) user).getTotalPurchasedProducts() + "fruits in total!");
         }
         System.out.println(separator);
-        System.out.println("Type [Anything] to return to Customer Menu: ");
-        sc.nextLine();
+        System.out.println("Please enter:");
+        System.out.println("[EX] Export Purchase History CSV");
+        System.out.println("[Anything Else] Return to Customer Menu: ");
+        String action = sc.nextLine();
+
+        if(action.equalsIgnoreCase("ex")) {
+            FileManager.exportCustomerHistory((Customer) user);
+            System.out.println("Returning to customer menu...");
+        }
         customerMainMenu();
     }
 
@@ -822,8 +831,8 @@ class Core {
             for (Store store : stores) {
                 int soldToUser = store.getQuantityOfProductsBoughtByCustomer((Customer) user);
                 System.out.println("- " + store.getName());
-                System.out.println("--- Total Fruits Sold: " + store.getTotalSoldProducts());
-                System.out.println("--- Your Purchases: " + soldToUser);
+                System.out.println("--- Total Products Sold: " + store.getTotalSoldProducts());
+                System.out.println("--- Total Products Sold to You: " + soldToUser);
             }
             System.out.println(separator);
             System.out.println("Please enter:");
@@ -1045,6 +1054,8 @@ class Core {
                     System.out.println("Please enter: ");
                     System.out.println("[Corresponding #] View Fruit Info");
                     System.out.println("[AD] Add New Fruit");
+                    System.out.println("[IM] Import Items CSV");
+                    System.out.println("[EX] Export Items CSV");
                     System.out.println("[Anything Else] Return to Seller Menu");
 
                     String productPick = sc.nextLine();
@@ -1078,6 +1089,14 @@ class Core {
                         }
                     } else if(productPick.equalsIgnoreCase("ad")) {
                         addNewProduct(store);
+                    } else if(productPick.equalsIgnoreCase("im")) {
+                        FileManager.importSellerCSV((Seller) user, store);
+                        System.out.println("Returning to all stores menu...");
+                        storesMenu();
+                    } else if(productPick.equalsIgnoreCase("ex")) {
+                        FileManager.exportSellerCSV((Seller) user, store);
+                        System.out.println("Returning to all stores menu...");
+                        storesMenu();
                     } else {
                         sellerMainMenu();
                     }
