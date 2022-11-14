@@ -296,35 +296,50 @@ public class Tester {
         Assert.assertEquals(s, seller.removeStore(s));
         Assert.assertEquals(1, seller.getStores().size());
         Assert.assertEquals(s2, seller.getStore(0));
-        seller.updateSeller();
-        File f = new File(seller.getUsername() + ".csv");
+//        seller.updateSeller();
+//        File f = new File(seller.getUsername() + ".csv");
 
-        ArrayList<String> checker = new ArrayList<>();
-        checker.add("hammer,bangs nails into walls,12,10.0");
-        checker.add("nails,holds things together,100,0.05");
-        checker.add("drill,automated way to attach nails,6,40.0");
+//        ArrayList<String> checker = new ArrayList<>();
+//        checker.add("hammer,bangs nails into walls,12,10.0");
+//        checker.add("nails,holds things together,100,0.05");
+//        checker.add("drill,automated way to attach nails,6,40.0");
 
+//        try {
+//            FileReader fr = new FileReader(f);
+//            BufferedReader bfr = new BufferedReader(fr);
+//
+//            ArrayList<String> lines = new ArrayList<>();
+//
+//            String line = bfr.readLine();
+//            while (line != null) {
+//                lines.add(line);
+//                line = bfr.readLine();
+//            }
+//
+//            for (int i = 0; i < lines.size(); i++) {
+//                Assert.assertEquals(checker.get(i), lines.get(i));
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+
+        File f2 = new File("userData");
         try {
-            FileReader fr = new FileReader(f);
+            FileReader fr = new FileReader(f2);
             BufferedReader bfr = new BufferedReader(fr);
 
-            ArrayList<String> lines = new ArrayList<>();
-
+            ArrayList<String> lines = new ArrayList<String>();
             String line = bfr.readLine();
             while (line != null) {
                 lines.add(line);
                 line = bfr.readLine();
             }
-
-            for(int i = 0; i < lines.size(); i++) {
-                Assert.assertEquals(checker.get(i), lines.get(i));
-            }
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        File f2 = new File("userData");
-        int size = 0;
+        seller.pushToFile();
+
         try {
             FileReader fr = new FileReader(f2);
             BufferedReader bfr = new BufferedReader(fr);
@@ -336,30 +351,10 @@ public class Tester {
                 line = bfr.readLine();
             }
 
-            size = lines.size();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        seller.pushToFile();
-
-        try {
-            FileReader fr = new FileReader(f);
-            BufferedReader bfr = new BufferedReader(fr);
-
-            ArrayList<String> lines = new ArrayList<String>();
-            String line = bfr.readLine();
-            while (line != null) {
-                lines.add(line);
-                line = bfr.readLine();
-            }
-
-            Assert.assertEquals(size + 1, lines.size());
             Assert.assertEquals("S:johndoe;johndoe@gmail.com;password", lines.get(lines.size() - 1));
         } catch (IOException e) {
             e.printStackTrace();
         }
-
 
 
     }
@@ -403,6 +398,19 @@ public class Tester {
         products2.add(n);
         allProducts.add(d);
         products2.add(d);
+        allProducts.add(h);
+        allProducts.add(n);
+        allProducts.add(d);
+
+        allProducts.add(p);
+        allProducts.add(a);
+        allProducts.add(c);
+        allProducts.add(h);
+        allProducts.add(n);
+        allProducts.add(d);
+        allProducts.add(h);
+        allProducts.add(n);
+        allProducts.add(d);
 
         Store s2 = new Store("Home Depot", "Hardware", products2);
         Store s3 = new Store("Lowe's", "Hardware", products2);
@@ -412,7 +420,10 @@ public class Tester {
         stores.add(s2);
         stores.add(s3);
 
-        ArrayList<Store> allStores = stores;
+        ArrayList<Store> allStores = new ArrayList<>();
+        allStores.add(s);
+        allStores.add(s2);
+        allStores.add(s3);
         allStores.add(s);
         allStores.add(s2);
         allStores.add(s3);
@@ -433,12 +444,86 @@ public class Tester {
 
         ArrayList<Product> juice = new ArrayList<>();
         juice.add(p);
+        juice.add(p);
         ArrayList<Store> safeway = new ArrayList<>();
+        safeway.add(s);
         safeway.add(s);
         Assert.assertEquals(juice, mp.searchProducts("name", "juice"));
         Assert.assertEquals(juice, mp.searchProducts("desc", "sweet and fruity"));
         Assert.assertEquals(safeway, mp.searchStores("Safe"));
 
+        Seller seller3 = new Seller("janedoe", "johndoe@gmail.com", "password", stores);
+        Seller seller4 = new Seller("janedoe", "johndoe@gmail.com", "password", stores);
+        mp.addSeller(seller3);
+        mp.addSeller(seller4);
+        Assert.assertEquals(seller3, mp.removeSeller(3));
+        Assert.assertEquals(seller3, mp.removeSeller(seller3));
+        Assert.assertEquals(seller, mp.getSeller(0));
+
     }
 
+    //product test class
+    @Test
+    public void productTest() {
+        Product p = new Product("apple", "a red fruit", 1.00, 10);
+        Product p2 = new Product("apple", "a red fruit", 1.00, 10);
+
+        Assert.assertEquals(true, p.equals(p2));
+        Assert.assertEquals("apple", p.getName());
+        Assert.assertEquals(1.00, p.getPrice(), 1e-15);
+        Assert.assertEquals("a red fruit", p.getDescription());
+        Assert.assertEquals(10, p.getQuantity());
+        Assert.assertEquals("apple,a red fruit,10,1.0", p.toString());
+
+        p.pushToFile();
+
+        File f = new File("productData");
+        try {
+            FileReader fr = new FileReader(f);
+            BufferedReader bfr = new BufferedReader(fr);
+
+            ArrayList<String> lines = new ArrayList<String>();
+            String line = bfr.readLine();
+            while (line != null) {
+                lines.add(line);
+                line = bfr.readLine();
+            }
+
+            Assert.assertEquals("apple:a red fruit;1.00;10", lines.get(lines.size() - 1));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    //user test class
+    @Test
+    public void userTest() {
+        User u = new User("johndoe", "johndoe@gmail.com", "password");
+        User u2 = new User("johndoe", "johndoe@gmail.com", "password");
+
+        Assert.assertEquals(true, u.equals(u2));
+        Assert.assertEquals("johndoe", u.getUsername());
+        Assert.assertEquals("johndoe@gmail.com", u.getEmail());
+        Assert.assertEquals("password", u.getPassword());
+
+        u.pushToFile();
+
+        File f = new File("userData");
+        try {
+            FileReader fr = new FileReader(f);
+            BufferedReader bfr = new BufferedReader(fr);
+
+            ArrayList<String> lines = new ArrayList<String>();
+            String line = bfr.readLine();
+            while (line != null) {
+                lines.add(line);
+                line = bfr.readLine();
+            }
+
+            Assert.assertEquals("U:johndoe;johndoe@gmail.com;password", lines.get(lines.size() - 1));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
 }
