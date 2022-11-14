@@ -58,6 +58,7 @@ public class Sale {
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
+        this.totalCost = product.getPrice() * quantity;
     }
 
     public double getTotalCost() {

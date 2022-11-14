@@ -139,7 +139,7 @@ public class Seller extends User {
     }
 
     public ArrayList<Product> getAllProducts() {
-        ArrayList<Product> allProducts = null;
+        ArrayList<Product> allProducts = new ArrayList<>();
         for (Store s : stores) {
             ArrayList<Product> products = s.getProducts();
             for (Product p : products) {
