@@ -112,6 +112,64 @@ public class MarketPlace {
     }
 
 
+    /**
+     * Sorts a list of every Store in the MarketPlace based on sales.
+     * @param maxFirst true: sorts from high sales to low sales, false: sorts from low sales to high sales
+     * @return the sorted list of Stores
+     */
+    public ArrayList<Store> getSalesSortedStores(boolean maxFirst) {
+        ArrayList<Store> copiedStores = new ArrayList<>();
+        for (Store store : getStores()) {
+            copiedStores.add(store);
+        }
+        ArrayList<Store> sortedStores = new ArrayList<>();
+
+        while (copiedStores.size() > 0) {
+            Store min = copiedStores.get(0);
+            for (int i = 1; i < copiedStores.size(); i++) {
+                if (copiedStores.get(i).getTotalSoldProducts() < min.getTotalSoldProducts()) {
+                    min = copiedStores.get(i);
+                }
+            }
+            copiedStores.remove(min);
+            sortedStores.add(min);
+        }
+        if (maxFirst) {
+            Collections.reverse(sortedStores);
+        }
+        return sortedStores;
+    }
+
+
+    /**
+     * Sorts a list of every Store in the MarketPlace based on sales to a specified user.
+     * @param maxFirst true: sorts from high sales to low sales, false: sorts from low sales to high sales
+     * @return the sorted list of Stores
+     */
+    public ArrayList<Store> getUserSalesSortedStores(User user, boolean maxFirst) {
+        ArrayList<Store> copiedStores = new ArrayList<>();
+        for (Store store : getStores()) {
+            copiedStores.add(store);
+        }
+        ArrayList<Store> sortedStores = new ArrayList<>();
+
+        while (copiedStores.size() > 0) {
+            Store min = copiedStores.get(0);
+            for (int i = 1; i < copiedStores.size(); i++) {
+                if (copiedStores.get(i).getQuantityOfProductsBoughtByCustomer((Customer) user) < min.getQuantityOfProductsBoughtByCustomer((Customer) user)) {
+                    min = copiedStores.get(i);
+                }
+            }
+            copiedStores.remove(min);
+            sortedStores.add(min);
+        }
+        if (maxFirst) {
+            Collections.reverse(sortedStores);
+        }
+        return sortedStores;
+    }
+
+
     //Equals
     @Override
     public boolean equals(Object o) {

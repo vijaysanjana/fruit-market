@@ -173,6 +173,38 @@ public class Store {
     }
 
 
+    /**
+     * Provides a list of the Store's sales by a specified customer.
+     * @param customer the customer to search for sales from
+     * @return list of sales from the specified customer
+     */
+    public ArrayList<Sale> getSalesFromCustomer(Customer customer) {
+        ArrayList<Sale> salesFromCustomer = new ArrayList<>();
+        for (Sale sale : sales) {
+            if (sale.getCustomer().equals(customer)) {
+                salesFromCustomer.add(sale);
+            }
+        }
+        return salesFromCustomer;
+    }
+
+    /**
+     * Provides the number of the Store's products bought by a specified user.
+     * @param customer the customer to search for sales from
+     * @return number of products bought by the specified customers
+     */
+    public int getQuantityOfProductsBoughtByCustomer(Customer customer) {
+        ArrayList<Sale> salesFromCustomer = getSalesFromCustomer(customer);
+        int soldToCustomer = 0;
+        for (Sale sale : salesFromCustomer) {
+            if (sale.getCustomer().equals(customer)) {
+                soldToCustomer += sale.getQuantity();
+            }
+        }
+        return soldToCustomer;
+    }
+
+
     //Equals
     @Override
     public boolean equals(Object o) {

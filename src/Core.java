@@ -202,7 +202,7 @@ class Core {
         } else if (action.equalsIgnoreCase("4")) { // TODO: needs testing
             historyMenu();
         } else if (action.equalsIgnoreCase("5")) {  // TODO: needs testing
-            dashboardMenu();
+            dashboardMenu(0);
         } else if (action.equalsIgnoreCase("q")) { // TODO: needs testing
             printFarewell();
         } else {
@@ -771,16 +771,29 @@ class Core {
         customerMainMenu();
     }
 
-    public static void dashboardMenu() {
+    public static void dashboardMenu(int sortMode) {
         System.out.println(separator);
         System.out.println("All Available Stores:");
-        for (Store store : mp.getStores()) {
-            int soldToUser = 0;
-            for (Sale sale : store.getSales()) {
-                if (sale.getCustomer().equals((Customer) user)) {
-                    soldToUser += sale.getQuantity();
-                }
-            }
+        ArrayList<Store> stores = new ArrayList<>();
+        switch (sortMode) {
+            case 1:
+                stores = mp.getSalesSortedStores(true);
+                break;
+            case 2:
+                stores = mp.getSalesSortedStores(false);
+                break;
+            case 3:
+                stores = mp.getUserSalesSortedStores(user, true);
+                break;
+            case 4:
+                stores = mp.getUserSalesSortedStores(user, false);
+                break;
+            default:
+                stores = mp.getStores();
+        }
+
+        for (Store store : stores) {
+            int soldToUser = store.getQuantityOfProductsBoughtByCustomer((Customer) user);
             System.out.println("- " + store.getName());
             System.out.println("--- Total Products Sold: " + store.getTotalSoldProducts());
             System.out.println("--- Total Products Sold to You: " + soldToUser);
@@ -796,16 +809,16 @@ class Core {
         String productPick = sc.nextLine();
         if (productPick.equalsIgnoreCase("1")) { // TODO: needs testing
             // TODO: Dashboard Sort
-            dashboardMenu();
+            dashboardMenu(1);
         } else if (productPick.equalsIgnoreCase("2")) { // TODO: needs testing
             // TODO: Dashboard Sort
-            dashboardMenu();
+            dashboardMenu(2);
         } else if (productPick.equalsIgnoreCase("3")) { // TODO: needs testing
             // TODO: Dashboard Sort
-            dashboardMenu();
+            dashboardMenu(3);
         } else if (productPick.equalsIgnoreCase("4")) { // TODO: needs testing
             // TODO: Dashboard Sort
-            dashboardMenu();
+            dashboardMenu(4);
         } else { // TODO: needs testing
             customerMainMenu();
         }
