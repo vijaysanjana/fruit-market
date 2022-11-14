@@ -1,5 +1,4 @@
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.*;
@@ -109,5 +108,24 @@ public class Customer extends User {
             return purchases.remove(purchases.indexOf(sale));
         }
         return null;
+    }
+
+    public void exportPurchases() throws IOException {
+        ArrayList<Sale> history = this.getPurchases();
+        String fileName = this.getUsername() + ".txt";
+        File f = new File(fileName);
+        FileOutputStream fos = new FileOutputStream(f, false);
+        PrintWriter pw = new PrintWriter(fos);
+        if (history == null || history.size() == 0) {
+            System.out.println("You have not purchased anything yet!");
+            return;
+        } else {
+            for (Sale s : history) {
+                pw.println(s.getProduct().getName() + " (" + s.getQuantity() + " ct.) was purchased for $" + String.format("%.2f", s.getTotalCost()));
+            }
+        }
+        fos.close();
+        pw.close();
+        System.out.println("A file titled " + this.getUsername() + ".txt has been created with your purchase history!");
     }
 }
