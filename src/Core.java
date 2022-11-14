@@ -828,10 +828,10 @@ class Core {
             }
             System.out.println(separator);
             System.out.println("Please enter:");
-            System.out.println("[1] Sort Stores by Total Products Sold (High to Low)");
-            System.out.println("[2] Sort Stores by Total Products Sold (Low to High)");
-            System.out.println("[3] Sort Stores by Total Products Sold to You (High to Low)");
-            System.out.println("[4] Sort Stores by Total Products Sold to You (Low to High)");
+            System.out.println("[1] Sort Stores by Total Fruits Sold (High to Low)");
+            System.out.println("[2] Sort Stores by Total Fruits Sold (Low to High)");
+            System.out.println("[3] Sort Stores by Total Fruits Sold to You (High to Low)");
+            System.out.println("[4] Sort Stores by Total Fruits Sold to You (Low to High)");
             System.out.println("[Anything Else] Return to Customer Menu");
 
             String productPick = sc.nextLine();
@@ -887,13 +887,14 @@ class Core {
     }
 
     public static void sellerMainMenu() {
+        System.out.println(separator);
         System.out.println("What would you like to do today?");
         System.out.println("Please enter: ");
         System.out.println("[1] View Your Stores");
         System.out.println("[2] View Your Carted Fruits");
         System.out.println("[3] View Sales History");
         System.out.println("[4] View Statistics Dashboard");
-        System.out.println("[D] Delete & Logout");
+        System.out.println("[D] Delete Account");
         System.out.println("[Q] Logout & Quit");
 
         String action = sc.nextLine();
@@ -965,12 +966,23 @@ class Core {
                             System.out.println(separator);
                             System.out.println("Please enter: ");
                             System.out.println("[QU] Change Quantity Available");
+                            System.out.println("[DE] Change Description");
                             System.out.println("[PR] Change Price");
                             System.out.println("[RM] Remove Fruit");
                             System.out.println("[Anything Else] Return to Seller Menu");
 
                             String productAction = sc.nextLine();
-                            // TODO
+                            if(productAction.equalsIgnoreCase("qu")) {
+                                changeProductQuantity(store, prod);
+                            } else if(productAction.equalsIgnoreCase("de")) {
+                                changeProductDescription(store, prod);
+                            } else if(productAction.equalsIgnoreCase("pr")) {
+                                changeProductPrice(store, prod);
+                            } else if(productAction.equalsIgnoreCase("rm")) {
+                                removeProduct(store, prod);
+                            } else {
+                                sellerMainMenu();
+                            }
                         } else {
                             sellerMainMenu();
                         }
@@ -1083,6 +1095,103 @@ class Core {
         }
     }
 
+    public static void changeProductQuantity(Store store, Product product) {
+        System.out.println(separator);
+        System.out.println("Please enter a new fruit quantity (integer, at least 1): ");
+
+        String quant = sc.nextLine();
+        while(!quant.matches("-?\\d+(\\.\\d+)?") || (Integer.parseInt(quant) <= 0)) {
+            if(!tryAgain("Invalid value! Quantity must be an integer and at least 1!")) {
+                storesMenu();
+                break;
+            }
+            System.out.println("Please enter a new fruit quantity (integer, at least 1): ");
+            quant = sc.nextLine();
+        }
+
+        FileManager.updateSellerDataQuantity((Seller) user, store, product, Integer.parseInt(quant));
+        product.setQuantity(Integer.parseInt(quant));
+        System.out.println("Successfully updated " + product.getName()
+                + "'s quantity available to: " + quant);
+        System.out.println("Returning to all stores menu...");
+        storesMenu();
+    }
+
+    public static void changeProductDescription(Store store, Product product) {
+        System.out.println(separator);
+        System.out.println("Please enter a new fruit description: ");
+
+        String desc = sc.nextLine();
+        while(desc.contains(",") || desc.contains(";")) {
+            if(!tryAgain("Description cannot contain ',' or ';'!"));
+            storesMenu();
+            break;
+        }
+
+        FileManager.updateSellerDataDescription((Seller) user, store, product, desc);
+        product.setDescription(desc);
+        System.out.println("Successfully updated " + product.getName()
+                + "'s description to: " + desc);
+        System.out.println("Returning to all stores menu...");
+        storesMenu();
+    }
+
+    public static void changeProductPrice(Store store, Product product) {
+        System.out.println(separator);
+        System.out.println("Please enter a new price (double, at least 0.00): ");
+
+        String price = sc.nextLine();
+        String formatted = String.format("%.2f", Double.parseDouble(price));
+        while(!formatted.matches("-?\\d+(\\.\\d+)?") || (Double.parseDouble(formatted) < 0.00)) {
+            if(!tryAgain("Invalid value! Price must be a double and at least 0.00!")) {
+                storesMenu();
+                break;
+            }
+            System.out.println("Please enter a new price (double, at least 0.00): ");
+            price = sc.nextLine();
+            formatted = String.format("%.2f", Double.parseDouble(price));
+        }
+
+        FileManager.updateSellerDataPrice((Seller) user, store,
+                product, Double.parseDouble(formatted));
+        product.setPrice(Double.parseDouble(formatted));
+        System.out.println("Successfully updated " + product.getName()
+                + "'s description to: " + formatted);
+        System.out.println("Returning to all stores menu...");
+        storesMenu();
+    }
+
+    public static void removeProduct(Store store, Product product) {
+        System.out.println(separator);
+        System.out.println("WARNING: Are you sure you want to remove this product?");
+        System.out.println("WARNING: All seller data corresponding with this product will be deleted.");
+        System.out.println("WARNING: THIS DECISION IS FINAL");
+        System.out.println(separator);
+        System.out.println("Please enter: ");
+        System.out.println("[DELETE] Delete Product (All Caps Required)");
+        System.out.println("[Anything Else] Return to Seller Menu");
+        System.out.println(separator);
+
+        String action = sc.nextLine();
+        if(action.equals("DELETE")) {
+            FileManager.removeSellerDataProduct((Seller) user, store, product);
+
+            mp = new MarketPlace();
+            FileManager.loadAllStores(mp, true);
+            for(Seller seller : mp.getSellers()) {
+                if(seller.getUsername().equalsIgnoreCase(user.getUsername())
+                        && seller.getEmail().equalsIgnoreCase(user.getEmail())) {
+                    user = seller;
+                }
+            }
+
+            System.out.println("Successfully deleted " + product.getName());
+            System.out.println("Returning to seller menu...");
+            sellerMainMenu();
+        } else {
+            sellerMainMenu();
+        }
+    }
 
     public static void salesMenu() {
 
