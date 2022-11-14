@@ -12,7 +12,7 @@ class Core {
     private static MarketPlace mp = new MarketPlace();
 
     /**
-     * Main method for the marketplace system. Arranges login/signup and customer/seller menus.
+     * Main method for the marketplace system. Arranges login/signup and customer/seller menus
      * @param args
      */
     public static void main(String[] args) {
