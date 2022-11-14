@@ -1091,6 +1091,16 @@ class Core {
                         addNewProduct(store);
                     } else if(productPick.equalsIgnoreCase("im")) {
                         FileManager.importSellerCSV((Seller) user, store);
+
+                        mp = new MarketPlace();
+                        FileManager.loadAllStores(mp, true);
+                        for(Seller seller : mp.getSellers()) {
+                            if(seller.getUsername().equalsIgnoreCase(user.getUsername())
+                                    && seller.getEmail().equalsIgnoreCase(user.getEmail())) {
+                                user = seller;
+                            }
+                        }
+
                         System.out.println("Returning to all stores menu...");
                         storesMenu();
                     } else if(productPick.equalsIgnoreCase("ex")) {
@@ -1304,30 +1314,63 @@ class Core {
 
     public static void cartedProductsMenu() { // TODO: Complete!
         System.out.println(separator);
-        System.out.println("Your Stores:");
-        for (Store store : ((Seller) user).getStores()) {
-            System.out.println("- " + store.getName());
+        System.out.println("All carted items:");
+        ArrayList<ArrayList<String>> data = FileManager.getAllCarts();
+        for(int j = 0; j < data.size(); j++) {
+            ArrayList<String> arr = data.get(j);
+            System.out.println(separator);
+            System.out.println("- Customer: " + arr.get(0));
+            for(int i = 1; i < arr.size(); i++) {
+                String s = arr.get(i);
+                String temp = s.substring(s.indexOf(';')+1);
+                String name = temp.substring(0,temp.indexOf(';'));
+                String quant = s.substring(0,s.indexOf(';'));
+
+                String temp2 = temp.substring(temp.indexOf(';')+1);
+                String desc = temp2.substring(0,temp2.indexOf(';'));
+
+                String temp3 = temp2.substring(temp2.indexOf(';')+1);
+                String price = temp3.substring(0,temp3.indexOf(';'));
+
+                String quantAvail = temp3.substring(temp3.indexOf(';')+1);
+                System.out.println("--- Item: " + name + " (#Held: " + quant + ")");
+                System.out.println("----- Description: " + desc);
+                System.out.println("----- Price: " + price);
+                System.out.println("----- Quantity Available: " + quantAvail);
+            }
         }
+
+        System.out.println(separator);
+        System.out.println("Type [Anything] to return to Seller Menu");
+        String a = sc.nextLine();
+        sellerMainMenu();
     }
 
     public static void salesMenu() {
         System.out.println(separator);
-        System.out.println("Your Stores:");
-        for (Store store : ((Seller) user).getStores()) {
-            System.out.println("- " + store.getName());
-            int counter = 1;
-            if (store.getSales().size() > 0) {
-                for (Sale sale : store.getSales()) {
-                    System.out.println("--- #" + counter + " - " + sale.getCustomer().getUsername() + " (" + sale.getQuantity() + "Items | $" + sale.getTotalCost() + " Total)");
-                    counter++;
-                }
-            } else {
-                System.out.println("No sales found");
+        System.out.println("Your sales:");
+
+        ArrayList<ArrayList<Object>> temp = FileManager.getSellerAllData((Seller) user);
+        for(int i = 0; i < temp.size(); i++) {
+            ArrayList<Object> arr = temp.get(i);
+            System.out.println(separator);
+            System.out.println("- Store: " + arr.get(0));
+            for(int j = 2; j < arr.size(); j+=2) {
+                String q = (String) arr.get(j-1);
+                Product p = (Product) arr.get(j);
+                System.out.println("--- Item: " + p.getName());
+                System.out.println("----- Price: " + p.getPrice());
+                System.out.println("----- Quantity Sold: " + q);
+
+                String formatted = String.format("%.2f",
+                        Double.parseDouble(String.valueOf(Integer.parseInt(q)*p.getPrice())));
+                System.out.println("----- Profit Made: " + formatted);
             }
         }
+
         System.out.println(separator);
-        System.out.println("Type [Anything] to return to Seller Menu: ");
-        sc.nextLine();
+        System.out.println("Type [Anything] to return to Seller Menu");
+        String a = sc.nextLine();
         sellerMainMenu();
     }
 

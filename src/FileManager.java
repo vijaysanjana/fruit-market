@@ -819,6 +819,11 @@ public class FileManager {
         }
     }
 
+    /**
+     * Import a CSV and input it into seller's store data
+     * @param seller
+     * @param store
+     */
     public static void importSellerCSV(Seller seller, Store store) {
         System.out.println(Core.separator);
         Scanner sc = new Scanner(System.in);
@@ -826,6 +831,7 @@ public class FileManager {
         String filePath = sc.nextLine();
         try {
             ArrayList<String> arr = new ArrayList<>();
+            ArrayList<String> names = new ArrayList<>();
             File curFile = new File(sellerDataFolder + File.separatorChar
                     + seller.getUsername() + File.separatorChar
                     + store.getName() + "_data");
@@ -833,6 +839,9 @@ public class FileManager {
                     new FileReader(curFile));
             String line = currentReader.readLine();
             while(line != null) {
+                String temp = line.substring(line.indexOf(';')+1);
+                String name = temp.substring(0,temp.indexOf(';'));
+                names.add(name);
                 arr.add(line);
                 line = currentReader.readLine();
             }
@@ -844,7 +853,14 @@ public class FileManager {
                 if(line.split(",").length != 5) {
                     System.out.println("Skipping line (invalid format): " + line);
                 } else {
-                    arr.add(line.replaceAll(",", ";"));
+                    String temp = line.substring(line.indexOf(',')+1);
+                    String name = temp.substring(0,temp.indexOf(','));
+                    if(names.contains(name)) {
+                        System.out.println("Skipping line (name already used): " + line);
+                    } else {
+                        System.out.println("Added new product: " + name);
+                        arr.add(line.replaceAll(",", ";"));
+                    }
                 }
                 line = importReader.readLine();
             }
@@ -866,6 +882,11 @@ public class FileManager {
         }
     }
 
+    /**
+     * Export's seller's particular store as CSV
+     * @param seller
+     * @param store
+     */
     public static void exportSellerCSV(Seller seller, Store store) {
         System.out.println(Core.separator);
         try {
@@ -906,6 +927,10 @@ public class FileManager {
         }
     }
 
+    /**
+     * Exports customer's purchase history as CSV
+     * @param customer
+     */
     public static void exportCustomerHistory(Customer customer) {
         System.out.println(Core.separator);
         try {
@@ -941,5 +966,35 @@ public class FileManager {
             e.printStackTrace();
             throw new RuntimeException(new DataException());
         }
+    }
+
+    public static ArrayList<ArrayList<String>> getAllCarts() {
+        ArrayList<ArrayList<String>> cartData = new ArrayList<>();
+        File dataFolder = new File(customerDataFolder);
+        int counter = 0;
+        for(File f : dataFolder.listFiles()) {
+            if(f.isDirectory()) {
+                File cartFile = new File(customerDataFolder + File.separatorChar +
+                        f.getName() + File.separatorChar + "shopping_cart");
+                cartData.add(new ArrayList<>());
+                cartData.get(counter).add(f.getName());
+
+                try {
+                    BufferedReader br = new BufferedReader(new FileReader(cartFile));
+                    String line = br.readLine();
+                    while(line != null) {
+                        cartData.get(counter).add(line);
+                        line = br.readLine();
+                    }
+                } catch(Exception e) {
+                    e.printStackTrace();
+                    throw new RuntimeException(new DataException());
+                }
+
+                counter++;
+            }
+        }
+
+        return cartData;
     }
 }
