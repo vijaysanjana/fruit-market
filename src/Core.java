@@ -66,35 +66,15 @@ class Core {
                             break;
                         }
                     }
-
                     if (user instanceof Customer) {
                         System.out.println(separator);
                         System.out.println("Welcome customer: " + user.getUsername());
                         shoppingCart = ((Customer) user).getShoppingCart();
 
-                        // TESTING PRODUCTS, STORES, ETC ----------------------------------------------------------------------------------------------------------------
-                        Seller dendenMan = new Seller("DendenMan", "denny@dennys.gov", "secret");
-                        Store dennys = new Store("Denny's", "it's... Denny's");
-                        dennys.addProduct(new Product("Gamer Eggs", "Nature's Protein Shake", 19.99));
-                        dennys.addProduct(new Product("Gamer Sausage", "Nature's Protein... Protein", 5.99));
-                        dennys.addProduct(new Product("Gamer Pancakes", "Nature's Gluten Shake", 13.99));
-                        dendenMan.addStore(dennys);
-                        //
-
-                        // TESTING PRODUCTS, STORES, ETC
-                        Seller god = new Seller("God", "God@god.cod", "rapture");
-                        Store soapStore = new Store("God's Soap Emporium", "Got bored, like soap - God");
-                        soapStore.addProduct(new Product("Dawn PowerWash Dish Spray", "clean up you gross ass plate", 4.99));
-                        soapStore.addProduct(new Product("Lavender Ascent", "Isn't this a good name for soap?", 49.99));
-                        soapStore.addProduct(new Product("Tide Pods", "50% more edible than competitors", 2.49));
-                        god.addStore(soapStore);
-                        //
-
-                        // TESTING PRODUCTS, STORES, ETC
-                        mp.addSeller(dendenMan);
-                        mp.addSeller(god);
-                        mp.addCustomer((Customer) user);
-                        //------------------------------------------------------------------------------------------------------------------------------------------------
+                        // TESTING
+                        FileManager.loadAllStores(mp, true);
+                        FileManager.loadAllCarts((Customer) user, shoppingCart, mp);
+                        // TESTING
 
                         customerMainMenu();
                         break system_loop;
@@ -130,33 +110,6 @@ class Core {
                                     System.out.println(separator);
                                     System.out.println("Welcome customer: " + user.getUsername());
                                     shoppingCart = ((Customer) user).getShoppingCart();
-
-
-                                    // TESTING PRODUCTS, STORES, ETC ----------------------------------------------------------------------------------------------------------------
-                                    Seller dendenMan = new Seller("DendenMan", "denny@dennys.gov", "secret");
-                                    Store dennys = new Store("Denny's", "it's... Denny's");
-                                    dennys.addProduct(new Product("Gamer Eggs", "Nature's Protein Shake", 19.99));
-                                    dennys.addProduct(new Product("Gamer Sausage", "Nature's Protein... Protein", 5.99));
-                                    dennys.addProduct(new Product("Gamer Pancakes", "Nature's Gluten Shake", 13.99));
-                                    dendenMan.addStore(dennys);
-                                    //
-
-                                    // TESTING PRODUCTS, STORES, ETC
-                                    Seller god = new Seller("God", "God@god.cod", "rapture");
-                                    Store soapStore = new Store("God's Soap Emporium", "Got bored, like soap - God");
-                                    soapStore.addProduct(new Product("Dawn PowerWash Dish Spray", "clean up you gross ass plate", 4.99));
-                                    soapStore.addProduct(new Product("Lavender Ascent", "Isn't this a good name for soap?", 49.99));
-                                    soapStore.addProduct(new Product("Tide Pods", "50% more edible than competitors", 2.49));
-                                    god.addStore(soapStore);
-                                    //
-
-                                    // TESTING PRODUCTS, STORES, ETC
-                                    mp.addSeller(dendenMan);
-                                    mp.addSeller(god);
-                                    mp.addCustomer((Customer) user);
-                                    //------------------------------------------------------------------------------------------------------------------------------------------------
-
-
                                     customerMainMenu();
                                     break system_loop;
                                 } else {
@@ -224,14 +177,6 @@ class Core {
         return (yn.equalsIgnoreCase("y") || yn.equalsIgnoreCase("yes"));
     }
 
-    private static void showProductInfo(Product product) {
-        System.out.println(separator);
-        System.out.println("Product: " + product.getName());
-        System.out.println("Price: " + product.getPrice());
-        System.out.println("Quantity: " + product.getQuantity());
-        System.out.println("Description: " + product.getDescription());
-    }
-
     /**
      * Prints out the customer main menu for users to view.
      * Allows for navigation of the menu to see marketplace; view, search, and purchase products; and view history.
@@ -265,33 +210,6 @@ class Core {
     }
 
     public static void marketplaceMenu() {
-
-        /*// TESTING PRODUCTS, STORES, ETC
-        Seller dendenMan = new Seller("DendenMan", "denny@dennys.gov", "secret");
-        Store dennys = new Store("Denny's", "it's... Denny's");
-        dennys.addProduct(new Product("Gamer Eggs", "Nature's Protein Shake", 19.99));
-        dennys.addProduct(new Product("Gamer Sausage", "Nature's Protein... Protein", 5.99));
-        dennys.addProduct(new Product("Gamer Pancakes", "Nature's Gluten Shake", 13.99));
-        dendenMan.addStore(dennys);
-        //
-
-        // TESTING PRODUCTS, STORES, ETC
-        Seller god = new Seller("God", "God@god.cod", "rapture");
-        Store soapStore = new Store("God's Soap Emporium", "Got bored, like soap - God");
-        soapStore.addProduct(new Product("Dawn PowerWash Dish Spray", "clean up you gross ass plate", 4.99));
-        soapStore.addProduct(new Product("Lavender Ascent", "Isn't this a good name for soap?", 49.99));
-        soapStore.addProduct(new Product("Tide Pods", "50% more edible than competitors", 2.49));
-        god.addStore(soapStore);
-        //
-
-        MarketPlace mp = new MarketPlace();
-
-        // TESTING PRODUCTS, STORES, ETC
-        mp.addSeller(dendenMan);
-        mp.addSeller(god);
-        mp.addCustomer((Customer) user);
-        // */
-
         ArrayList<Store> stores = mp.getStores();
         ArrayList<Product> products = new ArrayList<Product>();
 
@@ -308,7 +226,7 @@ class Core {
                 for (Product p : tempProds) {
                     products.add(p);
                     System.out.println("--- #" + (counter + 1) + " " +
-                            p.getName() + " (Price: " + p.getPrice() + ")");
+                            p.getName() + " (Price $" + p.getPrice() + " | Quantity Available " + p.getQuantity() + ")");
                     counter++;
                 }
             }
@@ -317,48 +235,115 @@ class Core {
         if(!products.isEmpty()) {
             System.out.println(separator);
             System.out.println("Please enter: ");
+            System.out.println("[PH] Sort Products by Price (High to Low)");
+            System.out.println("[PL] Sort Products by Price (Low to High)");
+            System.out.println("[QH] Sort Products by Quantity Available (High to Low)");
+            System.out.println("[QL] Sort Products by Quantity Available (High to Low)");
             System.out.println("[Correspond #] View Product Info");
-            System.out.println("[Ph] Sort Products by Price (High to Low)");
-            System.out.println("[Pl] Sort Products by Price (Low to High)");
-            System.out.println("[Qh] Sort Products by Quantity Available (High to Low)");
-            System.out.println("[Ql] Sort Products by Quantity Available (High to Low)");
             System.out.println("[Anything Else] Return to Customer Menu");
 
             String productPick = sc.nextLine();
             if (productPick.matches("-?\\d+(\\.\\d+)?")) { // TODO: needs testing
-                Product p = products.get(Integer.parseInt(productPick) - 1);
-                if (p != null) { // TODO: needs testing
-                    showProductInfo(p);
-                    System.out.println(separator);
-                    System.out.println("Please enter: ");
-                    System.out.println("[1] Add to Shopping Cart");
-                    System.out.println("[Anything Else] Return to All Products Page");
-
-                    String productAction = sc.nextLine();
-                    if (productAction.equalsIgnoreCase("1")) {
-                        System.out.println(separator);
-                        System.out.println("Please enter a purchase quantity: ");
-                        String purchaseQuantity = sc.nextLine();
-                        while (!purchaseQuantity.matches("-?\\d+(\\.\\d+)?")) {
-                            System.out.println("Entered quantity is not an integer! Please enter a valid quantity: ");
-                            purchaseQuantity = sc.nextLine();
-                        }
-
-                        shoppingCart.addPurchase(new Sale((Customer) user, p, Integer.parseInt(purchaseQuantity)));
-                        System.out.println("Successfully added " + purchaseQuantity + " to your shopping cart." +
-                                " Returning to available products page...");
-                        marketplaceMenu();
-                    } else {
-                        marketplaceMenu();
+                while(Integer.parseInt(productPick)-1 > products.size()) {
+                    System.out.println("Entered # is not a valid product! Please enter a valid product #: ");
+                    productPick = sc.nextLine();
+                    if(!productPick.matches("-?\\d+(\\.\\d+)?")) {
+                        productPick = "QUIT_MENU_PLEASE";
+                        break;
                     }
-                } else { // TODO: needs testing
-                    while (p == null) {
-                        System.out.println("Entered # is not a valid product! Please enter a valid product #: ");
-                        productPick = sc.nextLine();
-                        if (!productPick.matches("-?\\d+(\\.\\d+)?")) {
-                            continue;
+                }
+                if(productPick.equals("QUIT_MENU_PLEASE")) {
+                    customerMainMenu();
+                } else {
+                    Product p = products.get(Integer.parseInt(productPick) - 1);
+                    if(p.getQuantity() <= 0) {
+                        while(p.getQuantity() <= 0) {
+                            System.out.println("There is no more of this product available to purchase! Please enter another option: ");
+                            productPick = sc.nextLine();
+                            if(productPick.matches("-?\\d+(\\.\\d+)?")) {
+                                p = products.get(Integer.parseInt(productPick) - 1);
+                                if(p.getQuantity() >= 1) {
+                                    if (p != null) { // TODO: needs testing
+                                        showProductInfo(p);
+                                        System.out.println(separator);
+                                        System.out.println("Please enter: ");
+                                        System.out.println("[1] Add to Shopping Cart");
+                                        System.out.println("[Anything Else] Return to All Products Page");
+
+                                        String productAction = sc.nextLine();
+                                        if (productAction.equalsIgnoreCase("1")) {
+                                            System.out.println(separator);
+                                            System.out.println("Please enter a purchase quantity: ");
+                                            String purchaseQuantity = sc.nextLine();
+                                            while (!purchaseQuantity.matches("-?\\d+(\\.\\d+)?")) {
+                                                System.out.println("Entered quantity is not an integer! Please enter a valid quantity: ");
+                                                purchaseQuantity = sc.nextLine();
+                                            }
+                                            while(p.getQuantity()-Integer.parseInt(purchaseQuantity) < 0) {
+                                                System.out.println("There is only " + p.getQuantity() + " of this product available to purchase.");
+                                                System.out.println("Please try a smaller quantity: ");
+                                                purchaseQuantity = sc.nextLine();
+                                            }
+
+                                            shoppingCart.addPurchase(new Sale((Customer) user, p, Integer.parseInt(purchaseQuantity)));
+
+                                            // TESTING
+                                            FileManager.addCustomerShopppingCart((Customer) user, p, Integer.parseInt(purchaseQuantity));
+                                            p.setQuantity(p.getQuantity()-Integer.parseInt(purchaseQuantity));
+                                            // TESTING
+
+                                            System.out.println("Successfully added " + purchaseQuantity + " to your shopping cart." +
+                                                    " Returning to available products page...");
+                                            marketplaceMenu();
+                                            break;
+                                        } else {
+                                            marketplaceMenu();
+                                            break;
+                                        }
+                                    }
+                                }
+                            } else {
+                                customerMainMenu();
+                                break;
+                            }
                         }
-                        p = products.get(Integer.parseInt(productPick) - 1);
+                    } else {
+                        if (p != null) { // TODO: needs testing
+                            showProductInfo(p);
+                            System.out.println(separator);
+                            System.out.println("Please enter: ");
+                            System.out.println("[1] Add to Shopping Cart");
+                            System.out.println("[Anything Else] Return to All Products Page");
+
+                            String productAction = sc.nextLine();
+                            if (productAction.equalsIgnoreCase("1")) {
+                                System.out.println(separator);
+                                System.out.println("Please enter a purchase quantity: ");
+                                String purchaseQuantity = sc.nextLine();
+                                while (!purchaseQuantity.matches("-?\\d+(\\.\\d+)?")) {
+                                    System.out.println("Entered quantity is not an integer! Please enter a valid quantity: ");
+                                    purchaseQuantity = sc.nextLine();
+                                }
+                                while(p.getQuantity()-Integer.parseInt(purchaseQuantity) < 0) {
+                                    System.out.println("There is only " + p.getQuantity() + " of this product available to purchase.");
+                                    System.out.println("Please try a smaller quantity: ");
+                                    purchaseQuantity = sc.nextLine();
+                                }
+
+                                shoppingCart.addPurchase(new Sale((Customer) user, p, Integer.parseInt(purchaseQuantity)));
+
+                                // TESTING
+                                FileManager.addCustomerShopppingCart((Customer) user, p, Integer.parseInt(purchaseQuantity));
+                                p.setQuantity(p.getQuantity()-Integer.parseInt(purchaseQuantity));
+                                // TESTING
+
+                                System.out.println("Successfully added " + purchaseQuantity + " to your shopping cart." +
+                                        " Returning to available products page...");
+                                marketplaceMenu();
+                            } else {
+                                marketplaceMenu();
+                            }
+                        }
                     }
                 }
             } else if (productPick.equalsIgnoreCase("ph")) { // TODO: needs testing
@@ -400,8 +385,15 @@ class Core {
         }
     }
 
+    private static void showProductInfo(Product product) {
+        System.out.println(separator);
+        System.out.println("Product: " + product.getName());
+        System.out.println("Description: " + product.getDescription());
+        System.out.println("Price: " + String.format("%.2f", product.getPrice()));
+        System.out.println("Quantity Available: " + product.getQuantity());
+    }
+
     public static void searchMenu() {
-        MarketPlace mp = new MarketPlace();
         ArrayList<Product> productsFound = new ArrayList<>();
         int counter = 0;
 
@@ -429,7 +421,9 @@ class Core {
                 for(Product p : result) {
                     productsFound.add(p);
                     System.out.println("- #" + (counter + 1) + " " +
-                            p.getName() + " (Price: " + p.getPrice() + ")");
+                            p.getName() + " (Price: " + p.getPrice()
+                            + " | Quantity Available " + p.getQuantity() + ")");
+                    counter++;
                 }
             }
             addSearchProduct(productsFound);
@@ -448,7 +442,9 @@ class Core {
                 for(Product p : result) {
                     productsFound.add(p);
                     System.out.println("- #" + (counter + 1) + " " +
-                            p.getName() + " (Price: " + p.getPrice() + ")");
+                            p.getName() + " (Price: " + p.getPrice()
+                            + " | Quantity Available " + p.getQuantity() + ")");
+                    counter++;
                 }
             }
             addSearchProduct(productsFound);
@@ -474,7 +470,9 @@ class Core {
                         for(Product p : s.getProducts()) {
                             productsFound.add(p);
                             System.out.println("--- #" + (counter+1) + " "
-                                    + p.getName() + " (Price: " + p.getPrice() + ")");
+                                    + p.getName() + " (Price $" + p.getPrice()
+                                    + " | Quantity Available " + p.getQuantity() + ")");
+                            counter++;
                         }
                     }
                 }
@@ -493,57 +491,123 @@ class Core {
             System.out.println("[Anything Else] Return to Customer Menu");
 
             String productPick = sc.nextLine();
+
             if (productPick.matches("-?\\d+(\\.\\d+)?")) { // TODO: needs testing
-                Product p = productsFound.get(Integer.parseInt(productPick) - 1);
-                if (p != null) { // TODO: needs testing
-                    showProductInfo(p);
-                    System.out.println(separator);
-                    System.out.println("Please enter: ");
-                    System.out.println("[1] Add to Shopping Cart");
-                    System.out.println("[Anything Else] Return to Search Page");
-
-                    String productAction = sc.nextLine();
-                    if(productAction.equalsIgnoreCase("1")) {
-                        System.out.println(separator);
-                        System.out.println("Please enter a purchase quantity: ");
-                        String purchaseQuantity = sc.nextLine();
-                        while(!purchaseQuantity.matches("-?\\d+(\\.\\d+)?")) {
-                            System.out.println("Entered quantity is not an integer! Please enter a valid quantity: ");
-                            purchaseQuantity = sc.nextLine();
-                        }
-
-                        shoppingCart.addPurchase(new Sale((Customer) user, p, Integer.parseInt(purchaseQuantity)));
-                        System.out.println("Successfully added " + purchaseQuantity + " to your shopping cart." +
-                                " Returning to search page...");
-                        searchMenu();
-                    } else {
-                        searchMenu();
-                    }
-                } else { // TODO: needs testing
-                    while(p == null) {
-                        System.out.println("Entered # is not a valid product! Please enter a valid product #: ");
-                        productPick = sc.nextLine();
-                        if(!productPick.matches("-?\\d+(\\.\\d+)?")) {
-                            continue;
-                        }
-                        p = productsFound.get(Integer.parseInt(productPick) - 1);
+                while(Integer.parseInt(productPick)-1 > productsFound.size()) {
+                    System.out.println("Entered # is not a valid product! Please enter a valid product #: ");
+                    productPick = sc.nextLine();
+                    if(!productPick.matches("-?\\d+(\\.\\d+)?")) {
+                        productPick = "QUIT_MENU_PLEASE";
+                        break;
                     }
                 }
-            } else { // TODO: needs testing
-                customerMainMenu();
+                if(productPick.equals("QUIT_MENU_PLEASE")) {
+                    customerMainMenu();
+                } else {
+                    Product p = productsFound.get(Integer.parseInt(productPick) - 1);
+                    if(p.getQuantity() <= 0) {
+                        while(p.getQuantity() <= 0) {
+                            System.out.println("There is no more of this product available to purchase! Please enter another option: ");
+                            productPick = sc.nextLine();
+                            if(productPick.matches("-?\\d+(\\.\\d+)?")) {
+                                p = productsFound.get(Integer.parseInt(productPick) - 1);
+                                if(p.getQuantity() >= 1) {
+                                    if (p != null) { // TODO: needs testing
+                                        showProductInfo(p);
+                                        System.out.println(separator);
+                                        System.out.println("Please enter: ");
+                                        System.out.println("[1] Add to Shopping Cart");
+                                        System.out.println("[Anything Else] Return to Search Page");
+
+                                        String productAction = sc.nextLine();
+                                        if (productAction.equalsIgnoreCase("1")) {
+                                            System.out.println(separator);
+                                            System.out.println("Please enter a purchase quantity: ");
+                                            String purchaseQuantity = sc.nextLine();
+                                            while (!purchaseQuantity.matches("-?\\d+(\\.\\d+)?")) {
+                                                System.out.println("Entered quantity is not an integer! Please enter a valid quantity: ");
+                                                purchaseQuantity = sc.nextLine();
+                                            }
+                                            while(p.getQuantity()-Integer.parseInt(purchaseQuantity) < 0) {
+                                                System.out.println("There is only " + p.getQuantity() + " of this product available to purchase.");
+                                                System.out.println("Please try a smaller quantity: ");
+                                                purchaseQuantity = sc.nextLine();
+                                            }
+
+                                            shoppingCart.addPurchase(new Sale((Customer) user, p, Integer.parseInt(purchaseQuantity)));
+
+                                            // TESTING
+                                            FileManager.addCustomerShopppingCart((Customer) user, p, Integer.parseInt(purchaseQuantity));
+                                            p.setQuantity(p.getQuantity()-Integer.parseInt(purchaseQuantity));
+                                            // TESTING
+
+                                            System.out.println("Successfully added " + purchaseQuantity + " to your shopping cart." +
+                                                    " Returning to search page...");
+                                            searchMenu();
+                                            break;
+                                        } else {
+                                            searchMenu();
+                                            break;
+                                        }
+                                    }
+                                }
+                            } else {
+                                customerMainMenu();
+                                break;
+                            }
+                        }
+                    } else {
+                        if (p != null) { // TODO: needs testing
+                            showProductInfo(p);
+                            System.out.println(separator);
+                            System.out.println("Please enter: ");
+                            System.out.println("[1] Add to Shopping Cart");
+                            System.out.println("[Anything Else] Return to Search Page");
+
+                            String productAction = sc.nextLine();
+                            if (productAction.equalsIgnoreCase("1")) {
+                                System.out.println(separator);
+                                System.out.println("Please enter a purchase quantity: ");
+                                String purchaseQuantity = sc.nextLine();
+                                while (!purchaseQuantity.matches("-?\\d+(\\.\\d+)?")) {
+                                    System.out.println("Entered quantity is not an integer! Please enter a valid quantity: ");
+                                    purchaseQuantity = sc.nextLine();
+                                }
+                                while(p.getQuantity()-Integer.parseInt(purchaseQuantity) < 0) {
+                                    System.out.println("There is only " + p.getQuantity() + " of this product available to purchase.");
+                                    System.out.println("Please try a smaller quantity: ");
+                                    purchaseQuantity = sc.nextLine();
+                                }
+
+                                shoppingCart.addPurchase(new Sale((Customer) user, p, Integer.parseInt(purchaseQuantity)));
+
+                                // TESTING
+                                FileManager.addCustomerShopppingCart((Customer) user, p, Integer.parseInt(purchaseQuantity));
+                                p.setQuantity(p.getQuantity()-Integer.parseInt(purchaseQuantity));
+                                // TESTING
+
+                                System.out.println("Successfully added " + purchaseQuantity + " to your shopping cart." +
+                                        " Returning to search page...");
+                                searchMenu();
+                            } else {
+                                searchMenu();
+                            }
+                        }
+                    }
+                }
             }
         } else {
             System.out.println(separator);
             System.out.println("No products available.");
             System.out.println("Please enter: ");
             System.out.println("[1] Return to Search Menu");
-            System.out.println("[Anything Else] Logout & Quit");
+            System.out.println("[Anything Else] Return to Customer Menu");
 
             String noProdAction = sc.nextLine();
             if(noProdAction.equalsIgnoreCase("1")) {
                 searchMenu();
             } else {
-                printFarewell();
+                customerMainMenu();
             }
         }
     }
@@ -559,69 +623,100 @@ class Core {
             for(Sale s : shoppingCart.getHeldPurchases()) {
                 counter++;
                 allTotal += s.getTotalCost();
-                String totalPrice = String.format(
-                        String.valueOf(s.getTotalCost()), "%.2f");
+                String totalPrice = String.format("%.2f", s.getTotalCost());
                 System.out.println("- #" + counter + " " + s.getProduct().getName()
                         + " (" + s.getQuantity() + " for $"
-                        + s.getProduct().getPrice() + " each; Product total $"
+                        + s.getProduct().getPrice() + " each | Product Total $"
                         + totalPrice + ")");
             }
         }
 
         System.out.println(separator);
         System.out.println("Please enter: ");
+        System.out.println("[CH] Checkout & Purchase");
         System.out.println("[Corresponding #] View Product Info");
-        System.out.println("[C] Purchase & Checkout");
         System.out.println("[Anything Else] Return to Customer Menu");
 
         String cartPick = sc.nextLine();
         if(cartPick.matches("-?\\d+(\\.\\d+)?")) { // TODO: needs testing
-            Sale s = shoppingCart.getPurchase(Integer.parseInt(cartPick) - 1);
-            Product p = s.getProduct();
-            if(p != null) { // TODO: needs testing
-                showProductInfo(p);
-                System.out.println(separator);
-                System.out.println("Please enter: ");
-                System.out.println("[1] Remove from Shopping Cart");
-                System.out.println("[2] Change Purchase Quantity");
-                System.out.println("[Anything Else] Return to All Products Page");
-
-                String cartAction = sc.nextLine();
-                if(cartAction.equalsIgnoreCase("1")) { // TODO: needs testing
-                    shoppingCart.removePurchase(p);
-                    System.out.println("Successfully removed " + p.getName() + " from your shopping cart." +
-                            " Returning to shopping cart page...");
-                    cartMenu();
-                } else if(cartAction.equalsIgnoreCase("2")) { // TODO: needs testing
-                    System.out.println(separator);
-                    System.out.println("Please enter a new quantity: ");
-                    String changeQuantity = sc.nextLine();
-                    while(!changeQuantity.matches("-?\\d+(\\.\\d+)?")) { // TODO: needs testing
-                        System.out.println("Entered quantity is not an integer! Please enter a valid quantity: ");
-                        changeQuantity = sc.nextLine();
-                    }
-
-                    //shoppingCart.getHeldPurchases().set((Integer.parseInt(cartPick)-1),
-                            //new Sale(s.getCustomer(), p, Integer.parseInt(changeQuantity)));
-                    shoppingCart.getPurchase(Integer.parseInt(cartPick) - 1).setQuantity(Integer.parseInt(changeQuantity));
-                    System.out.println("Successfully changed purchase quantity to " + changeQuantity + "." +
-                            " Returning to shopping cart page...");
-                    cartMenu();
-                } else { // TODO: needs testing
-                    cartMenu();
+            while(Integer.parseInt(cartPick)-1 > shoppingCart.getHeldPurchases().size()) {
+                System.out.println("Entered # is not a valid product! Please enter a valid product #: ");
+                cartPick = sc.nextLine();
+                if(!cartPick.matches("-?\\d+(\\.\\d+)?")) {
+                    cartPick = "QUIT_MENU_PLEASE";
+                    break;
                 }
+            }
+            if(cartPick.equals("QUIT_MENU_PLEASE")) {
+                customerMainMenu();
             } else {
-                while(p == null) { // TODO: needs testing
-                    System.out.println("Entered # is not a valid product! Please enter a valid product #: ");
-                    cartPick = sc.nextLine();
-                    if(!cartPick.matches("-?\\d+(\\.\\d+)?")) {
-                        continue;
+                Sale s = shoppingCart.getPurchase(Integer.parseInt(cartPick) - 1);
+                Product p = s.getProduct();
+                if(p != null) { // TODO: needs testing
+                    showProductInfo(p);
+                    System.out.println(separator);
+                    System.out.println("Please enter: ");
+                    System.out.println("[1] Remove from Shopping Cart");
+                    System.out.println("[2] Change Purchase Quantity");
+                    System.out.println("[Anything Else] Return to All Products Page");
+
+                    String cartAction = sc.nextLine();
+                    if(cartAction.equalsIgnoreCase("1")) { // TODO: needs testing
+
+                        // TESTING
+                        p.setQuantity(p.getQuantity() + FileManager.getCustomerShoppingCartQuantity((Customer) user, p));
+                        FileManager.updateCustomerShoppingCart((Customer) user, p, 0);
+                        // TESTING
+
+                        shoppingCart.removePurchase(p);
+                        System.out.println("Successfully removed " + p.getName() + " from your shopping cart." +
+                                " Returning to shopping cart page...");
+                        cartMenu();
+                    } else if(cartAction.equalsIgnoreCase("2")) { // TODO: needs testing
+                        System.out.println(separator);
+                        System.out.println("Please enter a new quantity: ");
+                        String changeQuantity = sc.nextLine();
+                        while(!changeQuantity.matches("-?\\d+(\\.\\d+)?")) { // TODO: needs testing
+                            System.out.println("Entered quantity is not an integer! Please enter a valid quantity: ");
+                            changeQuantity = sc.nextLine();
+                        }
+                        while(p.getQuantity()+(FileManager.getCustomerShoppingCartQuantity((Customer) user, p)
+                                -Integer.parseInt(changeQuantity)) < 0) {
+                            System.out.println("There is only " + p.getQuantity() + " of this product available to purchase.");
+                            System.out.println("You currently have " +
+                                    FileManager.getCustomerShoppingCartQuantity((Customer) user, p)
+                                    + " held in your shopping cart.");
+                            System.out.println("Please try a smaller quantity: ");
+                            changeQuantity = sc.nextLine();
+                        }
+
+                        // TESTING
+                        p.setQuantity(p.getQuantity() +
+                                (FileManager.getCustomerShoppingCartQuantity((Customer) user, p)
+                                        -Integer.parseInt(changeQuantity)));
+                        FileManager.updateCustomerShoppingCart((Customer) user, p, Integer.parseInt(changeQuantity));
+                        // TESTING
+
+                        shoppingCart.getPurchase(Integer.parseInt(cartPick) - 1).setQuantity(Integer.parseInt(changeQuantity));
+                        System.out.println("Successfully changed purchase quantity to " + changeQuantity + "." +
+                                " Returning to shopping cart page...");
+                        cartMenu();
+                    } else { // TODO: needs testing
+                        cartMenu();
                     }
-                    p = shoppingCart.getHeldPurchases().get(Integer.parseInt(cartPick)-1).getProduct();
+                } else {
+                    while(p == null) { // TODO: needs testing
+                        System.out.println("Entered # is not a valid product! Please enter a valid product #: ");
+                        cartPick = sc.nextLine();
+                        if(!cartPick.matches("-?\\d+(\\.\\d+)?")) {
+                            continue;
+                        }
+                        p = shoppingCart.getHeldPurchases().get(Integer.parseInt(cartPick)-1).getProduct();
+                    }
                 }
             }
         } else if(cartPick.equalsIgnoreCase("c")) { // TODO: needs testing
-            String allTotalPrice = String.format(String.valueOf(allTotal), "%.2f");
+            String allTotalPrice = String.format("%.2f", allTotal);
 
             System.out.println(separator);
             System.out.println("You are purchasing " + counter + " products for $" + allTotalPrice);

@@ -25,7 +25,7 @@ public class FileManager {
         //addSellerData(god, soapStore, new Product("Tide Pods", "50% more edible than competitors", 2.49));
 
         MarketPlace mp = new MarketPlace();
-        loadAllStores(mp);
+        loadAllStores(mp, true);
         ArrayList<Product> st = mp.getProducts();
         for(Store s : mp.getStores()) {
             System.out.println("===============================");
@@ -93,30 +93,63 @@ public class FileManager {
      * Loads in all stores that have been saved and initializes it into the provided MarketPlace object
      * @param mp
      */
-    public static void loadAllStores(MarketPlace mp) {
-        File sellData = new File(sellerDataFolder + File.separatorChar);
-        if(sellData.listFiles().length != 0) {
-            for(File f : sellData.listFiles()) {
-                String sellerName = f.getName();
-                ArrayList<ArrayList<String>> logins = getUserLogins();
-                for(ArrayList<String> logs : logins) {
-                    if(logs.get(0).equalsIgnoreCase("S") && logs.get(1).equalsIgnoreCase(sellerName)) {
-                        Seller tempSeller = new Seller(logs.get(1), logs.get(2), logs.get(3));
-                        File storeData = new File(sellerDataFolder + File.separatorChar
-                                + sellerName + File.separatorChar);
-                        ArrayList<ArrayList<Object>> allStores = getSellerAllData(tempSeller);
-                        for(ArrayList<Object> arr : allStores) {
-                            Store tempStore = new Store((String) arr.get(0), "");
-                            for(int i = 2; i < arr.size(); i+=2) {
-                                Product p = (Product) arr.get(i);
-                                tempStore.addProduct(p);
+    public static void loadAllStores(MarketPlace mp, boolean loadEmpty) {
+        File sellLocation = new File(sellerDataFolder + File.separatorChar);
+        try {
+            if(sellLocation.listFiles().length != 0) {
+                for(File f : sellLocation.listFiles()) {
+                    String sellerName = f.getName();
+                    ArrayList<ArrayList<String>> logins = getUserLogins();
+                    for(ArrayList<String> logs : logins) {
+                        if(logs.get(0).equalsIgnoreCase("S") && logs.get(1).equalsIgnoreCase(sellerName)) {
+                            Seller tempSeller = new Seller(logs.get(1), logs.get(2), logs.get(3));
+                            ArrayList<ArrayList<Object>> allStores = getSellerAllData(tempSeller);
+                            for(ArrayList<Object> arr : allStores) {
+                                Store tempStore = new Store((String) arr.get(0), "");
+                                for(int i = 2; i < arr.size(); i+=2) {
+                                    Product p = (Product) arr.get(i);
+                                    if(loadEmpty) {
+                                        tempStore.addProduct(p);
+                                    } else {
+                                        if(p.getQuantity() >= 1) {
+                                            tempStore.addProduct(p);
+                                        }
+                                    }
+                                }
+                                tempSeller.addStore(tempStore);
+                                mp.addSeller(tempSeller);
                             }
-                            tempSeller.addStore(tempStore);
-                            mp.addSeller(tempSeller);
                         }
                     }
                 }
             }
+        } catch(Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(new DataException("STORE LOADING FAILED!"));
+        }
+    }
+
+    /**
+     * Loads in all shopping carts for a specified customer and initializes into their object
+     * @param customer
+     * @param spc
+     * @param mp
+     */
+    public static void loadAllCarts(Customer customer, ShoppingCart spc, MarketPlace mp) {
+        File cartFile = new File(customerDataFolder + File.separatorChar
+                + customer.getUsername() + File.separatorChar + "shopping_cart");
+        try {
+            ArrayList<ArrayList<Object>> cartData = getCustomerShoppingCart(customer);
+            for(ArrayList<Object> arr : cartData) {
+                for(Product prod : mp.getProducts()) {
+                    if(prod.equals(arr.get(1))) {
+                        prod.setQuantity(prod.getQuantity()-Integer.parseInt((String) arr.get(0)));
+                        spc.addPurchase(new Sale(customer, prod, Integer.parseInt((String) arr.get(0))));
+                    }
+                }
+            }
+        } catch(Exception e) {
+            throw new RuntimeException(new DataException("SHOPPING CART LOADING FAILED!"));
         }
     }
 
@@ -158,6 +191,10 @@ public class FileManager {
             File histFile = new File(customerDataFolder + File.separatorChar
                     + customer.getUsername() + File.separatorChar + "purchase_history");
 
+            if(!histFile.exists()) {
+                return data;
+            }
+
             BufferedReader br = new BufferedReader(new FileReader(histFile));
             String line = br.readLine();
 
@@ -177,6 +214,26 @@ public class FileManager {
     }
 
     /**
+     * Returns a customer's shopping cart intended purchase quantity for a specified product
+     * @param customer
+     * @param product
+     * @return
+     */
+    public static int getCustomerShoppingCartQuantity(Customer customer, Product product) {
+        createNecessaryFolders(customer);
+        ArrayList<ArrayList<Object>> cart = getCustomerShoppingCart(customer);
+        for(ArrayList<Object> arr : cart) {
+            Product p = (Product) arr.get(1);
+            if(product.getName().equals(p.getName())
+                    && product.getDescription().equals(p.getDescription())
+                    && product.getPrice() == p.getPrice()) {
+                return Integer.parseInt((String) arr.get(0));
+            }
+        }
+        return -1;
+    }
+
+    /**
      * Returns all of a customer's current shopping cart data with quantity and product object
      * @param customer
      * @return ArrayList<ArrayList<Object>> => (String)quantity[0], (Product)product_obj[1]
@@ -188,6 +245,10 @@ public class FileManager {
             int counter = 0;
             File histFile = new File(customerDataFolder + File.separatorChar
                     + customer.getUsername() + File.separatorChar + "shopping_cart");
+
+            if(!histFile.exists()) {
+                return cart;
+            }
 
             BufferedReader br = new BufferedReader(new FileReader(histFile));
             String line = br.readLine();
@@ -223,6 +284,10 @@ public class FileManager {
         try {
             File histFile = new File(sellerDataFolder + File.separatorChar
                     + seller.getUsername() + File.separatorChar + store.getName() + "_data");
+
+            if(!histFile.exists()) {
+                return products;
+            }
 
             BufferedReader br = new BufferedReader(new FileReader(histFile));
             String line = br.readLine();
@@ -260,6 +325,7 @@ public class FileManager {
             try {
                 File histFile = new File(sellerDataFolder + File.separatorChar
                         + seller.getUsername() + File.separatorChar + f.getName());
+
                 BufferedReader br = new BufferedReader(new FileReader(histFile));
                 String line = br.readLine();
                 while(line != null) {
@@ -281,15 +347,15 @@ public class FileManager {
      * Adds a purchase to a customer's history with a specified purchase quantity
      * @param customer
      * @param product
-     * @param quantity
+     * @param purchaseQuantity
      */
-    public static void addCustomerData(Customer customer, Product product, int quantity) {
+    public static void addCustomerData(Customer customer, Product product, int purchaseQuantity) {
         createNecessaryFolders(customer);
         try {
             File histFile = new File(customerDataFolder + File.separatorChar
                     + customer.getUsername() + File.separatorChar + "purchase_history");
             FileWriter fw = new FileWriter(histFile, true);
-            fw.write(quantity + ";" + product.getName() + ";" + product.getDescription() + ";"
+            fw.write(purchaseQuantity + ";" + product.getName() + ";" + product.getDescription() + ";"
                     + product.getPrice() + ";" + product.getQuantity());
             fw.write("\n");
             fw.close();
@@ -303,15 +369,15 @@ public class FileManager {
      * Adds a porduct to a customer's shopping cart data with a specified quantity
      * @param customer
      * @param product
-     * @param quantity
+     * @param purchaseQuantity
      */
-    public static void addCustomerShopppingCart(Customer customer, Product product, int quantity) {
+    public static void addCustomerShopppingCart(Customer customer, Product product, int purchaseQuantity) {
         createNecessaryFolders(customer);
         try {
             File histFile = new File(customerDataFolder + File.separatorChar
                     + customer.getUsername() + File.separatorChar + "shopping_cart");
             FileWriter fw = new FileWriter(histFile, true);
-            fw.write(quantity + ";" + product.getName() + ";" + product.getDescription() + ";"
+            fw.write(purchaseQuantity + ";" + product.getName() + ";" + product.getDescription() + ";"
                     + product.getPrice() + ";" + product.getQuantity());
             fw.write("\n");
             fw.close();
@@ -325,9 +391,9 @@ public class FileManager {
      * Updates a customer's shopping cart data with a new quantity; set quantity to 0 to remove
      * @param customer
      * @param product
-     * @param quantity
+     * @param purchaseQuantity
      */
-    public static void updateCustomerShoppingCart(Customer customer, Product product, int quantity) {
+    public static void updateCustomerShoppingCart(Customer customer, Product product, int purchaseQuantity) {
         createNecessaryFolders(customer);
         ArrayList<ArrayList<Object>> currentCart = getCustomerShoppingCart(customer);
         File histFile = new File(customerDataFolder + File.separatorChar
@@ -337,18 +403,17 @@ public class FileManager {
             ArrayList<Object> arr = currentCart.get(i);
             Product p = (Product) arr.get(1);
 
-            if(quantity != 0) {
+            if(purchaseQuantity != 0) {
                 if(p.getName().equals(product.getName())
                         && p.getDescription().equals(product.getDescription())
-                        && p.getPrice() == product.getPrice()
-                        && p.getQuantity() == product.getQuantity()) {
-                    arr.set(0, String.valueOf(quantity));
+                        && p.getPrice() == product.getPrice()) {
+                    System.out.println(purchaseQuantity);
+                    arr.set(0, String.valueOf(purchaseQuantity));
                 }
             } else {
                 if(p.getName().equals(product.getName())
                         && p.getDescription().equals(product.getDescription())
-                        && p.getPrice() == product.getPrice()
-                        && p.getQuantity() == product.getQuantity()) {
+                        && p.getPrice() == product.getPrice()) {
                     currentCart.remove(i);
                 }
             }
@@ -425,16 +490,14 @@ public class FileManager {
                 if(productQuantity != 0) {
                     if(p.getName().equals(product.getName())
                             && p.getDescription().equals(product.getDescription())
-                            && p.getPrice() == product.getPrice()
-                            && p.getQuantity() == product.getQuantity()) {
+                            && p.getPrice() == product.getPrice()) {
                         p.setQuantity(productQuantity);
                         arr.set((j-1), Integer.toString(soldQuantity));
                     }
                 } else {
                     if(p.getName().equals(product.getName())
                             && p.getDescription().equals(product.getDescription())
-                            && p.getPrice() == product.getPrice()
-                            && p.getQuantity() == product.getQuantity()) {
+                            && p.getPrice() == product.getPrice()) {
                         currentData.remove(i);
                     }
                 }
