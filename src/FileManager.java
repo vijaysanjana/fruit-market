@@ -500,11 +500,136 @@ public class FileManager {
                             && p.getDescription().equals(product.getDescription())
                             && p.getPrice() == product.getPrice()) {
                         p.setQuantity(productQuantity);
-                        arr.set(i-1, String.valueOf(soldQuantity));
+                        if(soldQuantity != -1) {
+                            arr.set(i-1, String.valueOf(soldQuantity));
+                        }
                     }
                 } else {
                     tempData.remove(counter);
                 }
+            }
+            counter++;
+        }
+
+        replaceSellerData(tempData, histFile);
+    }
+
+    /**
+     * Updates a seller's product's quantity with a new value
+     * @param seller
+     * @param store
+     * @param product
+     * @param quantity
+     */
+    public static void updateSellerDataQuantity(Seller seller, Store store, Product product, int quantity) {
+        createNecessaryFolders(seller);
+        ArrayList<ArrayList<Object>> currentData = getSellerAllData(seller);
+        ArrayList<ArrayList<Object>> tempData = new ArrayList<>(currentData);
+        File histFile = new File(sellerDataFolder + File.separatorChar
+                + seller.getUsername() + File.separatorChar + store.getName() + "_data");
+
+        int counter = 0;
+        for(ArrayList<Object> arr : currentData) {
+            for(int i = 2; i < arr.size(); i+=2) {
+                if((arr.get(0)).equals(store.getName())) {
+                    Product p = (Product) arr.get(i);
+                    if(p.getName().equals(product.getName())) {
+                        p.setQuantity(quantity);
+                    }
+                } else {
+                    tempData.remove(counter);
+                }
+            }
+            counter++;
+        }
+
+        replaceSellerData(tempData, histFile);
+    }
+
+    /**
+     * Updates a seller's product's description with a new value
+     * @param seller
+     * @param store
+     * @param product
+     * @param description
+     */
+    public static void updateSellerDataDescription(Seller seller, Store store, Product product, String description) {
+        createNecessaryFolders(seller);
+        ArrayList<ArrayList<Object>> currentData = getSellerAllData(seller);
+        ArrayList<ArrayList<Object>> tempData = new ArrayList<>(currentData);
+        File histFile = new File(sellerDataFolder + File.separatorChar
+                + seller.getUsername() + File.separatorChar + store.getName() + "_data");
+
+        int counter = 0;
+        for(ArrayList<Object> arr : currentData) {
+            for(int i = 2; i < arr.size(); i+=2) {
+                if((arr.get(0)).equals(store.getName())) {
+                    Product p = (Product) arr.get(i);
+                    if(p.getName().equals(product.getName())) {
+                        p.setDescription(description);
+                    }
+                } else {
+                    tempData.remove(counter);
+                }
+            }
+            counter++;
+        }
+
+        replaceSellerData(tempData, histFile);
+    }
+
+    /**
+     * Updates a seller's product's price with a new one
+     * @param seller
+     * @param store
+     * @param product
+     * @param price
+     */
+    public static void updateSellerDataPrice(Seller seller, Store store, Product product, double price) {
+        createNecessaryFolders(seller);
+        ArrayList<ArrayList<Object>> currentData = getSellerAllData(seller);
+        ArrayList<ArrayList<Object>> tempData = new ArrayList<>(currentData);
+        File histFile = new File(sellerDataFolder + File.separatorChar
+                + seller.getUsername() + File.separatorChar + store.getName() + "_data");
+
+        int counter = 0;
+        for(ArrayList<Object> arr : currentData) {
+            for(int i = 2; i < arr.size(); i+=2) {
+                if((arr.get(0)).equals(store.getName())) {
+                    Product p = (Product) arr.get(i);
+                    if(p.getName().equals(product.getName())) {
+                        p.setPrice(price);
+                    }
+                } else {
+                    tempData.remove(counter);
+                }
+            }
+            counter++;
+        }
+
+        replaceSellerData(tempData, histFile);
+    }
+
+    public static void removeSellerDataProduct(Seller seller, Store store, Product product) {
+        createNecessaryFolders(seller);
+        ArrayList<ArrayList<Object>> currentData = getSellerAllData(seller);
+        ArrayList<ArrayList<Object>> tempData = new ArrayList<>(currentData);
+        File histFile = new File(sellerDataFolder + File.separatorChar
+                + seller.getUsername() + File.separatorChar + store.getName() + "_data");
+
+        int counter = 0;
+        for(ArrayList<Object> arr : currentData) {
+            if (arr.get(0).equals(store.getName())) {
+                for (int i = 2; i < arr.size(); i += 2) {
+                    Product p = (Product) arr.get(i);
+                    if (p.getName().equals(product.getName())) {
+                        arr.remove(i - 1);
+                        arr.remove(i - 1);
+                        break;
+                    }
+                }
+            } else {
+                tempData.remove(counter);
             }
             counter++;
         }
