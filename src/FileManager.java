@@ -166,21 +166,21 @@ public class FileManager {
      */
     private static void createNecessaryFolders(User user) {
         if(new File(customerDataFolder + File.separatorChar).mkdir()) {
-            System.out.println("Customer data folder created");
+            //System.out.println("Customer data folder created");
         }
         if(new File(sellerDataFolder + File.separatorChar).mkdir()) {
-            System.out.println("Seller data folder created");
+            //System.out.println("Seller data folder created");
         }
         if(user instanceof Customer) {
             if(new File(customerDataFolder + File.separatorChar
                     + user.getUsername() + File.separatorChar).mkdir()) {
-                System.out.println("Individual customer folder created");
+                //System.out.println("Individual customer folder created");
             }
         }
         if(user instanceof Seller) {
             if(new File(sellerDataFolder + File.separatorChar
                     + user.getUsername() + File.separatorChar).mkdir()) {
-                System.out.println("Individual seller folder created");
+                //System.out.println("Individual seller folder created");
             }
         }
     }
@@ -694,7 +694,6 @@ public class FileManager {
             if(new File(sellerDataFolder + File.separatorChar
                     + seller.getUsername() + File.separatorChar
                     + store.getName() + "_data").createNewFile()) {
-                System.out.println("Customer data folder created");
             }
         } catch (IOException e) {
             e.printStackTrace();
