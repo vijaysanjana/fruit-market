@@ -150,10 +150,8 @@ class Core {
                                 }
                             }
                         } else {
-                            if (!tryAgain("Invalid customer/seller selection!")) { // TODO: needs testing
-                                printFarewell();
-                                break system_loop;
-                            }
+                            printFarewell();
+                            break system_loop;
                         }
                     }
                 } else {
@@ -252,7 +250,7 @@ class Core {
 
             String productPick = sc.nextLine();
             if (productPick.matches("-?\\d+(\\.\\d+)?")) { // TODO: needs testing
-                while(Integer.parseInt(productPick)-1 > products.size()) {
+                while(Integer.parseInt(productPick)-1 > products.size() || Integer.parseInt(productPick) < 1) {
                     System.out.println("Entered # is not a valid item! Please enter a valid item #: ");
                     productPick = sc.nextLine();
                     if(!productPick.matches("-?\\d+(\\.\\d+)?")) {
@@ -268,7 +266,7 @@ class Core {
                         while(p.getQuantity() <= 0) {
                             System.out.println("There is no more of this fruit available to purchase! Please enter another option: ");
                             productPick = sc.nextLine();
-                            if(productPick.matches("-?\\d+(\\.\\d+)?")) {
+                            if(productPick.matches("-?\\d+(\\.\\d+)?") && !(Integer.parseInt(productPick) < 1)) {
                                 p = products.get(Integer.parseInt(productPick) - 1);
                                 if(p.getQuantity() >= 1) {
                                     if (p != null) { // TODO: needs testing
@@ -283,8 +281,8 @@ class Core {
                                             System.out.println(separator);
                                             System.out.println("Please enter a purchase quantity: ");
                                             String purchaseQuantity = sc.nextLine();
-                                            while (!purchaseQuantity.matches("-?\\d+(\\.\\d+)?")) {
-                                                System.out.println("Entered quantity is not an integer! Please enter a valid quantity: ");
+                                            while (!purchaseQuantity.matches("-?\\d+(\\.\\d+)?") || (Integer.parseInt(purchaseQuantity) < 1)) {
+                                                System.out.println("Entered quantity is not a valid integer! Please enter a valid quantity: ");
                                                 purchaseQuantity = sc.nextLine();
                                             }
                                             while(p.getQuantity()-Integer.parseInt(purchaseQuantity) < 0) {
@@ -328,8 +326,8 @@ class Core {
                                 System.out.println(separator);
                                 System.out.println("Please enter a purchase quantity: ");
                                 String purchaseQuantity = sc.nextLine();
-                                while (!purchaseQuantity.matches("-?\\d+(\\.\\d+)?")) {
-                                    System.out.println("Entered quantity is not an integer! Please enter a valid quantity: ");
+                                while (!purchaseQuantity.matches("-?\\d+(\\.\\d+)?") || (Integer.parseInt(purchaseQuantity) < 1)) {
+                                    System.out.println("Entered quantity is not a valid integer! Please enter a valid quantity: ");
                                     purchaseQuantity = sc.nextLine();
                                 }
                                 while(p.getQuantity()-Integer.parseInt(purchaseQuantity) < 0) {
@@ -500,11 +498,11 @@ class Core {
 
             String productPick = sc.nextLine();
 
-            if (productPick.matches("-?\\d+(\\.\\d+)?")) { // TODO: needs testing
+            if (productPick.matches("-?\\d+(\\.\\d+)?") && !(Integer.parseInt(productPick) < 1)) { // TODO: needs testing
                 while(Integer.parseInt(productPick)-1 > productsFound.size()) {
                     System.out.println("Entered # is not a valid item! Please enter a valid item #: ");
                     productPick = sc.nextLine();
-                    if(!productPick.matches("-?\\d+(\\.\\d+)?")) {
+                    if(!productPick.matches("-?\\d+(\\.\\d+)?") || (Integer.parseInt(productPick) < 1)) {
                         productPick = "QUIT_MENU_PLEASE";
                         break;
                     }
@@ -517,7 +515,7 @@ class Core {
                         while(p.getQuantity() <= 0) {
                             System.out.println("There is no more of this fruit available to purchase! Please enter another option: ");
                             productPick = sc.nextLine();
-                            if(productPick.matches("-?\\d+(\\.\\d+)?")) {
+                            if(productPick.matches("-?\\d+(\\.\\d+)?") && (Integer.parseInt(productPick) > 1)) {
                                 p = productsFound.get(Integer.parseInt(productPick) - 1);
                                 if(p.getQuantity() >= 1) {
                                     if (p != null) { // TODO: needs testing
@@ -532,8 +530,8 @@ class Core {
                                             System.out.println(separator);
                                             System.out.println("Please enter a purchase quantity: ");
                                             String purchaseQuantity = sc.nextLine();
-                                            while (!purchaseQuantity.matches("-?\\d+(\\.\\d+)?")) {
-                                                System.out.println("Entered quantity is not an integer! Please enter a valid quantity: ");
+                                            while (!purchaseQuantity.matches("-?\\d+(\\.\\d+)?") || (Integer.parseInt(purchaseQuantity) < 1)) {
+                                                System.out.println("Entered quantity is not a valid integer! Please enter a valid quantity: ");
                                                 purchaseQuantity = sc.nextLine();
                                             }
                                             while(p.getQuantity()-Integer.parseInt(purchaseQuantity) < 0) {
@@ -577,8 +575,8 @@ class Core {
                                 System.out.println(separator);
                                 System.out.println("Please enter a purchase quantity: ");
                                 String purchaseQuantity = sc.nextLine();
-                                while (!purchaseQuantity.matches("-?\\d+(\\.\\d+)?")) {
-                                    System.out.println("Entered quantity is not an integer! Please enter a valid quantity: ");
+                                while (!purchaseQuantity.matches("-?\\d+(\\.\\d+)?") || (Integer.parseInt(purchaseQuantity) < 1)) {
+                                    System.out.println("Entered quantity is not a valid integer! Please enter a valid quantity: ");
                                     purchaseQuantity = sc.nextLine();
                                 }
                                 while(p.getQuantity()-Integer.parseInt(purchaseQuantity) < 0) {
@@ -744,19 +742,25 @@ class Core {
                     FileManager.addCustomerData((Customer) user, heldPurchase.getProduct(), quantitySold); //add to history
                     System.out.println("Purchased " + quantitySold + " " + p.getName() + "!"); //announce purchase
                     FileManager.updateCustomerShoppingCart((Customer) user, p, 0); //remove from cart
+
+                    Seller tempSeller =  null;
+                    Store tempStore = null;
+                    seller_find_loop:
                     for(Seller seller : mp.getSellers()) {
                         for(Store store : seller.getStores()) {
-                            if (store.getProducts().contains(p)) {
-                                store.addSale(heldPurchase);
-                            }
                             for(Product prod : store.getProducts()) {
-                                if(prod.getName().equals(p.getName()) && prod.getDescription().equals(p.getDescription())
-                                        && prod.getPrice()==p.getPrice()) {
-                                    FileManager.updateSellerData(seller, store, p, p.getQuantity(), quantitySold);
+                                if(prod.getName().equals(p.getName())
+                                        && prod.getDescription().equals(p.getDescription())
+                                        && prod.getPrice() == p.getPrice()) {
+                                    store.addSale(heldPurchase);
+                                    tempSeller = seller;
+                                    tempStore = store;
+                                    break seller_find_loop;
                                 }
                             }
                         }
                     }
+                    FileManager.updateSellerData(tempSeller, tempStore, p, p.getQuantity(), quantitySold);
                 }
                 shoppingCart.setHeldPurchases(new ArrayList<>());
                 System.out.println("Returning to customer menu page...");
