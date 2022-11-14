@@ -4,6 +4,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Scanner;
 
 public class FileManager {
     private static File userDataFile = new File("userData");
@@ -813,6 +814,130 @@ public class FileManager {
                     + store.getName() + "_data").createNewFile()) {
             }
         } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException(new DataException());
+        }
+    }
+
+    public static void importSellerCSV(Seller seller, Store store) {
+        System.out.println(Core.separator);
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Please enter the file path of the import csv: ");
+        String filePath = sc.nextLine();
+        try {
+            ArrayList<String> arr = new ArrayList<>();
+            File curFile = new File(sellerDataFolder + File.separatorChar
+                    + seller.getUsername() + File.separatorChar
+                    + store.getName() + "_data");
+            BufferedReader currentReader = new BufferedReader(
+                    new FileReader(curFile));
+            String line = currentReader.readLine();
+            while(line != null) {
+                arr.add(line);
+                line = currentReader.readLine();
+            }
+
+            BufferedReader importReader = new BufferedReader(
+                    new FileReader(filePath));
+            line = importReader.readLine();
+            while (line != null) {
+                if(line.split(",").length != 5) {
+                    System.out.println("Skipping line (invalid format): " + line);
+                } else {
+                    arr.add(line.replaceAll(",", ";"));
+                }
+                line = importReader.readLine();
+            }
+
+            OutputStream os = new FileOutputStream(curFile);
+            PrintWriter pw = new PrintWriter(new OutputStreamWriter(os, StandardCharsets.UTF_8));
+            for(String s : arr) {
+                pw.print(s + "\n");
+            }
+            pw.flush();
+            pw.close();
+
+            System.out.println("File imported successfully!");
+        } catch (FileNotFoundException e) {
+            System.out.println("File not found! Please try again.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(new DataException());
+        }
+    }
+
+    public static void exportSellerCSV(Seller seller, Store store) {
+        System.out.println(Core.separator);
+        try {
+            ArrayList<String> arr = new ArrayList<>();
+            File curFile = new File(sellerDataFolder + File.separatorChar
+                    + seller.getUsername() + File.separatorChar
+                    + store.getName() + "_data");
+            BufferedReader currentReader = new BufferedReader(
+                    new FileReader(curFile));
+            String line = currentReader.readLine();
+            while(line != null) {
+                if(line.split(";").length != 5) {
+                    System.out.println("Skipping line (invalid format): " + line);
+                } else {
+                    arr.add(line.replaceAll(";", ","));
+                }
+                line = currentReader.readLine();
+            }
+
+            OutputStream os = new FileOutputStream(
+                    seller.getUsername() + "_" +
+                            store.getName().replaceAll(" ", "_") + ".csv");
+            PrintWriter pw = new PrintWriter(new OutputStreamWriter(os, StandardCharsets.UTF_8));
+            for(String s : arr) {
+                pw.print(s + "\n");
+            }
+            pw.flush();
+            pw.close();
+
+            System.out.println("File format: #items_purchased,item_name,item_description" +
+                    ",item_price,item_quantity");
+            System.out.println("File exported successfully as "
+                    + seller.getUsername() + "_" +
+                            store.getName().replaceAll(" ", "_") + ".csv");
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(new DataException());
+        }
+    }
+
+    public static void exportCustomerHistory(Customer customer) {
+        System.out.println(Core.separator);
+        try {
+            ArrayList<String> arr = new ArrayList<>();
+            File curFile = new File(customerDataFolder + File.separatorChar
+                    + customer.getUsername() + File.separatorChar + "purchase_history");
+            BufferedReader currentReader = new BufferedReader(
+                    new FileReader(curFile));
+            String line = currentReader.readLine();
+            while(line != null) {
+                if(line.split(";").length != 5) {
+                    System.out.println("Skipping line (invalid format): " + line);
+                } else {
+                    arr.add(line.replaceAll(";", ","));
+                }
+                line = currentReader.readLine();
+            }
+
+            OutputStream os = new FileOutputStream(
+                    customer.getUsername() + "_purchase_history.csv");
+            PrintWriter pw = new PrintWriter(new OutputStreamWriter(os, StandardCharsets.UTF_8));
+            for(String s : arr) {
+                pw.print(s + "\n");
+            }
+            pw.flush();
+            pw.close();
+
+            System.out.println("File format: #items_purchased,item_name,item_description" +
+                    ",item_price,item_quantity");
+            System.out.println("File exported successfully as "
+                    + customer.getUsername() + "_purchase_history.csv");
+        } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException(new DataException());
         }

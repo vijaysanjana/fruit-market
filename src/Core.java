@@ -5,7 +5,7 @@ import java.util.*;
  * Marketplace main menu system used for logic control flow and to display login, signup, and user actions
  */
 class Core {
-    private static final String separator = "---------------------------";
+    public static final String separator = "---------------------------";
     private static Scanner sc = new Scanner(System.in);
     private static User user;
     private static ShoppingCart shoppingCart;
@@ -737,8 +737,8 @@ class Core {
                 System.out.println(separator);
                 for (Sale heldPurchase : shoppingCart.getHeldPurchases()) {
                     Product p = heldPurchase.getProduct();
+
                     int quantitySold = FileManager.getCustomerShoppingCartQuantity((Customer) user, p);
-                    ((Customer) user).addSale(heldPurchase);
                     FileManager.addCustomerData((Customer) user, heldPurchase.getProduct(), quantitySold); //add to history
                     System.out.println("Purchased " + quantitySold + " " + p.getName() + "!"); //announce purchase
                     FileManager.updateCustomerShoppingCart((Customer) user, p, 0); //remove from cart
@@ -790,10 +790,18 @@ class Core {
                 System.out.println("--- Total Price: " +
                         String.format("%.2f", (prod.getPrice()*quant)));
             }
+            System.out.println("You have purchased " + ((Customer) user).getTotalPurchasedProducts() + "fruits in total!");
         }
         System.out.println(separator);
-        System.out.println("Type [Anything] to return to Customer Menu: ");
-        sc.nextLine();
+        System.out.println("Please enter:");
+        System.out.println("[EX] Export Purchase History CSV");
+        System.out.println("[Anything Else] Return to Customer Menu: ");
+        String action = sc.nextLine();
+
+        if(action.equalsIgnoreCase("ex")) {
+            FileManager.exportCustomerHistory((Customer) user);
+            System.out.println("Returning to customer menu...");
+        }
         customerMainMenu();
     }
 
@@ -822,8 +830,8 @@ class Core {
             for (Store store : stores) {
                 int soldToUser = store.getQuantityOfProductsBoughtByCustomer((Customer) user);
                 System.out.println("- " + store.getName());
-                System.out.println("--- Total Fruits Sold: " + store.getTotalSoldProducts());
-                System.out.println("--- Your Purchases: " + soldToUser);
+                System.out.println("--- Total Products Sold: " + store.getTotalSoldProducts());
+                System.out.println("--- Total Products Sold to You: " + soldToUser);
             }
             System.out.println(separator);
             System.out.println("Please enter:");
@@ -835,116 +843,31 @@ class Core {
 
             String productPick = sc.nextLine();
             if (productPick.equalsIgnoreCase("1")) { // TODO: needs testing
+                // TODO: Dashboard Sort
                 dashboardMenu(1);
             } else if (productPick.equalsIgnoreCase("2")) { // TODO: needs testing
+                // TODO: Dashboard Sort
                 dashboardMenu(2);
             } else if (productPick.equalsIgnoreCase("3")) { // TODO: needs testing
+                // TODO: Dashboard Sort
                 dashboardMenu(3);
             } else if (productPick.equalsIgnoreCase("4")) { // TODO: needs testing
+                // TODO: Dashboard Sort
                 dashboardMenu(4);
             } else { // TODO: needs testing
                 customerMainMenu();
             }
         } else if (user instanceof Seller) {
-            System.out.println(separator);
-            System.out.println("Please enter:");
-            System.out.println("[1] View Sales Statistics");
-            System.out.println("[2] View Customer Statistics");
-            System.out.println("[Anything Else] Return to Seller Menu");
 
-            String statChoice = sc.nextLine();
-            if (statChoice.equalsIgnoreCase("1")) {
-                productSalesStatsDashboard(0);
-            } else if (statChoice.equalsIgnoreCase("2")) {
-                customerSalesStatsDashboard(0);
-            } else {
-                sellerMainMenu();
-            }
         }
     }
 
-    public static void customerSalesStatsDashboard(int sortMode) {
-        System.out.println(separator);
-        System.out.println("Your Stores:");
-        for (Store store : ((Seller) user). getStores()) {
-            System.out.println("- " + store.getName());
-            ArrayList<Customer> customers = new ArrayList<>();
-            switch (sortMode) {
-                case 1:
-                    customers = mp.getStoreSalesSortedCustomers(store, true);
-                    break;
-                case 2:
-                    customers = mp.getStoreSalesSortedCustomers(store, false);
-                    break;
-                default:
-                    customers = store.getAllCustomers();
-            }
+    public static void customerSalesStatsDashboard() {
 
-            if (customers.size() > 0) {
-                for (Customer customer : customers) {
-                    System.out.println(customer.getUsername() + " (" + store.getQuantityOfProductsBoughtByCustomer((Customer) user) + " Fruits Purchased)");
-                }
-            } else {
-                System.out.println("--- No customers found");
-            }
-        }
-
-        System.out.println(separator);
-        System.out.println("Please enter:");
-        System.out.println("[1] Sort Customers by Purchases (High to Low)");
-        System.out.println("[2] Sort Customers by Purchases (Low to High)");
-        System.out.println("[Anything Else] Return to Statistics Dashboard Menu");
-
-        String productPick = sc.nextLine();
-        if (productPick.equalsIgnoreCase("1")) { // TODO: needs testing
-            customerSalesStatsDashboard(1);
-        } else if (productPick.equalsIgnoreCase("2")) { // TODO: needs testing
-            customerSalesStatsDashboard(2);
-        } else { // TODO: needs testing
-            dashboardMenu(0);
-        }
     }
 
-    public static void productSalesStatsDashboard(int sortMode) {
-        System.out.println(separator);
-        System.out.println("Your Stores:");
-        for (Store store : ((Seller) user).getStores()) {
-            System.out.println("- " + store.getName());
-            ArrayList<Product> products = new ArrayList<>();
-            switch (sortMode) {
-                case 1:
-                    products = mp.getStoreSalesSortedProducts(store, true);
-                    break;
-                case 2:
-                    products = mp.getStoreSalesSortedProducts(store, false);
-                    break;
-                default:
-                    products = store.getProducts();
-            }
+    public static void productSalesStatsDashboard() {
 
-            if (products.size() > 0) {
-                for (Product product : products) {
-                    System.out.println("--- " + product.getName() + " (" + store.getNumberOfProductsSold(product) + " Sold)");
-                }
-            } else {
-                System.out.println("--- No products found");
-            }
-        }
-
-        System.out.println(separator);
-        System.out.println("Please enter:");
-        System.out.println("[1] Sort Products by Sales (High to Low)");
-        System.out.println("[2] Sort Products by Sales (Low to High)");
-        System.out.println("[Anything Else] Return to Statistics Dashboard Menu");
-
-        String productPick = sc.nextLine();
-        if (productPick.equalsIgnoreCase("1")) { // TODO: needs testing
-            productSalesStatsDashboard(1);
-        } else if (productPick.equalsIgnoreCase("2")) { // TODO: needs testing
-            productSalesStatsDashboard(2);
-        } else { // TODO: needs testing
-            dashboardMenu(0);
-        }
     }
 
 
@@ -984,12 +907,6 @@ class Core {
         String action = sc.nextLine();
         if (action.equalsIgnoreCase("1")) {
             storesMenu();
-        } else if (action.equalsIgnoreCase("2")) {
-            cartedProductsMenu();
-        } else if (action.equalsIgnoreCase("3")) {
-            historyMenu();
-        } else if (action.equalsIgnoreCase("4")) {
-            dashboardMenu(0);
         } else if (action.equalsIgnoreCase("d")) {
             deleteAccount(user);
         } else if (action.equalsIgnoreCase("q")) {
@@ -1045,6 +962,8 @@ class Core {
                     System.out.println("Please enter: ");
                     System.out.println("[Corresponding #] View Fruit Info");
                     System.out.println("[AD] Add New Fruit");
+                    System.out.println("[IM] Import Items CSV");
+                    System.out.println("[EX] Export Items CSV");
                     System.out.println("[Anything Else] Return to Seller Menu");
 
                     String productPick = sc.nextLine();
@@ -1078,6 +997,14 @@ class Core {
                         }
                     } else if(productPick.equalsIgnoreCase("ad")) {
                         addNewProduct(store);
+                    } else if(productPick.equalsIgnoreCase("im")) {
+                        FileManager.importSellerCSV((Seller) user, store);
+                        System.out.println("Returning to all stores menu...");
+                        storesMenu();
+                    } else if(productPick.equalsIgnoreCase("ex")) {
+                        FileManager.exportSellerCSV((Seller) user, store);
+                        System.out.println("Returning to all stores menu...");
+                        storesMenu();
                     } else {
                         sellerMainMenu();
                     }
@@ -1283,11 +1210,12 @@ class Core {
         }
     }
 
-    public static void cartedProductsMenu() {
+    public static void salesMenu() {
 
     }
 
-    public static void salesMenu() {
+
+    public static void cartedProductsMenu() {
 
     }
 
