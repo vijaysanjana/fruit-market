@@ -1,3 +1,7 @@
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.*;
 
 
@@ -10,6 +14,7 @@ public class Sale {
     private Product product; //The Product to be sold
     private int quantity; //The number of Products to be sold
     private double totalCost; //The total cost of the sale
+    private String name; //The customer username + (amount of purchases + 1)
 
 
     //Constructors
@@ -18,6 +23,7 @@ public class Sale {
         this.product = product;
         this.quantity = 1;
         this.totalCost = product.getPrice();
+        this.name = customer.getUsername() + customer.getPurchases().size();
     }
 
     public Sale(Customer customer, Product product, int quantity) {
@@ -25,6 +31,7 @@ public class Sale {
         this.product = product;
         this.quantity = quantity;
         this.totalCost = product.getPrice() * quantity;
+        this.name = customer.getUsername() + customer.getPurchases().size();
     }
 
 
@@ -61,6 +68,13 @@ public class Sale {
         this.totalCost = totalCost;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
     //Equals
     @Override
@@ -72,4 +86,18 @@ public class Sale {
         return (customer.equals(sale.getCustomer()) && product.equals(sale.getProduct()) &&
                 quantity == sale.getQuantity() && totalCost == sale.getTotalCost());
     }
+
+    public void pushToFile() {
+        try {
+            File f = new File("saleData");
+            List<String> lines = Files.readAllLines(f.toPath(), StandardCharsets.UTF_8);
+            lines.add(String.format("%s:%s;%d;%.2f", getName(), getProduct().getName(), getQuantity(), getTotalCost()));
+            Files.write(f.toPath(), lines, StandardCharsets.UTF_8);
+        } catch (
+                IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
 }

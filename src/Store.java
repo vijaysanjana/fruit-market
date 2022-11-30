@@ -1,3 +1,5 @@
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.*;
 import java.io.*;
 
@@ -35,6 +37,31 @@ public class Store {
         this.sales = sales;
     }
 
+    public void pushToFile() {
+        try {
+            File f = new File("storeData");
+            List<String> lines = Files.readAllLines(f.toPath(), StandardCharsets.UTF_8);
+            StringBuffer salesStr = new StringBuffer();
+            String temp;
+            for (Sale s : getSales()) {
+                temp = s.getCustomer().getUsername() + s.getCustomer().getPurchases().size();
+                salesStr.append(temp);
+                if (getSales().indexOf(s) < getSales().size() - 1)
+                    salesStr.append(",");
+            }
+            StringBuffer productsStr = new StringBuffer();
+            for (Product p : getProducts()) {
+                productsStr.append(p.getName());
+                if (getProducts().indexOf(p) < getProducts().size() - 1)
+                    productsStr.append(",");
+            }
+            lines.add(String.format("%s:%s;%s;%s", getName(), getDescription(), productsStr, salesStr));
+            Files.write(f.toPath(), lines, StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     //Getters and Setters
     public String getName() {
@@ -68,6 +95,7 @@ public class Store {
     public void setSales(ArrayList<Sale> sales) {
         this.sales = sales;
     }
+
 
 
     //Equals
@@ -158,7 +186,5 @@ public class Store {
         }
         return null;
     }
-
-
 
 }
