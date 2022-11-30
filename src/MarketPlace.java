@@ -1,4 +1,3 @@
-import java.lang.reflect.Array;
 import java.util.*;
 
 
@@ -48,67 +47,6 @@ public class MarketPlace {
             }
         }
         return stores;
-    }
-
-    public ArrayList<Product> getProducts() {
-        ArrayList<Product> products = new ArrayList<>();
-        for (Store store : getStores()) {
-            for (Product product : store.getProducts()) {
-                products.add(product);
-            }
-        }
-        return products;
-    }
-
-    public ArrayList<Product> searchProducts(String type, String str) {
-        ArrayList<Product> products = getProducts();
-        if(type.equalsIgnoreCase("name")) {
-            ArrayList<Product> results = new ArrayList<>();
-            for(Product p : products) {
-                if(p.getName().contains(str)) {
-                    results.add(p);
-                }
-            }
-            return results;
-        } else if(type.equalsIgnoreCase("desc")) {
-            ArrayList<Product> results = new ArrayList<>();
-            for(Product p : products) {
-                if(p.getDescription().contains(str)) {
-                    results.add(p);
-                }
-            }
-            return results;
-        }
-        return null;
-    }
-
-    public ArrayList<Store> searchStores(String str) {
-        ArrayList<Store> stores = getStores();
-        ArrayList<Store> results = new ArrayList<>();
-        for (Store s : stores) {
-            if (s.getName().contains(str)) {
-                results.add(s);
-            }
-        }
-        return results;
-    }
-
-    public ArrayList<ShoppingCart> getShoppingCarts() {
-        ArrayList<ShoppingCart> shoppingCarts = new ArrayList<>();
-        for (Customer customer : customers) {
-            shoppingCarts.add(customer.getShoppingCart());
-        }
-        return shoppingCarts;
-    }
-
-    public ArrayList<Sale> getPurchases() {
-        ArrayList<Sale> purchases = new ArrayList<>();
-        for (Customer customer : customers) {
-            for (Sale purchase : customer.getPurchases()) {
-                purchases.add(purchase);
-            }
-        }
-        return purchases;
     }
 
 

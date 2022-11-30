@@ -1,7 +1,3 @@
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.util.*;
 
 
@@ -12,21 +8,24 @@ public class Product {
 
     private String name; //Product's name
     private String description; //Product's description
+    private Store store; //The Store the Product is owned by
     private double price; //Product's price
     private int quantity; //the number of this Product available for purchase
 
 
     //Constructors
-    public Product(String name, String description, double price) {
+    public Product(String name, String description, Store store, double price) {
         this.name = name;
         this.description = description;
+        this.store = store;
         this.price = price;
         this.quantity = 1;
     }
 
-    public Product(String name, String description, double price, int quantity) {
+    public Product(String name, String description, Store store, double price, int quantity) {
         this.name = name;
         this.description = description;
+        this.store = store;
         this.price = price;
         this.quantity = quantity;
     }
@@ -47,6 +46,14 @@ public class Product {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Store getStore() {
+        return store;
+    }
+
+    public void setStore(Store store) {
+        this.store = store;
     }
 
     public int getQuantity() {
@@ -74,23 +81,12 @@ public class Product {
         }
         Product product = (Product) o;
         return (name.equals(product.getName()) && description.equals(product.getDescription()) &&
-                quantity == product.getQuantity() && price == product.getPrice());
+                store.equals(product.getStore()) && quantity == product.getQuantity() &&
+                price == product.getPrice());
     }
 
     public String toString() {
         String s = name + "," + description + "," + quantity + "," + price;
         return s;
-    }
-
-    public void pushToFile() {
-        try {
-            File f = new File("productData");
-            List<String> lines = Files.readAllLines(f.toPath(), StandardCharsets.UTF_8);
-            lines.add(String.format("%s:%s;%.2f;%d", getName(), getDescription(), getPrice(), getQuantity()));
-            Files.write(f.toPath(), lines, StandardCharsets.UTF_8);
-        } catch (
-                IOException e) {
-            e.printStackTrace();
-        }
     }
 }

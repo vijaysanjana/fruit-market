@@ -48,9 +48,9 @@ public class User {
         this.password = password;
     }
 
-    public void pushToFile() {
+    public void pushToFile(String fileName) {
         try {
-            File f = new File("userData");
+            File f = new File(fileName);
             List<String> lines = Files.readAllLines(f.toPath(), StandardCharsets.UTF_8);
             lines.add(String.format("U:%s;%s;%s", getUsername(), getEmail(), getPassword()));
             Files.write(f.toPath(), lines, StandardCharsets.UTF_8);
