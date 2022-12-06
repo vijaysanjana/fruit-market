@@ -50,6 +50,7 @@ class ServerCore {
     // ClientHandler class
     private static class ClientHandler implements Runnable {
         private final Socket clientSocket;
+        private User user;
 
         // Constructor
         public ClientHandler(Socket client)
@@ -68,9 +69,17 @@ class ServerCore {
                 in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
                 String request = in.readLine();
+                String response;
                 while (request != null) {
 
-                    if (request.contains("[insert request here]")) {
+                    if (request.contains("{Login}")) {
+                        String email = request.substring((request.indexOf("}") + 1), request.indexOf(","));
+                        String password = request.substring((request.indexOf(",") + 1), request.lastIndexOf(","));
+                        user = AccountManager.login(email, password);
+
+                        String userType = (user instanceof Customer) ? "C" : "S";
+                        response = "{Login}" + userType + "," + user.getUsername() + ",";
+                        out.println(response);
                         //Interpret Request
                         //Update Data Classes
                         //Construct Necessary Data for Client in Response Format
