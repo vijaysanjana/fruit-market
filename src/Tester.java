@@ -1,4 +1,4 @@
-import org.junit.Assert;
+/* import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions.*;
 
@@ -11,6 +11,8 @@ import java.util.ArrayList;
  * @author Jack, Nathan, Sanjana, Tommy, Aadit
  * @version 11/14/2022
  */
+
+/*
 public class Tester {
 
     //customer class test
@@ -536,3 +538,4 @@ public class Tester {
 
     }
 }
+*/
