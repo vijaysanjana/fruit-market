@@ -1,6 +1,6 @@
 /**
  * Thrown when data read or write failed
- * @author Jack, Nathan, Sanj, Tommy, Adit
+ * @author Jack, Nathan, Sanjana, Tommy, Aadit
  * @version 11/14/2022
  */
 public class DataException extends Exception {

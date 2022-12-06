@@ -8,7 +8,7 @@ import java.io.*;
 /**
  * Store class contains descriptive information, owning Seller, list of Products, and list of Sales of the Store.
  *
- * @author Jack, Nathan, Sanj, Tommy, Adit
+ * @author Jack, Nathan, Sanjana, Tommy, Aadit
  * @version 11/14/2022
  */
 public class Store {

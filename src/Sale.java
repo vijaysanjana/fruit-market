@@ -8,7 +8,7 @@ import java.util.*;
 /**
  * Sale class contains buying Customer, which Product and how many are to be sold, and the TotalCost of the Sale.
  *
- * @author Jack, Nathan, Sanj, Tommy, Adit
+ * @author Jack, Nathan, Sanjana, Tommy, Aadit
  * @version 11/14/2022
  */
 public class Sale {

@@ -10,7 +10,7 @@ import java.util.List;
 
 /**
  * Account management system to handle logins/signups
- * @author Jack, Nathan, Sanj, Tommy, Adit
+ * @author Jack, Nathan, Sanjana, Tommy, Aadit
  * @version 11/14/2022
  */
 public class AccountManager {
