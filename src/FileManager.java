@@ -8,7 +8,7 @@ import java.util.Scanner;
 
 /**
  * File manager system for everything stored
- * @author Jack, Nathan, Sanj, Tommy, Adit
+ * @author Jack, Nathan, Sanjana, Tommy, Aadit
  * @version 11/14/2022
  */
 public class FileManager {
