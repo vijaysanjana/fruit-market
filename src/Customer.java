@@ -1,3 +1,4 @@
+import javax.swing.*;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -161,7 +162,7 @@ public class Customer extends User {
         FileOutputStream fos = new FileOutputStream(f, false);
         PrintWriter pw = new PrintWriter(fos);
         if (history == null || history.size() == 0) {
-            System.out.println("You have not purchased anything yet!");
+            JOptionPane.showMessageDialog(null, "You have not purchased anything yet!", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         } else {
             for (Sale s : history) {
@@ -170,6 +171,6 @@ public class Customer extends User {
         }
         fos.close();
         pw.close();
-        System.out.println("A file titled " + this.getUsername() + ".txt has been created with your purchase history!");
+        JOptionPane.showConfirmDialog(null, "A file titled " + this.getUsername() + ".txt has been created with your purchase history!", "File created", JOptionPane.PLAIN_MESSAGE);
     }
 }
