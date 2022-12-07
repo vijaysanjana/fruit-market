@@ -22,7 +22,7 @@ public class AccountManager {
      * @return
      */
     public static User login(String email, String password) {
-        ArrayList<ArrayList<String>> data = FileManager.getUserLogins();
+        ArrayList<ArrayList<String>> data = DataManager.getUserLogins();
         for (ArrayList<String> arr : data) {
             if (arr.get(2).equalsIgnoreCase(email)) {
                 if (arr.get(3).equals(password)) {
@@ -48,7 +48,7 @@ public class AccountManager {
      * @return
      */
     public static User signup(String username, String email, String password, String type) {
-        if (FileManager.writeUserSignup(username, email, password, type)) {
+        if (DataManager.writeUserSignup(username, email, password, type)) {
             if (type.equalsIgnoreCase("customer")) {
                 return new Customer(username, email, password);
             } else if (type.equalsIgnoreCase("seller")) {
