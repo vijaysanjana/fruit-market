@@ -25,7 +25,7 @@ class Core {
             String email;
             String password;
             int loginSignup;
-            String customerSeller;
+            int customerSeller;
             String username;
 
             JOptionPane.showMessageDialog(null, "Welcome to The Marketplace!", "Welcome", JOptionPane.PLAIN_MESSAGE);
@@ -50,9 +50,7 @@ class Core {
                         }
                     }
                     if (user instanceof Customer) {
-                        System.out.println(separator);
-                        System.out.println("Welcome customer: " + user.getUsername());
-
+                        JOptionPane.showMessageDialog(null, "Welcome customer " + user.getUsername() + "!");
                         // TESTING
                         FileManager.loadAllStores(mp, true);
                         for (Customer customer : mp.getCustomers()) {
@@ -88,27 +86,21 @@ class Core {
                                 new AccountException("LOGGED IN USER IS NEITHER CUSTOMER NOR SELLER!"));
                     }
                 } else if (loginSignup == 1) { // THIS IS THE SIGNUP PART
-                    System.out.println(separator);
-                    System.out.println("Please enter your email: ");
-                    email = sc.nextLine();
-                    System.out.println("Please enter your password: ");
-                    password = sc.nextLine();
-                    System.out.println("Please enter your username: ");
-                    username = sc.nextLine();
+                    email = JOptionPane.showInputDialog("Please enter your email.");
+                    password = JOptionPane.showInputDialog("Please enter your password.");
+                    username = JOptionPane.showInputDialog("Please enter your username.");
 
                     customer_seller:
                     while (true) {
-                        System.out.println("Are you signing up to be a customer or seller?");
-                        System.out.println("Please enter: " + "\n[1] Customer" + "\n[2] Seller");
-                        customerSeller = sc.nextLine();
+                        String[] options = {"Customer", "Seller"};
+                        customerSeller = JOptionPane.showOptionDialog(null, "What would you like to sign up as?", "Signup", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 
-                        if (customerSeller.equals("1")) {
+                        if (customerSeller == 0) {
                             if (AccountManager.signup(username, email, password, "customer") != null) {
-                                System.out.println("Successfully signed up! Logging you in...");
+                                JOptionPane.showMessageDialog(null,"Successfully signed up! Logging you in...");
                                 user = AccountManager.login(email, password);
                                 if (user instanceof Customer) {
-                                    System.out.println(separator);
-                                    System.out.println("Welcome customer: " + user.getUsername());
+                                    JOptionPane.showMessageDialog(null, "Welcome customer " + user.getUsername() + "!");
                                     shoppingCart = ((Customer) user).getShoppingCart();
                                     customerMainMenu();
                                     break system_loop;
@@ -126,7 +118,7 @@ class Core {
                                     break system_loop;
                                 }
                             }
-                        } else if (customerSeller.equals("2")) {
+                        } else if (customerSeller == 1) {
                             if (AccountManager.signup(username, email, password, "seller") != null) {
                                 System.out.println("Successfully signed up! Logging you in...");
                                 user = AccountManager.login(email, password);
