@@ -9,6 +9,17 @@ public class DataManager {
     private static File userDataFile = new File("userData");
     private static String sellerDataFolder = "seller_data";
     private static String customerDataFolder = "customer_data";
+    
+    /**
+    * Formatting as follows
+    * seller_data/[individual_seller_name]
+    * -- [store_name]_store: productName;description;price;quantity
+    * -- [store_name]_sales: productName;numberItemSold;customerName;totalCost
+    *
+    * customer_data/[individual_customer_name]
+    * -- purchase_history: productName;numberItemsBought;totalCost
+    * -- shopping_cart: productName;numberItemsCarted
+    */
 
     public static void loadEverything(MarketPlace mp) {
         loadCustomers(mp);
