@@ -71,7 +71,6 @@ public class DataManager {
                         if(logs.get(0).equalsIgnoreCase("C")
                                 && logs.get(1).equalsIgnoreCase(customerName)) {
                             customer = new Customer(logs.get(1), logs.get(2), logs.get(3));
-                            System.out.println("I AM A CUSTOMER " + customer.getUsername());
                         }
                     }
                     mp.addCustomer(customer);
@@ -95,7 +94,6 @@ public class DataManager {
                         if(logs.get(0).equalsIgnoreCase("S")
                                 && logs.get(1).equalsIgnoreCase(sellerName)) {
                             seller = new Seller(logs.get(1), logs.get(2), logs.get(3));
-                            System.out.println("I AM A SELLER " + seller.getUsername());
                         }
                     }
                     mp.addSeller(seller);
@@ -127,16 +125,15 @@ public class DataManager {
                                             Product product = new Product(prod[0], prod[1],
                                                     Double.parseDouble(prod[2]), Integer.parseInt(prod[3]));
                                             store.addProduct(product);
-                                            System.out.println("I AM A PRODUCT " + product.getName());
 
                                             line = br.readLine();
                                         }
                                         s.addStore(store);
+                                        break;
                                     }
-                                    break;
                                 }
+                                break;
                             }
-                            break;
                         }
                     }
                 }
@@ -173,11 +170,11 @@ public class DataManager {
 
                                             line = br.readLine();
                                         }
+                                        break;
                                     }
-                                    break;
                                 }
+                                break;
                             }
-                            break;
                         }
                     }
                 }
@@ -219,11 +216,11 @@ public class DataManager {
 
                                             line = br.readLine();
                                         }
+                                        break;
                                     }
-                                    break;
                                 }
+                                break;
                             }
-                            break;
                         }
                     }
                 }
