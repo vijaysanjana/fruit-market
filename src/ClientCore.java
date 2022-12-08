@@ -48,10 +48,15 @@ class ClientCore {
                             out.println(request);
 
                             response = in.readLine();
-                            customerSeller = response.substring((response.indexOf("}") + 1), response.indexOf(","));
-                            username = response.substring((response.indexOf(",") + 1), response.lastIndexOf(","));
+                            String[] responseData = response.substring(response.indexOf("}") + 1).split(",");
+                            customerSeller = responseData[0];
+                            username = responseData[1];
+                            String store = responseData[2];
+                            //customerSeller = response.substring((response.indexOf("}") + 1), response.indexOf(","));
+                            //username = response.substring((response.indexOf(",") + 1), response.lastIndexOf(","));
                             System.out.println(separator);
                             System.out.println("Welcome customer: " + username);
+                            System.out.println("Highlighed store: " + store);
                         }
                         //Open Login GUI
                         //Read User Input
