@@ -32,9 +32,7 @@ public class DataManager {
         s1.addProduct(p2);
 
         loadEverything(mp);
-        for(Product p : mp.getProducts()) {
-            System.out.println(p.getName());
-        }
+        saveEverything(mp);
     }
 
     public static void loadEverything(MarketPlace mp) {
@@ -232,6 +230,14 @@ public class DataManager {
     }
 
     public static void saveSellerStores(Seller seller) {
+        File iAmStore = new File(sellerDataFolder + File.separatorChar
+                + seller.getUsername() + File.separatorChar + "I_AM_A_GOOFY_GOOBER");
+        try {
+            iAmStore.createNewFile();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
         for(Store s : seller.getStores()) {
             File file = new File(sellerDataFolder + File.separatorChar
                     + seller.getUsername() + File.separatorChar + s.getName() + "_store");
@@ -340,7 +346,6 @@ public class DataManager {
         ArrayList<ArrayList<String>> data = new ArrayList<>();
 
         try (BufferedReader br = new BufferedReader(new FileReader(userDataFile))) {
-            int counter = 0;
             String line = br.readLine();
             while (line != null) {
                 String type = String.valueOf(line.charAt(0));
@@ -352,7 +357,6 @@ public class DataManager {
 
                 data.add(new ArrayList<>(Arrays.asList(type, username, email, password)));
 
-                counter++;
                 line = br.readLine();
             }
         } catch (Exception e) {
@@ -380,6 +384,12 @@ public class DataManager {
                 e.printStackTrace();
                 throw new RuntimeException(new AccountException("Creation of login file failed!"));
             }
+        }
+
+        if(username.contains(";") || username.contains(",")
+                || email.contains(";") || email.contains(",")
+                || password.contains(";") || password.contains(",")) {
+            return false;
         }
 
         ArrayList<ArrayList<String>> data = getUserLogins();
