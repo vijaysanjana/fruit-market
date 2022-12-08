@@ -119,7 +119,7 @@ class TestClientCore {
                             */
                             // TESTING
 
-                            //sellerMainMenu();
+                            sellerMainMenu();
                             break system_loop;
                         } else {
                             throw new RuntimeException(
@@ -153,6 +153,7 @@ class TestClientCore {
                                     if (customerSeller.equals("C")) {
                                         System.out.println(separator);
                                         System.out.println("Welcome customer: " + username);
+                                        customerMainMenu();
                                         //System.out.println("Welcome customer: " + user.getUsername());
                                         break system_loop;
                                     } else {
@@ -183,6 +184,7 @@ class TestClientCore {
                                     if (customerSeller.equals("S")) {
                                         System.out.println(separator);
                                         System.out.println("Welcome seller: " + username);
+                                        sellerMainMenu();
                                         //System.out.println("Welcome seller: " + user.getUsername());
                                         break system_loop;
                                     } else {
@@ -1227,10 +1229,24 @@ class TestClientCore {
      * Accesses all stores page
      */
     public static void storesMenu() throws IOException {
-        int counter = 0;
+
+        request = "{getStoreNames}";
+        clientOut.println(request);
+        response = interpretResponse(serverIn.readLine());
+
+        //int counter = 0;
         System.out.println(separator);
         System.out.println("Your stores:");
 
+        if (response.length <= 1) {
+            System.out.println("- No stores found");
+        } else {
+            for (int i = 1; i < response.length; i++) {
+                System.out.println("- #" + (i) + " " + response[i]);
+            }
+        }
+
+        /*
         if (((Seller) user).getStores().isEmpty()) {
             System.out.println("- No stores found");
         } else {
@@ -1239,6 +1255,7 @@ class TestClientCore {
                 counter++;
             }
         }
+        */
 
         System.out.println(separator);
         System.out.println("Please enter: ");

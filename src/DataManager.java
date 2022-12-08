@@ -257,7 +257,7 @@ public class DataManager {
 
     public static void saveCustomerHistory(Customer customer) {
         File file = new File(customerDataFolder + File.separatorChar
-                + customer.getPurchases() + File.separatorChar + "purchase_history");
+                + customer.getUsername() + File.separatorChar + "purchase_history");
 
         for(Sale s : customer.getPurchases()) {
             try(FileWriter fw = new FileWriter(file, false)) {
@@ -274,7 +274,7 @@ public class DataManager {
 
     public static void saveCustomerCart(Customer customer) {
         File file = new File(customerDataFolder + File.separatorChar
-                + customer.getPurchases() + File.separatorChar + "shopping_cart");
+                + customer.getUsername() + File.separatorChar + "shopping_cart");
 
         for(Sale s : customer.getShoppingCart().getHeldPurchases()) {
             try(FileWriter fw = new FileWriter(file, false)) {
