@@ -162,9 +162,9 @@ class ServerCore {
                 String userType = (user instanceof Customer) ? "C" : "S";
                 String response = "{Login}," + userType + "," + user.getUsername();
                 System.out.println("Response compiled"); //Test
-                System.out.println(mp.getCustomer(0).getUsername());
-                System.out.println(mp.getCustomer(1).getUsername());
-                System.out.println(mp.getCustomer(2).getUsername());
+                //System.out.println(mp.getCustomer(0).getUsername());
+                //System.out.println(mp.getCustomer(1).getUsername());
+                //System.out.println(mp.getCustomer(2).getUsername());
                 return response;
             }
             return null;
@@ -178,6 +178,11 @@ class ServerCore {
             String customerSeller = request[4];
 
             if (AccountManager.signup(username, email, password, customerSeller) != null) {
+                if (customerSeller.equals("customer")) {
+                    mp.addCustomer(new Customer(username, email, password));
+                } else {
+                    mp.addSeller(new Seller(username, email, password));
+                }
                 return "{Signup}";
             }
             return null;
