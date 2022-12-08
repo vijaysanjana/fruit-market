@@ -1,6 +1,6 @@
 /**
  * Exception thrown when account system failed
- * @author Jack, Nathan, Sanj, Tommy, Adit
+ * @author Jack, Nathan, Sanjana, Tommy, Aadit
  * @version 11/14/2022
  */
 public class AccountException extends Exception {
