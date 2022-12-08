@@ -4,6 +4,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Scanner;
 
 public class DataManager {
     private static File userDataFile = new File("userData");
@@ -20,6 +21,21 @@ public class DataManager {
     * -- purchase_history: productName;numberItemsBought;totalCost
     * -- shopping_cart: productName;numberItemsCarted
     */
+
+    public static void main(String[] args) {
+        MarketPlace mp = new MarketPlace();
+        Product p1 = new Product("RGB Apples", "It's apples but with a hint of artificial coloring!", 29.99, 5);
+        Product p2 = new Product("Gamer Fuel", "It's fuel, but for gamers!", 5.99, 100);
+        Store s1 = new Store("Gamer Store", "");
+
+        s1.addProduct(p1);
+        s1.addProduct(p2);
+
+        loadEverything(mp);
+        for(Product p : mp.getProducts()) {
+            System.out.println(p.getName());
+        }
+    }
 
     public static void loadEverything(MarketPlace mp) {
         loadCustomers(mp);
@@ -55,6 +71,7 @@ public class DataManager {
                         if(logs.get(0).equalsIgnoreCase("C")
                                 && logs.get(1).equalsIgnoreCase(customerName)) {
                             customer = new Customer(logs.get(1), logs.get(2), logs.get(3));
+                            System.out.println("I AM A CUSTOMER " + customer.getUsername());
                         }
                     }
                     mp.addCustomer(customer);
@@ -78,6 +95,7 @@ public class DataManager {
                         if(logs.get(0).equalsIgnoreCase("S")
                                 && logs.get(1).equalsIgnoreCase(sellerName)) {
                             seller = new Seller(logs.get(1), logs.get(2), logs.get(3));
+                            System.out.println("I AM A SELLER " + seller.getUsername());
                         }
                     }
                     mp.addSeller(seller);
@@ -109,6 +127,7 @@ public class DataManager {
                                             Product product = new Product(prod[0], prod[1],
                                                     Double.parseDouble(prod[2]), Integer.parseInt(prod[3]));
                                             store.addProduct(product);
+                                            System.out.println("I AM A PRODUCT " + product.getName());
 
                                             line = br.readLine();
                                         }
@@ -220,17 +239,19 @@ public class DataManager {
             File file = new File(sellerDataFolder + File.separatorChar
                     + seller.getUsername() + File.separatorChar + s.getName() + "_store");
 
-            for(Product p : s.getProducts()) {
-                try(FileWriter fw = new FileWriter(file, false)) {
+            try(FileWriter fw = new FileWriter(file, false)) {
+                for(Product p : s.getProducts()) {
+                    System.out.println(p.getName());
                     fw.write(p.getName() + ";"
                             + p.getDescription() + ";"
                             + p.getPrice() + ";"
                             + p.getQuantity());
                     fw.write("\n");
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    throw new RuntimeException(new DataException("Saving of seller stores failed!"));
                 }
+                fw.close();
+            } catch(Exception e) {
+                e.printStackTrace();
+                throw new RuntimeException(new DataException("Saving of seller stores failed!"));
             }
         }
     }
@@ -240,51 +261,54 @@ public class DataManager {
             File file = new File(sellerDataFolder + File.separatorChar
                     + seller.getUsername() + File.separatorChar + s.getName() + "_sales");
 
-            for(Sale sa : s.getSales()) {
-                try(FileWriter fw = new FileWriter(file, false)) {
+            try(FileWriter fw = new FileWriter(file, false)) {
+                for(Sale sa : s.getSales()) {
                     fw.write(sa.getProduct().getName() + ";"
                             + sa.getQuantity() + ";"
                             + sa.getCustomer().getUsername() + ";"
                             + sa.getTotalCost());
                     fw.write("\n");
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    throw new RuntimeException(new DataException("Saving of seller sales failed!"));
                 }
+                fw.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new RuntimeException(new DataException("Saving of seller sales failed!"));
             }
         }
     }
 
     public static void saveCustomerHistory(Customer customer) {
         File file = new File(customerDataFolder + File.separatorChar
-                + customer.getPurchases() + File.separatorChar + "purchase_history");
+                + customer.getUsername() + File.separatorChar + "purchase_history");
 
-        for(Sale s : customer.getPurchases()) {
-            try(FileWriter fw = new FileWriter(file, false)) {
+        try(FileWriter fw = new FileWriter(file, false)) {
+            for(Sale s : customer.getPurchases()) {
                 fw.write(s.getName() + ";"
                         + s.getQuantity() + ";"
                         + s.getTotalCost());
                 fw.write("\n");
-            } catch(Exception e) {
-                e.printStackTrace();
-                throw new RuntimeException(new DataException("Saving of customer purchase history failed!"));
             }
+            fw.close();
+        } catch(Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(new DataException("Saving of customer purchase history failed!"));
         }
     }
 
     public static void saveCustomerCart(Customer customer) {
         File file = new File(customerDataFolder + File.separatorChar
-                + customer.getPurchases() + File.separatorChar + "shopping_cart");
+                + customer.getUsername() + File.separatorChar + "shopping_cart");
 
-        for(Sale s : customer.getShoppingCart().getHeldPurchases()) {
-            try(FileWriter fw = new FileWriter(file, false)) {
+        try(FileWriter fw = new FileWriter(file, false)) {
+            for(Sale s : customer.getShoppingCart().getHeldPurchases()) {
                 fw.write(s.getName() + ";"
                         + s.getQuantity());
                 fw.write("\n");
-            } catch(Exception e) {
-                e.printStackTrace();
-                throw new RuntimeException(new DataException("Saving of customer shopping cart failed!"));
             }
+            fw.close();
+        } catch(Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(new DataException("Saving of customer shopping cart failed!"));
         }
     }
 

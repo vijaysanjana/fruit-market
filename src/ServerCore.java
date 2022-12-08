@@ -99,9 +99,18 @@ class ServerCore {
                             serverOut.println(response);
                             break;
 
+
                         case "{getTotalHeldProducts}":
                             response = getTotalHeldProductsRequest(request);
                             serverOut.println(response);
+                            break;
+
+
+                        case "{getStoreNames}":
+
+                            //serverOut.println(response);
+                            break;
+
 
 
                         default:
@@ -191,5 +200,9 @@ class ServerCore {
         public String getTotalHeldProductsRequest(String[] request) {
             return "{getTotalHeldProducts}, " + ((Customer) user).getShoppingCart().getTotalheldProducts();
         }
+
+        //public String getStoreNamesRequest(String[] request) {
+
+        //}
     }
 }
