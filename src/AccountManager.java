@@ -17,20 +17,31 @@ public class AccountManager {
     /**
      * Method to attempt a login of user based on file data
      *
+     * @param mp
      * @param email
      * @param password
      * @return
      */
-    public static User login(String email, String password) {
+    public static User login(MarketPlace mp, String email, String password) {
         ArrayList<ArrayList<String>> data = DataManager.getUserLogins();
         for (ArrayList<String> arr : data) {
             if (arr.get(2).equalsIgnoreCase(email)) {
                 if (arr.get(3).equals(password)) {
                     if (arr.get(0).equalsIgnoreCase("C")) {
-                        return new Customer(arr.get(1), arr.get(2), arr.get(3));
+                        for(Customer c : mp.getCustomers()) {
+                            if(c.getUsername().equalsIgnoreCase(arr.get(1))) {
+                                mp.addCustomer(c);
+                                return c;
+                            }
+                        }
                     }
                     if (arr.get(0).equalsIgnoreCase("S")) {
-                        return new Seller(arr.get(1), arr.get(2), arr.get(3));
+                        for(Seller s : mp.getSellers()) {
+                            if(s.getUsername().equalsIgnoreCase(arr.get(1))) {
+                                mp.addSeller(s);
+                                return s;
+                            }
+                        }
                     }
                 }
             }
