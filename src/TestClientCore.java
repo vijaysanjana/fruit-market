@@ -1,10 +1,11 @@
-import java.util.ArrayList;
-import java.util.Scanner;
+import javax.swing.*;
+import java.util.*;
 import java.io.*;
 import java.net.*;
 
 /**
  * Marketplace main menu system used for logic control flow and to display login, signup, and user actions
+ *
  * @author Jack, Nathan, Sanj, Tommy, Adit
  * @version 11/14/2022
  */
@@ -38,26 +39,21 @@ class TestClientCore {
             while (true) {
                 String email;
                 String password;
-                String loginSignup;
+                int loginSignup;
                 String customerSeller;
                 String username;
 
-                System.out.println("Welcome to The Marketplace!");
-                System.out.println(separator);
-                System.out.println("Login or signup to use our service.");
-                System.out.println("Please enter: " + "\n[1] Login" + "\n[2] Signup");
-                loginSignup = sc.nextLine();
+                JOptionPane.showMessageDialog(null, "Welcome to The Marketplace!", "Welcome", JOptionPane.PLAIN_MESSAGE);
+                String[] options = {"Login", "Signup"};
+                loginSignup = JOptionPane.showOptionDialog(null, "Login or signup to use our service.", "Login", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 
                 login_signup:
                 while (true) {
-                    if (loginSignup.equals("1")) { // THIS IS THE LOGIN PART
+                    if (loginSignup == 0) { // THIS IS THE LOGIN PART
                         login_loop:
                         while (true) {
-                            System.out.println(separator);
-                            System.out.println("Please enter your email: ");
-                            email = sc.nextLine();
-                            System.out.println("Please enter your password: ");
-                            password = sc.nextLine();
+                            email = JOptionPane.showInputDialog("Please enter your email");
+                            password = JOptionPane.showInputDialog("Please enter your password");
 
                             request = "{Login}," + email + "," + password;
                             clientOut.println(request);
@@ -125,7 +121,7 @@ class TestClientCore {
                             throw new RuntimeException(
                                     new AccountException("LOGGED IN USER IS NEITHER CUSTOMER NOR SELLER!"));
                         }
-                    } else if (loginSignup.equals("2")) { // THIS IS THE SIGNUP PART
+                    } else if (loginSignup == 1) { // THIS IS THE SIGNUP PART
                         System.out.println(separator);
                         System.out.println("Please enter your email: ");
                         email = sc.nextLine();
@@ -282,12 +278,10 @@ class TestClientCore {
      * @return boolean
      */
     public static boolean tryAgain(String message) {
-        System.out.println(separator);
-        System.out.println(message);
-        System.out.println("Please enter [Y] or [Yes] to try again" +
-                ", or [Anything Else] to quit: ");
-        String yn = sc.nextLine();
-        return (yn.equalsIgnoreCase("y") || yn.equalsIgnoreCase("yes"));
+        JOptionPane.showMessageDialog(null, message, "Try again", JOptionPane.ERROR_MESSAGE);
+        String[] options = {"Yes", "No"};
+        int yn = JOptionPane.showOptionDialog(null, "Please enter Yes to try again or No to quit.", "try again", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+        return (yn == 0);
     }
 
     /**
@@ -301,33 +295,23 @@ class TestClientCore {
         response = interpretResponse(serverIn.readLine());
         String totalHeldProducts = response[1];
 
-        System.out.println(separator);
-        System.out.println("What would you like to do today?");
-        System.out.println("Please enter: ");
-        System.out.println("[1] Open Marketplace");
-        System.out.println("[2] Search for Fruit");
-        System.out.println("[3] View Shopping Cart (" + totalHeldProducts + " Fruits)");
-        //System.out.println("[3] View Shopping Cart ("
-        //        + shoppingCart.getTotalheldProducts() + " Fruits)");
-        System.out.println("[4] View Purchase History");
-        System.out.println("[5] View Statistics Dashboard");
-        System.out.println("[D] Delete Account");
-        System.out.println("[Q] Logout & Quit");
+        String[] options = {"Open Marketplace", "Search for Fruit", "View Shopping Cart ("
+                + shoppingCart.getTotalheldProducts() + " Fruits)", "View Purchase History", "View Statistics Dashboard", "Delete Account", "Logout & Quit"};
+        int action = JOptionPane.showOptionDialog(null, "What would you like to do today?", "Choice", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 
-        String action = sc.nextLine();
-        if (action.equalsIgnoreCase("1")) {
+        if (action == 0) {
             marketplaceMenu();
-        } else if (action.equalsIgnoreCase("2")) {
+        } else if (action == 1) {
             searchMenu();
-        } else if (action.equalsIgnoreCase("3")) {
+        } else if (action == 2) {
             cartMenu();
-        } else if (action.equalsIgnoreCase("4")) {
+        } else if (action == 3) {
             historyMenu();
-        } else if (action.equalsIgnoreCase("5")) {
+        } else if (action == 4) {
             dashboardMenu(0);
-        } else if (action.equalsIgnoreCase("d")) {
+        } else if (action == 5) {
             deleteAccount(user);
-        } else if (action.equalsIgnoreCase("q")) {
+        } else if (action == 6) {
             printFarewell();
         } else {
             if (tryAgain("Invalid menu selection!")) {
@@ -1593,7 +1577,7 @@ class TestClientCore {
         System.out.println(separator);
         System.out.println("All carted items:");
         ArrayList<ArrayList<String>> data = null; //(Added "null;" so this could run)
-                //FileManager.getAllCarts(); //FILE MANAGER
+        //FileManager.getAllCarts(); //FILE MANAGER
         for (int j = 0; j < data.size(); j++) {
             ArrayList<String> arr = data.get(j);
             System.out.println(separator);
