@@ -330,45 +330,44 @@ class TestClientCore {
             response = interpretResponse(serverIn.readLine());
             productNames.addAll(Arrays.asList(interpretListedResponse(response[1])));
         }
+        String availStores = "";
 
-        System.out.println(separator);
-        System.out.println("All available stores:");
+        availStores += "All available stores:";
 
         int counter = 0;
 
         for (Store s : stores) {
             ArrayList<Product> tempProds = s.getProducts();
-            System.out.println("- " + s.getName());
+            availStores += "\n- " + s.getName());
             if (stores.isEmpty()) {
-                System.out.println("--- No fruits found");
+                availStores += "\n--- No fruits found";
             } else {
                 for (Product p : tempProds) {
                     products.add(p);
-                    System.out.println("--- #" + (counter + 1) + " " +
+                    availStores += "\n--- #" + (counter + 1) + " " +
                             p.getName() + " (Price $" + p.getPrice() + " " +
-                            "| Quantity Available " + p.getQuantity() + ")");
+                            "| Quantity Available " + p.getQuantity() + ")";
                     counter++;
                 }
             }
         }
 
         if (!products.isEmpty()) {
-            System.out.println(separator);
-            System.out.println("Please enter: ");
-            System.out.println("[PH] Sort Fruits by Price (High to Low)");
-            System.out.println("[PL] Sort Fruits by Price (Low to High)");
-            System.out.println("[QH] Sort Fruits by Quantity Available (High to Low)");
-            System.out.println("[QL] Sort Fruits by Quantity Available (High to Low)");
-            System.out.println("[Correspond #] View Fruit Info");
-            System.out.println("[Anything Else] Return to Customer Menu");
+            String choices = "";
+            choices += "\nPlease enter: ";
+            choices += "\n[PH] Sort Fruits by Price (High to Low)";
+            choices += "\n[PL] Sort Fruits by Price (Low to High)";
+            choices += "\n[QH] Sort Fruits by Quantity Available (High to Low)";
+            choices += "\n[QL] Sort Fruits by Quantity Available (High to Low)";
+            choices += "\n[Correspond #] View Fruit Info";
+            choices += "\n[Anything Else] Return to Customer Menu";
 
-            String productPick = sc.nextLine();
+            String productPick = JOptionPane.showInputDialog(choices);
             if (productPick.matches("-?\\d+(\\.\\d+)?")) {
                 while (Integer.parseInt(productPick) - 1 > products.size()
                         || Integer.parseInt(productPick) < 1) {
-                    System.out.println("Entered # is not a valid item! " +
+                    productPick = JOptionPane.showInputDialog("Entered # is not a valid item! " +
                             "Please enter a valid item #: ");
-                    productPick = sc.nextLine();
                     if (!productPick.matches("-?\\d+(\\.\\d+)?")) {
                         productPick = "QUIT_MENU_PLEASE";
                         break;
@@ -380,21 +379,17 @@ class TestClientCore {
                     Product p = products.get(Integer.parseInt(productPick) - 1);
                     if (p.getQuantity() <= 0) {
                         while (p.getQuantity() <= 0) {
-                            System.out.println("There is no more of this fruit available to purchase! " +
+                            productPick = JOptionPane.showInputDialog("There is no more of this fruit available to purchase! " +
                                     "Please enter another option: ");
-                            productPick = sc.nextLine();
                             if (productPick.matches("-?\\d+(\\.\\d+)?") && !(Integer.parseInt(productPick) < 1)) {
                                 p = products.get(Integer.parseInt(productPick) - 1);
                                 if (p.getQuantity() >= 1) {
                                     if (p != null) {
                                         showProductInfo(p);
-                                        System.out.println(separator);
-                                        System.out.println("Please enter: ");
-                                        System.out.println("[1] Add to Shopping Cart");
-                                        System.out.println("[Anything Else] Return to All Fruits Page");
+                                        String [] options = {"Add to Shopping Cart", "Return to All Fruits Page"};
+                                        int productAction = JOptionPane.showOptionDialog(null, "Please choose one.", "Choice", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 
-                                        String productAction = sc.nextLine();
-                                        if (productAction.equalsIgnoreCase("1")) {
+                                        if (productAction == 0) {
                                             System.out.println(separator);
                                             System.out.println("Please enter a purchase quantity: ");
                                             String purchaseQuantity = sc.nextLine();
@@ -607,12 +602,7 @@ class TestClientCore {
 
     public static void addSearchProduct(ArrayList<Product> productsFound) throws IOException {
         if (!productsFound.isEmpty()) {
-            System.out.println(separator);
-            System.out.println("Please enter: ");
-            System.out.println("[Correspond #] View Fruit Info");
-            System.out.println("[Anything Else] Return to Customer Menu");
-
-            String productPick = sc.nextLine();
+            String productPick = JOptionPane.showInputDialog("Please enter:" + "\n[Correspond #] View Fruit Info" + "\n[Anything Else] Return to Customer Menu");
 
             if (productPick.matches("-?\\d+(\\.\\d+)?")
                     && !(Integer.parseInt(productPick) < 1)) { // TODO: needs testing
@@ -631,36 +621,26 @@ class TestClientCore {
                     Product p = productsFound.get(Integer.parseInt(productPick) - 1);
                     if (p.getQuantity() <= 0) {
                         while (p.getQuantity() <= 0) {
-                            System.out.println("There is no more of this fruit available to purchase! " +
+                            productPick = JOptionPane.showInputDialog("There is no more of this fruit available to purchase! " +
                                     "Please enter another option: ");
-                            productPick = sc.nextLine();
                             if (productPick.matches("-?\\d+(\\.\\d+)?")
                                     && (Integer.parseInt(productPick) > 1)) {
                                 p = productsFound.get(Integer.parseInt(productPick) - 1);
                                 if (p.getQuantity() >= 1) {
                                     if (p != null) { // TODO: needs testing
                                         showProductInfo(p);
-                                        System.out.println(separator);
-                                        System.out.println("Please enter: ");
-                                        System.out.println("[1] Add to Shopping Cart");
-                                        System.out.println("[Anything Else] Return to Search Page");
-
-                                        String productAction = sc.nextLine();
-                                        if (productAction.equalsIgnoreCase("1")) {
-                                            System.out.println(separator);
-                                            System.out.println("Please enter a purchase quantity: ");
-                                            String purchaseQuantity = sc.nextLine();
+                                        String[] options = {"Add to Shopping Cart", "Return to Search Page"};
+                                        int productAction =JOptionPane.showOptionDialog(null, "Please choose.", "Choice", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+                                        if (productAction == 0) {
+                                            String purchaseQuantity = JOptionPane.showInputDialog("Please enter a purchase quantity: ");
                                             while (!purchaseQuantity.matches("-?\\d+(\\.\\d+)?")
                                                     || (Integer.parseInt(purchaseQuantity) < 1)) {
-                                                System.out.println("Entered quantity is not a valid integer! " +
-                                                        "Please enter a valid quantity: ");
-                                                purchaseQuantity = sc.nextLine();
+                                                purchaseQuantity = JOptionPane.showInputDialog("Entered quantity is not a valid integer! " +
+                                                        "Please enter a valid quantity: "));
                                             }
                                             while (p.getQuantity() - Integer.parseInt(purchaseQuantity) < 0) {
-                                                System.out.println("There is only " + p.getQuantity() + " of " +
-                                                        "this fruit available to purchase.");
-                                                System.out.println("Please try a smaller quantity: ");
-                                                purchaseQuantity = sc.nextLine();
+                                                purchaseQuantity = JOptionPane.showInputDialog("There is only " + p.getQuantity() + " of " +
+                                                        "this fruit available to purchase. Please try a smaller quantity:"));
                                             }
 
                                             shoppingCart.addPurchase(new Sale((Customer) user,
@@ -671,8 +651,7 @@ class TestClientCore {
                                             //        p, Integer.parseInt(purchaseQuantity));
                                             p.setQuantity(p.getQuantity() - Integer.parseInt(purchaseQuantity));
                                             // TESTING
-
-                                            System.out.println("Successfully added " + purchaseQuantity
+                                            JOptionPane.showConfirmDialog(null, "Successfully added " + purchaseQuantity
                                                     + " to your shopping cart." +
                                                     " Returning to search page...");
                                             searchMenu();
