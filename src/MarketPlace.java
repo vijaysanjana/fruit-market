@@ -318,4 +318,12 @@ public class MarketPlace {
         }
         return null;
     }
+
+    //get Store object by store name
+     public Store getStore(String storeName) {
+        for (Store s : getStores())
+            if (s.getName().equals(storeName))
+                return s;
+        return null;
+     }
 }

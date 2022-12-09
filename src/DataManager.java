@@ -4,6 +4,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Scanner;
 
 public class DataManager {
     private static File userDataFile = new File("userData");
@@ -20,6 +21,19 @@ public class DataManager {
     * -- purchase_history: productName;numberItemsBought;totalCost
     * -- shopping_cart: productName;numberItemsCarted
     */
+
+    public static void main(String[] args) {
+        MarketPlace mp = new MarketPlace();
+        Product p1 = new Product("RGB Apples", "It's apples but with a hint of artificial coloring!", 29.99, 5);
+        Product p2 = new Product("Gamer Fuel", "It's fuel, but for gamers!", 5.99, 100);
+        Store s1 = new Store("Gamer Store", "");
+
+        s1.addProduct(p1);
+        s1.addProduct(p2);
+
+        loadEverything(mp);
+        saveEverything(mp);
+    }
 
     public static void loadEverything(MarketPlace mp) {
         loadCustomers(mp);
@@ -113,11 +127,11 @@ public class DataManager {
                                             line = br.readLine();
                                         }
                                         s.addStore(store);
+                                        break;
                                     }
-                                    break;
                                 }
+                                break;
                             }
-                            break;
                         }
                     }
                 }
@@ -154,11 +168,11 @@ public class DataManager {
 
                                             line = br.readLine();
                                         }
+                                        break;
                                     }
-                                    break;
                                 }
+                                break;
                             }
-                            break;
                         }
                     }
                 }
@@ -200,11 +214,11 @@ public class DataManager {
 
                                             line = br.readLine();
                                         }
+                                        break;
                                     }
-                                    break;
                                 }
+                                break;
                             }
-                            break;
                         }
                     }
                 }
@@ -216,21 +230,31 @@ public class DataManager {
     }
 
     public static void saveSellerStores(Seller seller) {
+        File iAmStore = new File(sellerDataFolder + File.separatorChar
+                + seller.getUsername() + File.separatorChar + "I_AM_A_GOOFY_GOOBER");
+        try {
+            iAmStore.createNewFile();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
         for(Store s : seller.getStores()) {
             File file = new File(sellerDataFolder + File.separatorChar
                     + seller.getUsername() + File.separatorChar + s.getName() + "_store");
 
-            for(Product p : s.getProducts()) {
-                try(FileWriter fw = new FileWriter(file, false)) {
+            try(FileWriter fw = new FileWriter(file, false)) {
+                for(Product p : s.getProducts()) {
+                    System.out.println(p.getName());
                     fw.write(p.getName() + ";"
                             + p.getDescription() + ";"
                             + p.getPrice() + ";"
                             + p.getQuantity());
                     fw.write("\n");
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    throw new RuntimeException(new DataException("Saving of seller stores failed!"));
                 }
+                fw.close();
+            } catch(Exception e) {
+                e.printStackTrace();
+                throw new RuntimeException(new DataException("Saving of seller stores failed!"));
             }
         }
     }
@@ -240,51 +264,54 @@ public class DataManager {
             File file = new File(sellerDataFolder + File.separatorChar
                     + seller.getUsername() + File.separatorChar + s.getName() + "_sales");
 
-            for(Sale sa : s.getSales()) {
-                try(FileWriter fw = new FileWriter(file, false)) {
+            try(FileWriter fw = new FileWriter(file, false)) {
+                for(Sale sa : s.getSales()) {
                     fw.write(sa.getProduct().getName() + ";"
                             + sa.getQuantity() + ";"
                             + sa.getCustomer().getUsername() + ";"
                             + sa.getTotalCost());
                     fw.write("\n");
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    throw new RuntimeException(new DataException("Saving of seller sales failed!"));
                 }
+                fw.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new RuntimeException(new DataException("Saving of seller sales failed!"));
             }
         }
     }
 
     public static void saveCustomerHistory(Customer customer) {
         File file = new File(customerDataFolder + File.separatorChar
-                + customer.getPurchases() + File.separatorChar + "purchase_history");
+                + customer.getUsername() + File.separatorChar + "purchase_history");
 
-        for(Sale s : customer.getPurchases()) {
-            try(FileWriter fw = new FileWriter(file, false)) {
+        try(FileWriter fw = new FileWriter(file, false)) {
+            for(Sale s : customer.getPurchases()) {
                 fw.write(s.getName() + ";"
                         + s.getQuantity() + ";"
                         + s.getTotalCost());
                 fw.write("\n");
-            } catch(Exception e) {
-                e.printStackTrace();
-                throw new RuntimeException(new DataException("Saving of customer purchase history failed!"));
             }
+            fw.close();
+        } catch(Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(new DataException("Saving of customer purchase history failed!"));
         }
     }
 
     public static void saveCustomerCart(Customer customer) {
         File file = new File(customerDataFolder + File.separatorChar
-                + customer.getPurchases() + File.separatorChar + "shopping_cart");
+                + customer.getUsername() + File.separatorChar + "shopping_cart");
 
-        for(Sale s : customer.getShoppingCart().getHeldPurchases()) {
-            try(FileWriter fw = new FileWriter(file, false)) {
+        try(FileWriter fw = new FileWriter(file, false)) {
+            for(Sale s : customer.getShoppingCart().getHeldPurchases()) {
                 fw.write(s.getName() + ";"
                         + s.getQuantity());
                 fw.write("\n");
-            } catch(Exception e) {
-                e.printStackTrace();
-                throw new RuntimeException(new DataException("Saving of customer shopping cart failed!"));
             }
+            fw.close();
+        } catch(Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(new DataException("Saving of customer shopping cart failed!"));
         }
     }
 
@@ -319,7 +346,6 @@ public class DataManager {
         ArrayList<ArrayList<String>> data = new ArrayList<>();
 
         try (BufferedReader br = new BufferedReader(new FileReader(userDataFile))) {
-            int counter = 0;
             String line = br.readLine();
             while (line != null) {
                 String type = String.valueOf(line.charAt(0));
@@ -331,7 +357,6 @@ public class DataManager {
 
                 data.add(new ArrayList<>(Arrays.asList(type, username, email, password)));
 
-                counter++;
                 line = br.readLine();
             }
         } catch (Exception e) {
@@ -359,6 +384,12 @@ public class DataManager {
                 e.printStackTrace();
                 throw new RuntimeException(new AccountException("Creation of login file failed!"));
             }
+        }
+
+        if(username.contains(";") || username.contains(",")
+                || email.contains(";") || email.contains(",")
+                || password.contains(";") || password.contains(",")) {
+            return false;
         }
 
         ArrayList<ArrayList<String>> data = getUserLogins();
