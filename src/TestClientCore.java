@@ -324,13 +324,23 @@ class TestClientCore {
      * Navigates through the marketplace menu for customers
      */
     public static void marketplaceMenu() throws IOException {
-        ArrayList<Store> stores = mp.getStores();
-        ArrayList<Product> products = new ArrayList<Product>();
+        request = "{getAllStores}";
+        clientOut.println(request);
+        response = interpretResponse(serverIn.readLine());
+        String[] storeNames = interpretListedResponse(response[1]);
+        ArrayList<String> productNames = new ArrayList<>(); //all products names
+        for (String store : storeNames) {
+            request = "{getAllProducts}";
+            clientOut.println(request);
+            response = interpretResponse(serverIn.readLine());
+            productNames.addAll(Arrays.asList(interpretListedResponse(response[1])));
+        }
 
         System.out.println(separator);
         System.out.println("All available stores:");
 
         int counter = 0;
+
         for (Store s : stores) {
             ArrayList<Product> tempProds = s.getProducts();
             System.out.println("- " + s.getName());
@@ -1654,5 +1664,12 @@ class TestClientCore {
             return null;
         }
         return response.split(",");
+    }
+
+    public static String[] interpretListedResponse(String response) {
+        if (response == null) {
+            return null;
+        }
+        return response.split("\\|");
     }
 }
