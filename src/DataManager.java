@@ -47,6 +47,8 @@ public class DataManager {
      * @param mp
      */
     public static void loadEverything(MarketPlace mp) {
+        System.out.println("Loading literally everything");
+
         loadCustomers(mp);
         loadSellers(mp);
         loadStores(mp);
@@ -60,6 +62,8 @@ public class DataManager {
      * @param mp
      */
     public static void saveEverything(MarketPlace mp) {
+        System.out.println("Saving literally everything");
+
         for (Seller s : mp.getSellers()) {
             createNecessaryFolders(s);
             saveSellerStores(s);
@@ -81,18 +85,20 @@ public class DataManager {
     private static void loadCustomers(MarketPlace mp) {
         File customerLocation = new File(customerDataFolder + File.separatorChar);
         try {
-            if (customerLocation.listFiles().length != 0) {
-                for (File f : customerLocation.listFiles()) {
-                    String customerName = f.getName();
-                    ArrayList<ArrayList<String>> logins = getUserLogins();
-                    Customer customer = null;
-                    for (ArrayList<String> logs : logins) {
-                        if (logs.get(0).equalsIgnoreCase("C")
-                                && logs.get(1).equalsIgnoreCase(customerName)) {
-                            customer = new Customer(logs.get(1), logs.get(2), logs.get(3));
+            if(customerLocation.listFiles() != null) {
+                if (customerLocation.listFiles().length != 0) {
+                    for (File f : customerLocation.listFiles()) {
+                        String customerName = f.getName();
+                        ArrayList<ArrayList<String>> logins = getUserLogins();
+                        Customer customer = null;
+                        for (ArrayList<String> logs : logins) {
+                            if (logs.get(0).equalsIgnoreCase("C")
+                                    && logs.get(1).equalsIgnoreCase(customerName)) {
+                                customer = new Customer(logs.get(1), logs.get(2), logs.get(3));
+                            }
                         }
+                        mp.addCustomer(customer);
                     }
-                    mp.addCustomer(customer);
                 }
             }
         } catch (Exception e) {
@@ -110,18 +116,20 @@ public class DataManager {
     private static void loadSellers(MarketPlace mp) {
         File sellerLocation = new File(sellerDataFolder + File.separatorChar);
         try {
-            if (sellerLocation.listFiles().length != 0) {
-                for (File f : sellerLocation.listFiles()) {
-                    String sellerName = f.getName();
-                    ArrayList<ArrayList<String>> logins = getUserLogins();
-                    Seller seller = null;
-                    for (ArrayList<String> logs : logins) {
-                        if (logs.get(0).equalsIgnoreCase("S")
-                                && logs.get(1).equalsIgnoreCase(sellerName)) {
-                            seller = new Seller(logs.get(1), logs.get(2), logs.get(3));
+            if(sellerLocation.listFiles() != null) {
+                if (sellerLocation.listFiles().length != 0) {
+                    for (File f : sellerLocation.listFiles()) {
+                        String sellerName = f.getName();
+                        ArrayList<ArrayList<String>> logins = getUserLogins();
+                        Seller seller = null;
+                        for (ArrayList<String> logs : logins) {
+                            if (logs.get(0).equalsIgnoreCase("S")
+                                    && logs.get(1).equalsIgnoreCase(sellerName)) {
+                                seller = new Seller(logs.get(1), logs.get(2), logs.get(3));
+                            }
                         }
+                        mp.addSeller(seller);
                     }
-                    mp.addSeller(seller);
                 }
             }
         } catch (Exception e) {
@@ -139,31 +147,35 @@ public class DataManager {
     private static void loadStores(MarketPlace mp) {
         File sellerLocation = new File(sellerDataFolder + File.separatorChar);
         try {
-            if (sellerLocation.listFiles().length != 0) {
-                for (File f : sellerLocation.listFiles()) {
-                    if (f.listFiles().length != 0) {
-                        for (Seller s : mp.getSellers()) {
-                            if (s.getUsername().equalsIgnoreCase(f.getName())) {
-                                for (File ff : f.listFiles()) {
-                                    if (ff.getName().contains("_store")) {
-                                        Store store = new Store(ff.getName().replace("_store", "")
-                                                , "");
-                                        BufferedReader br = new BufferedReader(new FileReader(ff));
-                                        String line = br.readLine();
+            if(sellerLocation.listFiles() != null) {
+                if (sellerLocation.listFiles().length != 0) {
+                    for (File f : sellerLocation.listFiles()) {
+                        if(f.listFiles() != null) {
+                            if (f.listFiles().length != 0) {
+                                for (Seller s : mp.getSellers()) {
+                                    if (s.getUsername().equalsIgnoreCase(f.getName())) {
+                                        for (File ff : f.listFiles()) {
+                                            if (ff.getName().contains("_store")) {
+                                                Store store = new Store(ff.getName().replace("_store", "")
+                                                        , "");
+                                                BufferedReader br = new BufferedReader(new FileReader(ff));
+                                                String line = br.readLine();
 
-                                        while (line != null) {
-                                            String[] prod = line.split(";");
-                                            Product product = new Product(prod[0], prod[1],
-                                                    Double.parseDouble(prod[2]), Integer.parseInt(prod[3]));
-                                            store.addProduct(product);
+                                                while (line != null) {
+                                                    String[] prod = line.split(";");
+                                                    Product product = new Product(prod[0], prod[1],
+                                                            Double.parseDouble(prod[2]), Integer.parseInt(prod[3]));
+                                                    store.addProduct(product);
 
-                                            line = br.readLine();
+                                                    line = br.readLine();
+                                                }
+                                                s.addStore(store);
+                                                break;
+                                            }
                                         }
-                                        s.addStore(store);
                                         break;
                                     }
                                 }
-                                break;
                             }
                         }
                     }
@@ -184,33 +196,37 @@ public class DataManager {
     private static void loadShoppingCarts(MarketPlace mp) {
         File customerLocation = new File(customerDataFolder + File.separatorChar);
         try {
-            if (customerLocation.listFiles().length != 0) {
-                for (File f : customerLocation.listFiles()) {
-                    if (f.listFiles().length != 0) {
-                        for (Customer c : mp.getCustomers()) {
-                            if (c.getUsername().equalsIgnoreCase(f.getName())) {
-                                for (File ff : f.listFiles()) {
-                                    if (ff.getName().contains("shopping_cart")) {
-                                        BufferedReader br = new BufferedReader(new FileReader(ff));
-                                        String line = br.readLine();
+            if(customerLocation.listFiles() != null) {
+                if (customerLocation.listFiles().length != 0) {
+                    for (File f : customerLocation.listFiles()) {
+                        if(f.listFiles() != null) {
+                            if (f.listFiles().length != 0) {
+                                for (Customer c : mp.getCustomers()) {
+                                    if (c.getUsername().equalsIgnoreCase(f.getName())) {
+                                        for (File ff : f.listFiles()) {
+                                            if (ff.getName().contains("shopping_cart")) {
+                                                BufferedReader br = new BufferedReader(new FileReader(ff));
+                                                String line = br.readLine();
 
-                                        while (line != null) {
-                                            String[] cart = line.split(";");
-                                            String name = cart[0];
+                                                while (line != null) {
+                                                    String[] cart = line.split(";");
+                                                    String name = cart[0];
 
-                                            for (Product p : mp.getProducts()) {
-                                                if (p.getName().equalsIgnoreCase(name)) {
-                                                    c.getShoppingCart().addPurchase(new Sale(c, p));
-                                                    break;
+                                                    for (Product p : mp.getProducts()) {
+                                                        if (p.getName().equalsIgnoreCase(name)) {
+                                                            c.getShoppingCart().addPurchase(new Sale(c, p));
+                                                            break;
+                                                        }
+                                                    }
+
+                                                    line = br.readLine();
                                                 }
+                                                break;
                                             }
-
-                                            line = br.readLine();
                                         }
                                         break;
                                     }
                                 }
-                                break;
                             }
                         }
                     }
@@ -231,38 +247,42 @@ public class DataManager {
     private static void loadHistorySales(MarketPlace mp) {
         File customerLocation = new File(customerDataFolder + File.separatorChar);
         try {
-            if (customerLocation.listFiles().length != 0) {
-                for (File f : customerLocation.listFiles()) {
-                    if (f.listFiles().length != 0) {
-                        for (Customer c : mp.getCustomers()) {
-                            if (c.getUsername().equalsIgnoreCase(f.getName())) {
-                                for (File ff : f.listFiles()) {
-                                    if (ff.getName().contains("purchase_history")) {
-                                        BufferedReader br = new BufferedReader(new FileReader(ff));
-                                        String line = br.readLine();
+            if(customerLocation.listFiles() != null) {
+                if (customerLocation.listFiles().length != 0) {
+                    for (File f : customerLocation.listFiles()) {
+                        if(f.listFiles() != null) {
+                            if (f.listFiles().length != 0) {
+                                for (Customer c : mp.getCustomers()) {
+                                    if (c.getUsername().equalsIgnoreCase(f.getName())) {
+                                        for (File ff : f.listFiles()) {
+                                            if (ff.getName().contains("purchase_history")) {
+                                                BufferedReader br = new BufferedReader(new FileReader(ff));
+                                                String line = br.readLine();
 
-                                        while (line != null) {
-                                            String[] hist = line.split(";");
-                                            String name = hist[0];
+                                                while (line != null) {
+                                                    String[] hist = line.split(";");
+                                                    String name = hist[0];
 
-                                            store_loop:
-                                            for (Store s : mp.getStores()) {
-                                                for (Product p : s.getProducts()) {
-                                                    if (p.getName().equalsIgnoreCase(name)) {
-                                                        Sale sale = new Sale(c, p, Integer.parseInt(hist[1]));
-                                                        c.addSale(sale);
-                                                        s.addSale(sale);
+                                                    store_loop:
+                                                    for (Store s : mp.getStores()) {
+                                                        for (Product p : s.getProducts()) {
+                                                            if (p.getName().equalsIgnoreCase(name)) {
+                                                                Sale sale = new Sale(c, p, Integer.parseInt(hist[1]));
+                                                                c.addSale(sale);
+                                                                s.addSale(sale);
+                                                            }
+                                                            break store_loop;
+                                                        }
                                                     }
-                                                    break store_loop;
-                                                }
-                                            }
 
-                                            line = br.readLine();
+                                                    line = br.readLine();
+                                                }
+                                                break;
+                                            }
                                         }
                                         break;
                                     }
                                 }
-                                break;
                             }
                         }
                     }
