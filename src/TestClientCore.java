@@ -389,6 +389,8 @@ class TestClientCore {
                                 if (p.getQuantity() >= 1) {
                                     if (p != null) {
                                         showProductInfo(p);
+                                    }
+                                }
                                 request = "{getProductByName}," + allProducts.get(Integer.parseInt(productPick) - 1);
                                 clientOut.println(request);
                                 response = interpretResponse(serverIn.readLine());
