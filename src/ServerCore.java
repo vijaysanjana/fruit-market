@@ -1,5 +1,6 @@
 import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
 
 // Server class
 class ServerCore {
@@ -50,9 +51,6 @@ class ServerCore {
     }
 
 
-
-
-
     // ClientHandler class
     private static class ClientHandler implements Runnable {
         private final Socket clientSocket;
@@ -60,13 +58,11 @@ class ServerCore {
         private ShoppingCart shoppingCart;
 
         // Constructor
-        public ClientHandler(Socket client)
-        {
+        public ClientHandler(Socket client) {
             this.clientSocket = client;
         }
 
-        public void run()
-        {
+        public void run() {
             PrintWriter serverOut = null;
             BufferedReader clientIn = null;
             try {
@@ -105,13 +101,35 @@ class ServerCore {
                             serverOut.println(response);
                             break;
 
-
-                        case "{getStoreNames}":
-
-                            //serverOut.println(response);
+                        case "{getUserBasicData}":
+                            response = getUserBasicDataRequest(request);
+                            serverOut.println(response);
                             break;
 
+                        case "{getAllStores}":
+                            response = getAllStoresRequest(request);
+                            serverOut.println(response);
+                            break;
 
+                        case "{getStore}":
+                            response = getStoreRequest(request);
+                            serverOut.println(response);
+                            break;
+
+                        case "{getAllProducts}":
+                            response = getAllProductsRequest(request);
+                            serverOut.println(response);
+                            break;
+
+                        case "{getProduct}":
+                            response = getProductRequest(request);
+                            serverOut.println(response);
+                            break;
+
+                        case "{getProducts}":
+                            response = getProductsRequest(request);
+                            serverOut.println(response);
+                            break;
 
                         default:
                     }
@@ -133,11 +151,9 @@ class ServerCore {
                     out.println(line);
                 }
                 */
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 e.printStackTrace();
-            }
-            finally {
+            } finally {
                 try {
                     if (serverOut != null) {
                         serverOut.close();
@@ -147,8 +163,7 @@ class ServerCore {
                         clientSocket.close();
                     }
                     System.out.println("Closing client thread"); //Test
-                }
-                catch (IOException e) {
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
@@ -166,7 +181,7 @@ class ServerCore {
             String email = request[1];
             String password = request[2];
 
-            user = AccountManager.login(email, password);
+            user = AccountManager.login(ServerCore.mp, email, password);
             if (user != null) {
                 String userType = (user instanceof Customer) ? "C" : "S";
                 String response = "{Login}," + userType + "," + user.getUsername();
@@ -198,11 +213,78 @@ class ServerCore {
         }
 
         public String getTotalHeldProductsRequest(String[] request) {
-            return "{getTotalHeldProducts}, " + ((Customer) user).getShoppingCart().getTotalheldProducts();
+            return "{getTotalHeldProducts}," + ((Customer) user).getShoppingCart().getTotalheldProducts();
         }
 
         //public String getStoreNamesRequest(String[] request) {
 
         //}
+
+        //gets all store names of initialized stores
+        public String getAllStoresRequest(String[] request) {
+            String response = "";
+            ArrayList<Store> list = mp.getStores();
+            for (Store s : list) {
+                if (list.indexOf(s) == list.size() - 1) response += s.getName();
+                else response += s.getName() + "|";
+            }
+            return "{getAllStores}," + response;
+        }
+
+        //gets all product names of all initialized stores
+        public String getAllProductsRequest(String[] request) {
+            String response = "";
+            ArrayList<Store> list = mp.getStores();
+            for (Store s : list) {
+                if (list.indexOf(s) == list.size() - 1) response += s.getName();
+                else response += s.getName() + "|";
+            }
+            return "{getAllProducts}," + response;
+        }
+
+        //gets all products and their data of certain store
+        public String getProductsRequest(String[] request) {
+            String temp = "";
+            String storeName = request[1];
+            Store store = mp.getStore(storeName);
+            for (Product p : store.getProducts()) {
+                temp += p.getName() + "|" + p.getDescription() + "|" + String.format("%.2f", p.getPrice()) + "|" + p.getQuantity();
+                if (store.getProducts().indexOf(p) != store.getProducts().size() - 1) // not last item in list
+                    temp += ",";
+            }
+            return "{getProducts}," + temp;
+        }
+
+        //gets all info of certain store
+        public String getStoreRequest(String[] request) {
+            String products = "";
+            String sales = "";
+            String storeName = request[1];
+            Store store = mp.getStore(storeName);
+            for (Product p : store.getProducts()) {
+                if (store.getProducts().indexOf(p) == store.getProducts().size() - 1) //last item in list
+                    products += p.getName();
+                else products += p.getName() + "|";
+            }
+            for (Sale s : store.getSales()) {
+                if (store.getSales().indexOf(s) == store.getSales().size() - 1) //last item in list
+                    sales += s.getName();
+                else sales += s.getName() + "|";
+            }
+            return "{getStore}," + store.getName() + "," + store.getDescription() + "," + products + "," + sales + "," + store.getTotalSoldProducts();
+        }
+
+        //gets product and its data from store name and array index of Store array
+        public String getProductRequest(String[] request) {
+            Store store = mp.getStore(request[1]);
+            Product p = store.getProduct(Integer.parseInt(request[2]));
+            return "{getProduct}," + p.getName() + "," + p.getDescription() + "," + String.format("%.2f",
+                    p.getPrice()) + "," + p.getQuantity();
+        }
+
+        public String getUserBasicDataRequest(String[] request) {
+            return "{getUserBasicData}," + user.getEmail() + "," + user.getUsername();
+        }
+
     }
 }
