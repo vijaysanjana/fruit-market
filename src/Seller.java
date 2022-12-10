@@ -1,3 +1,4 @@
+import javax.swing.*;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -5,6 +6,8 @@ import java.lang.reflect.Array;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.*;
+
+import javax.swing.JOptionPane.*;
 
 
 /**
@@ -104,9 +107,7 @@ public class Seller extends User {
     }
 
     public void importProduct() {
-        Scanner sc = new Scanner(System.in);
-        System.out.println("Enter file path of the file containing products to be imported: ");
-        String filePath = sc.nextLine();
+        String filePath = JOptionPane.showInputDialog("Enter file path of the file containing products to be imported: ");
         try {
             FileReader f = new FileReader(filePath);
             BufferedReader bfr = new BufferedReader(f);
@@ -121,7 +122,7 @@ public class Seller extends User {
                 Product p = new Product(arr[0], arr[1], Double.parseDouble(arr[3]), Integer.parseInt(arr[4]));
             }
         } catch (FileNotFoundException e) {
-            System.out.println("File not found - please enter a valid file path!");
+            JOptionPane.showMessageDialog(null, "File not found - please enter a valid file path!");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -138,7 +139,7 @@ public class Seller extends User {
         }
         fos.close();
         pw.close();
-        System.out.println("A file titled " + this.getUsername() + ".csv has been created with your products!");
+        JOptionPane.showMessageDialog(null, "A file titled " + this.getUsername() + ".csv has been created with your products!");
     }
 
     public ArrayList<Product> getAllProducts() {
