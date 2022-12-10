@@ -4,23 +4,29 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Scanner;
 
+/**
+ * Comprehensive data management system for the MarketPlace application.
+ * Includes methods necessary to save & load stores and histories into field for restart persistence.
+ * Includes methods to create & update user login data and registration.
+ * Includes methods to import & export files as CSV from data storage.
+ * Architecture of file storage and file formatting is in the comment below.
+ */
 public class DataManager {
-    private static File userDataFile = new File("userData");
-    private static String sellerDataFolder = "seller_data";
-    private static String customerDataFolder = "customer_data";
-    
+    private static final File userDataFile = new File("userData");
+    private static final String sellerDataFolder = "seller_data";
+    private static final String customerDataFolder = "customer_data";
+
     /**
-    * Formatting as follows
-    * seller_data/[individual_seller_name]
-    * -- [store_name]_store: productName;description;price;quantity
-    * -- [store_name]_sales: productName;numberItemSold;customerName;totalCost
-    *
-    * customer_data/[individual_customer_name]
-    * -- purchase_history: productName;numberItemsBought;totalCost
-    * -- shopping_cart: productName;numberItemsCarted
-    */
+     * Formatting as follows
+     * seller_data/[individual_seller_name]
+     * -- [store_name]_store: productName;description;price;quantity
+     * -- [store_name]_sales: productName;numberItemSold;customerName;totalCost
+     * <p>
+     * customer_data/[individual_customer_name]
+     * -- purchase_history: productName;numberItemsBought;totalCost
+     * -- shopping_cart: productName;numberItemsCarted
+     */
 
     public static void main(String[] args) {
         MarketPlace mp = new MarketPlace();
@@ -35,6 +41,11 @@ public class DataManager {
         saveEverything(mp);
     }
 
+    /**
+     * Single method to load all data (should only be performed ONCE)
+     *
+     * @param mp
+     */
     public static void loadEverything(MarketPlace mp) {
         loadCustomers(mp);
         loadSellers(mp);
@@ -43,30 +54,40 @@ public class DataManager {
         loadHistorySales(mp);
     }
 
+    /**
+     * Single method to save all data
+     *
+     * @param mp
+     */
     public static void saveEverything(MarketPlace mp) {
-        for(Seller s : mp.getSellers()) {
+        for (Seller s : mp.getSellers()) {
             createNecessaryFolders(s);
             saveSellerStores(s);
             saveSellerSales(s);
         }
 
-        for(Customer c : mp.getCustomers()) {
+        for (Customer c : mp.getCustomers()) {
             createNecessaryFolders(c);
             saveCustomerCart(c);
             saveCustomerHistory(c);
         }
     }
 
+    /**
+     * Loads all customers into marketplace fields
+     *
+     * @param mp
+     */
     private static void loadCustomers(MarketPlace mp) {
         File customerLocation = new File(customerDataFolder + File.separatorChar);
         try {
-            if(customerLocation.listFiles().length != 0) {
-                for(File f : customerLocation.listFiles()) {
+            if (customerLocation.listFiles().length != 0) {
+                for (File f : customerLocation.listFiles()) {
                     String customerName = f.getName();
                     ArrayList<ArrayList<String>> logins = getUserLogins();
                     Customer customer = null;
-                    for(ArrayList<String> logs : logins) {
-                        if(logs.get(0).equalsIgnoreCase("C")
+                    for (ArrayList<String> logs : logins) {
+                        if (logs.get(0).equalsIgnoreCase("C")
                                 && logs.get(1).equalsIgnoreCase(customerName)) {
                             customer = new Customer(logs.get(1), logs.get(2), logs.get(3));
                         }
@@ -74,23 +95,28 @@ public class DataManager {
                     mp.addCustomer(customer);
                 }
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             throw new RuntimeException(
                     new DataException(e.getMessage(), "Customer list loading", customerLocation)
             );
         }
     }
 
+    /**
+     * Loads all sellers into marketplace fields
+     *
+     * @param mp
+     */
     private static void loadSellers(MarketPlace mp) {
         File sellerLocation = new File(sellerDataFolder + File.separatorChar);
         try {
-            if(sellerLocation.listFiles().length != 0) {
-                for(File f : sellerLocation.listFiles()) {
+            if (sellerLocation.listFiles().length != 0) {
+                for (File f : sellerLocation.listFiles()) {
                     String sellerName = f.getName();
                     ArrayList<ArrayList<String>> logins = getUserLogins();
                     Seller seller = null;
-                    for(ArrayList<String> logs : logins) {
-                        if(logs.get(0).equalsIgnoreCase("S")
+                    for (ArrayList<String> logs : logins) {
+                        if (logs.get(0).equalsIgnoreCase("S")
                                 && logs.get(1).equalsIgnoreCase(sellerName)) {
                             seller = new Seller(logs.get(1), logs.get(2), logs.get(3));
                         }
@@ -98,22 +124,27 @@ public class DataManager {
                     mp.addSeller(seller);
                 }
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             throw new RuntimeException(
                     new DataException(e.getMessage(), "Seller list loading", sellerLocation)
             );
         }
     }
 
+    /**
+     * Searches through all sellers and loads their appropriate stores and products
+     *
+     * @param mp
+     */
     private static void loadStores(MarketPlace mp) {
         File sellerLocation = new File(sellerDataFolder + File.separatorChar);
         try {
-            if(sellerLocation.listFiles().length != 0) {
-                for(File f : sellerLocation.listFiles()) {
-                    if(f.listFiles().length != 0) {
-                        for(Seller s : mp.getSellers()) {
-                            if(s.getUsername().equalsIgnoreCase(f.getName())) {
-                                for(File ff : f.listFiles()) {
+            if (sellerLocation.listFiles().length != 0) {
+                for (File f : sellerLocation.listFiles()) {
+                    if (f.listFiles().length != 0) {
+                        for (Seller s : mp.getSellers()) {
+                            if (s.getUsername().equalsIgnoreCase(f.getName())) {
+                                for (File ff : f.listFiles()) {
                                     if (ff.getName().contains("_store")) {
                                         Store store = new Store(ff.getName().replace("_store", "")
                                                 , "");
@@ -138,32 +169,37 @@ public class DataManager {
                     }
                 }
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             throw new RuntimeException(
                     new DataException(e.getMessage(), "Store loading", sellerLocation)
             );
         }
     }
 
+    /**
+     * Searches through all customers and loads their appropriate shopping carts
+     *
+     * @param mp
+     */
     private static void loadShoppingCarts(MarketPlace mp) {
         File customerLocation = new File(customerDataFolder + File.separatorChar);
         try {
-            if(customerLocation.listFiles().length != 0) {
-                for(File f : customerLocation.listFiles()) {
-                    if(f.listFiles().length != 0) {
-                        for(Customer c : mp.getCustomers()) {
-                            if(c.getUsername().equalsIgnoreCase(f.getName())) {
-                                for(File ff : f.listFiles()) {
-                                    if(ff.getName().contains("shopping_cart")) {
+            if (customerLocation.listFiles().length != 0) {
+                for (File f : customerLocation.listFiles()) {
+                    if (f.listFiles().length != 0) {
+                        for (Customer c : mp.getCustomers()) {
+                            if (c.getUsername().equalsIgnoreCase(f.getName())) {
+                                for (File ff : f.listFiles()) {
+                                    if (ff.getName().contains("shopping_cart")) {
                                         BufferedReader br = new BufferedReader(new FileReader(ff));
                                         String line = br.readLine();
 
-                                        while(line != null) {
+                                        while (line != null) {
                                             String[] cart = line.split(";");
                                             String name = cart[0];
 
-                                            for(Product p : mp.getProducts()) {
-                                                if(p.getName().equalsIgnoreCase(name)) {
+                                            for (Product p : mp.getProducts()) {
+                                                if (p.getName().equalsIgnoreCase(name)) {
                                                     c.getShoppingCart().addPurchase(new Sale(c, p));
                                                     break;
                                                 }
@@ -180,35 +216,40 @@ public class DataManager {
                     }
                 }
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             throw new RuntimeException(
                     new DataException(e.getMessage(), "Shopping cart loading", customerLocation)
             );
         }
     }
 
+    /**
+     * Searches through all sellers and loads their appropriate sales history
+     *
+     * @param mp
+     */
     private static void loadHistorySales(MarketPlace mp) {
         File customerLocation = new File(customerDataFolder + File.separatorChar);
         try {
-            if(customerLocation.listFiles().length != 0) {
-                for(File f : customerLocation.listFiles()) {
-                    if(f.listFiles().length != 0) {
-                        for(Customer c : mp.getCustomers()) {
-                            if(c.getUsername().equalsIgnoreCase(f.getName())) {
-                                for(File ff : f.listFiles()) {
-                                    if(ff.getName().contains("purchase_history")) {
+            if (customerLocation.listFiles().length != 0) {
+                for (File f : customerLocation.listFiles()) {
+                    if (f.listFiles().length != 0) {
+                        for (Customer c : mp.getCustomers()) {
+                            if (c.getUsername().equalsIgnoreCase(f.getName())) {
+                                for (File ff : f.listFiles()) {
+                                    if (ff.getName().contains("purchase_history")) {
                                         BufferedReader br = new BufferedReader(new FileReader(ff));
                                         String line = br.readLine();
 
-                                        while(line != null) {
+                                        while (line != null) {
                                             String[] hist = line.split(";");
                                             String name = hist[0];
 
                                             store_loop:
-                                            for(Store s : mp.getStores()) {
-                                                for(Product p : s.getProducts()) {
-                                                    if(p.getName().equalsIgnoreCase(name)) {
-                                                        Sale sale =  new Sale(c,p,Integer.parseInt(hist[1]));
+                                            for (Store s : mp.getStores()) {
+                                                for (Product p : s.getProducts()) {
+                                                    if (p.getName().equalsIgnoreCase(name)) {
+                                                        Sale sale = new Sale(c, p, Integer.parseInt(hist[1]));
                                                         c.addSale(sale);
                                                         s.addSale(sale);
                                                     }
@@ -227,28 +268,33 @@ public class DataManager {
                     }
                 }
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             throw new RuntimeException(
                     new DataException(e.getMessage(), "Purchase history loading", customerLocation)
             );
         }
     }
 
+    /**
+     * Saves a seller's stores and products into file
+     *
+     * @param seller
+     */
     public static void saveSellerStores(Seller seller) {
-        for(Store s : seller.getStores()) {
+        for (Store s : seller.getStores()) {
             File file = new File(sellerDataFolder + File.separatorChar
                     + seller.getUsername() + File.separatorChar + s.getName() + "_store");
 
             try {
                 file.createNewFile();
-            } catch(Exception e) {
+            } catch (Exception e) {
                 throw new RuntimeException(
                         new DataException(e.getMessage(), "Seller store file creation", file)
                 );
             }
 
-            try(FileWriter fw = new FileWriter(file, false)) {
-                for(Product p : s.getProducts()) {
+            try (FileWriter fw = new FileWriter(file, false)) {
+                for (Product p : s.getProducts()) {
                     System.out.println(p.getName());
                     fw.write(p.getName() + ";"
                             + p.getDescription() + ";"
@@ -256,7 +302,7 @@ public class DataManager {
                             + p.getQuantity());
                     fw.write("\n");
                 }
-            } catch(Exception e) {
+            } catch (Exception e) {
                 throw new RuntimeException(
                         new DataException(e.getMessage(), "Seller store saving", file)
                 );
@@ -264,21 +310,26 @@ public class DataManager {
         }
     }
 
+    /**
+     * Saves a seller's sales history into file
+     *
+     * @param seller
+     */
     public static void saveSellerSales(Seller seller) {
-        for(Store s : seller.getStores()) {
+        for (Store s : seller.getStores()) {
             File file = new File(sellerDataFolder + File.separatorChar
                     + seller.getUsername() + File.separatorChar + s.getName() + "_sales");
 
             try {
                 file.createNewFile();
-            } catch(Exception e) {
+            } catch (Exception e) {
                 throw new RuntimeException(
                         new DataException(e.getMessage(), "Seller sales file creation", file)
                 );
             }
 
-            try(FileWriter fw = new FileWriter(file, false)) {
-                for(Sale sa : s.getSales()) {
+            try (FileWriter fw = new FileWriter(file, false)) {
+                for (Sale sa : s.getSales()) {
                     fw.write(sa.getProduct().getName() + ";"
                             + sa.getQuantity() + ";"
                             + sa.getCustomer().getUsername() + ";"
@@ -293,52 +344,61 @@ public class DataManager {
         }
     }
 
+    /**
+     * Saves a customer's purchase history into file
+     *
+     * @param customer
+     */
     public static void saveCustomerHistory(Customer customer) {
         File file = new File(customerDataFolder + File.separatorChar
                 + customer.getUsername() + File.separatorChar + "purchase_history");
 
         try {
             file.createNewFile();
-        } catch(Exception e) {
+        } catch (Exception e) {
             throw new RuntimeException(
                     new DataException(e.getMessage(), "Customer history file creation", file)
             );
         }
 
-        try(FileWriter fw = new FileWriter(file, false)) {
-            for(Sale s : customer.getPurchases()) {
+        try (FileWriter fw = new FileWriter(file, false)) {
+            for (Sale s : customer.getPurchases()) {
                 fw.write(s.getName() + ";"
                         + s.getQuantity() + ";"
                         + s.getTotalCost());
                 fw.write("\n");
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             throw new RuntimeException(
                     new DataException(e.getMessage(), "Customer history saving", file)
             );
         }
     }
 
+    /**
+     * Saves a customer's shopping cart into file
+     *
+     * @param customer
+     */
     public static void saveCustomerCart(Customer customer) {
         File file = new File(customerDataFolder + File.separatorChar
                 + customer.getUsername() + File.separatorChar + "shopping_cart");
 
         try {
             file.createNewFile();
-        } catch(Exception e) {
+        } catch (Exception e) {
             throw new RuntimeException(
                     new DataException(e.getMessage(), "Customer shopping cart file creation", file)
             );
         }
 
-        try(FileWriter fw = new FileWriter(file, false)) {
-            for(Sale s : customer.getShoppingCart().getHeldPurchases()) {
+        try (FileWriter fw = new FileWriter(file, false)) {
+            for (Sale s : customer.getShoppingCart().getHeldPurchases()) {
                 fw.write(s.getName() + ";"
                         + s.getQuantity());
                 fw.write("\n");
             }
-            fw.close();
-        } catch(Exception e) {
+        } catch (Exception e) {
             throw new RuntimeException(
                     new DataException(e.getMessage(), "Customer shopping cart saving", file)
             );
@@ -346,6 +406,11 @@ public class DataManager {
     }
 
 
+    /**
+     * Creates all of the appropriate folders for a user
+     *
+     * @param user
+     */
     private static void createNecessaryFolders(User user) {
         if (new File(customerDataFolder + File.separatorChar).mkdir()) {
             //System.out.println("Customer data folder created");
@@ -372,6 +437,7 @@ public class DataManager {
      *
      * @param seller
      * @param store
+     * @param file
      */
     public static void importStoreCSV(Seller seller, Store store, File file) {
         ArrayList<String> current = new ArrayList<>();
@@ -381,12 +447,12 @@ public class DataManager {
             BufferedReader br = new BufferedReader(new FileReader(storeFile));
             String line = br.readLine();
 
-            while(line != null) {
-                current.add(line.substring(0,line.indexOf(";")));
+            while (line != null) {
+                current.add(line.substring(0, line.indexOf(";")));
                 line = br.readLine();
             }
 
-        } catch(Exception e) {
+        } catch (Exception e) {
             throw new RuntimeException(
                     new DataException(e.getMessage(), "Reading of current store file", storeFile)
             );
@@ -397,13 +463,13 @@ public class DataManager {
             BufferedReader br = new BufferedReader(new FileReader(file));
             String line = br.readLine();
 
-            while(line != null) {
-                if(line.split(",").length != 4) {
+            while (line != null) {
+                if (line.split(",").length != 4) {
                     System.out.println("Invalid format; skipping line: " + line);
-                } else if(current.contains(line.substring(0,line.indexOf(",")))) {
+                } else if (current.contains(line.substring(0, line.indexOf(",")))) {
                     System.out.println("Product name already in use; skipping line: " + line);
                 } else {
-                    System.out.println("Adding new Product: " + line.substring(0,line.indexOf(",")));
+                    System.out.println("Adding new Product: " + line.substring(0, line.indexOf(",")));
                     String[] arr = line.split(",");
                     store.addProduct(new Product(arr[0], arr[1],
                             Double.parseDouble(arr[2]), Integer.parseInt(arr[3])));
@@ -414,7 +480,7 @@ public class DataManager {
             }
 
             System.out.println("Successfully imported CSV");
-        } catch(Exception e) {
+        } catch (Exception e) {
             throw new RuntimeException(
                     new DataException(e.getMessage(), "Reading of CSV file", file)
             );
@@ -432,7 +498,7 @@ public class DataManager {
                 + store.getName().replaceAll(" ", "_") + ".csv");
         try {
             FileWriter fw = new FileWriter(output);
-            for(Product p : store.getProducts()) {
+            for (Product p : store.getProducts()) {
                 fw.write(p.getName() + "," + p.getDescription()
                         + "," + p.getPrice() + "," + p.getQuantity());
                 fw.write("\n");
@@ -440,7 +506,7 @@ public class DataManager {
 
             System.out.println("Store CSV outputted successfully");
             System.out.println("File Format: name,description,price,quantity");
-        } catch(Exception e) {
+        } catch (Exception e) {
             throw new RuntimeException(
                     new DataException(e.getMessage(), "Output of store CSV file", output)
             );
@@ -458,14 +524,14 @@ public class DataManager {
 
         try {
             FileWriter fw = new FileWriter(output);
-            for(Sale s : customer.getPurchases()) {
+            for (Sale s : customer.getPurchases()) {
                 fw.write(s.getName() + "," + s.getQuantity() + "," + s.getTotalCost());
                 fw.write("\n");
             }
 
             System.out.println("History CSV outputted successfully");
             System.out.println("File Format: name,quantityBought,totalCost");
-        } catch(Exception e) {
+        } catch (Exception e) {
             throw new RuntimeException(
                     new DataException(e.getMessage(), "Output of history CSV file", output)
             );
@@ -513,7 +579,7 @@ public class DataManager {
      */
     public static boolean writeUserSignup(String username, String email,
                                           String password, String type) {
-        if(!userDataFile.exists()) {
+        if (!userDataFile.exists()) {
             try {
                 userDataFile.createNewFile();
             } catch (Exception e) {
@@ -523,7 +589,7 @@ public class DataManager {
             }
         }
 
-        if(username.contains(";") || username.contains(",")
+        if (username.contains(";") || username.contains(",")
                 || email.contains(";") || email.contains(",")
                 || password.contains(";") || password.contains(",")) {
             return false;
