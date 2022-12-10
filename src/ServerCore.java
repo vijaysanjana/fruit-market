@@ -89,12 +89,10 @@ class ServerCore {
                             //Send Response to ClientCore
                             break;
 
-
                         case "{Signup}":
                             response = signupRequest(request);
                             serverOut.println(response);
                             break;
-
 
                         case "{getTotalHeldProducts}":
                             response = getTotalHeldProductsRequest(request);
@@ -121,8 +119,33 @@ class ServerCore {
                             serverOut.println(response);
                             break;
 
-                        case "{getProduct}":
-                            response = getProductRequest(request);
+                        case "{getProductByName}":
+                            response = getProductByNameRequest(request);
+                            serverOut.println(response);
+                            break;
+
+                        case "{getProductByIndex}":
+                            response = getProductByIndexRequest(request);
+                            serverOut.println(response);
+                            break;
+
+                        case "{addToCustomerShoppingCart}":
+                            response = addToCustomerShoppingCartRequest(request);
+                            serverOut.println(response);
+                            break;
+
+                        case "{updatePriceSortedProducts}":
+                            response = updatePriceSortedProductsRequest(request);
+                            serverOut.println(response);
+                            break;
+
+                        case "{updateQuantitySortedProducts}":
+                            response = updateQuantitySortedProductsRequest(request);
+                            serverOut.println(response);
+                            break;
+
+                        case "{subtractProductQuantity}":
+                            response = subtractProductQuantityRequest(request);
                             serverOut.println(response);
                             break;
 
@@ -130,6 +153,52 @@ class ServerCore {
                             response = getProductsRequest(request);
                             serverOut.println(response);
                             break;
+
+                        case "{getSearchProduct}":
+                            response = getSearchProductRequest(request);
+                            serverOut.println(response);
+                            break;
+
+                        case "{getCustomerShoppingCart}":
+                            response = getCustomerShoppingCartRequest(request);
+                            serverOut.println(response);
+                            break;
+
+                        case "{getSaleByName}":
+                            response = getSaleByNameRequest(request);
+                            serverOut.println(response);
+                            break;
+
+                        case "{updateQuantityInShoppingCart}":
+                            response = updateQuantityInShoppingCartRequest(request);
+                            serverOut.println(response);
+                            break;
+
+                        case "{removeAllProductsFromShoppingCart}":
+                            response = removeAllProductsFromShoppingCartRequest(request);
+                            serverOut.println(response);
+                            break;
+
+                        case "{removeProductFromShoppingCart}":
+                            response = removeProductFromShoppingCartRequest(request);
+                            serverOut.println(response);
+                            break;
+
+                        case "{getSalesSortedStores}":
+                            response = getSalesSortedStoresRequest(request);
+                            serverOut.println(response);
+                            break;
+
+                        case "{getQuantityOfProductsBoughtByCustomer}":
+                            response = getQuantityOfProductsBoughtByCustomerRequest(request);
+                            serverOut.println(response);
+                            break;
+
+                        case "{getUserSalesSortedStoresRequest}":
+                            response = getUserSalesSortedStoresRequest(request);
+                            serverOut.println(response);
+                            break;
+
 
                         default:
                     }
@@ -275,16 +344,165 @@ class ServerCore {
         }
 
         //gets product and its data from store name and array index of Store array
-        public String getProductRequest(String[] request) {
+        public String getProductByIndexRequest(String[] request) {
             Store store = mp.getStore(request[1]);
             Product p = store.getProduct(Integer.parseInt(request[2]));
-            return "{getProduct}," + p.getName() + "," + p.getDescription() + "," + String.format("%.2f",
+            return "{getProductByIndex}," + p.getName() + "," + p.getDescription() + "," + String.format("%.2f",
                     p.getPrice()) + "," + p.getQuantity();
         }
 
-        public String getUserBasicDataRequest(String[] request) {
-            return "{getUserBasicData}," + user.getEmail() + "," + user.getUsername();
+        //gets product and its info from given param(product name)
+        public String getProductByNameRequest(String[] request) {
+            Store store = mp.getStore(request[1]);
+            Product p = store.getProduct(store.getProducts().indexOf(request[2]));
+            return "{getProductByName}," + p.getName() + "," + p.getDescription() + "," + String.format("%.2f",
+                    p.getPrice()) + "," + p.getQuantity();
         }
+
+        //gets basic user data including usertype given param(user email)
+        public String getUserBasicDataRequest(String[] request) {
+            User givenUser = mp.getUser(request[1]);
+            String userType;
+            if (givenUser instanceof Customer)
+                userType = "C";
+            else userType = "S";
+            return "{getUserBasicData}," + givenUser.getEmail() + "," + givenUser.getUsername() + "," + userType;
+        }
+
+        // adds product to customers shopping cart using param(email, product name, quantity being purchased)
+        public String addToCustomerShoppingCartRequest(String[] request) {
+            Customer customer = (Customer) mp.getUser(request[1]);
+            Product product = mp.getProduct(request[2]);
+            customer.addSale(new Sale(customer, product, Integer.parseInt(request[2])));
+            return "{addToCustomerShoppingCart}";
+        }
+
+        // updates product quantity with given param(product name, quantity)
+        public String subtractProductQuantityRequest(String[] request) {
+            Product product = mp.getProduct(request[1]);
+            product.setQuantity(Integer.parseInt(request[2]));
+            return "{subtractProductQuantity}";
+        }
+
+        // updates product list in each store based price given param(true/false) => high to low/ low to high
+        public String updatePriceSortedProductsRequest(String[] request) {
+            for (Store store : mp.getStores()) {
+                store.setProducts(store.getPriceSortedProducts(Boolean.parseBoolean(request[1])));
+            }
+            return "{updatePriceSortedProducts}";
+        }
+
+        // updates product list in each store based quantity given param(true/false) => high to low/ low to high
+        public String updateQuantitySortedProductsRequest(String[] request) {
+            for (Store store : mp.getStores()) {
+                store.setProducts(store.getQuantitySortedProducts(Boolean.parseBoolean(request[1])));
+            }
+            return "{updateQuantitySortedProducts}";
+        }
+
+        //get the products in search from either name/description/stores given param(search type, phrase being searched)
+        public String getSearchProductRequest(String[] request) {
+            ArrayList<Product> result = new ArrayList<>();
+            if (request[1].equals("name")) {
+                result = mp.searchProducts("name", request[2]);
+            } else if (request[1].equals("desc")) {
+                result = mp.searchProducts("desc", request[2]);
+            } else if (request[1].equals("stores")) {
+                result = mp.searchProducts("stores", request[2]);
+            }
+            String products = "";
+            for (Product p : result) {
+                if (result.indexOf(p) == result.size() - 1) //last item in list
+                    products += p.getName();
+                else products += p.getName() + "|";
+            }
+            return "{getSearchProduct}," + products;
+        }
+
+        //get customer shopping cart info and cart size given param(user email)
+        public String getCustomerShoppingCartRequest(String[] request) {
+            Customer customer = (Customer) mp.getUser(request[1]);
+            ArrayList<Sale> list = customer.getShoppingCart().getHeldPurchases();
+            String response = "";
+            for (Sale s : list) {
+                if (list.indexOf(s) == list.size() - 1) response += s.getName();
+                else response += s.getName() + "|";
+            }
+            return "{getCustomerShoppingCart}," + response + "," + customer.getShoppingCart().getTotalheldProducts();
+        }
+
+        //gets Sale info given param(sale name)
+        public String getSaleByNameRequest(String[] request) {
+            Sale sale = mp.getSale(request[1]);
+            return "{getSaleByName}," + sale.getProduct().getName() + "," + String.format("%.2f",
+                    sale.getTotalCost()) + "," + sale.getQuantity() + "," + String.format("%.2f",
+                    sale.getProduct().getPrice());
+        }
+
+        //removes product from customers shopping cart given param(user email, product name)
+        public String removeProductFromShoppingCartRequest(String[] request) {
+            Customer customer = (Customer) mp.getUser(request[1]);
+            Product product = mp.getProduct(request[2]);
+            customer.getShoppingCart().removePurchase(product);
+            return "{removeProductFromShoppingCart}";
+        }
+
+        //updates customers shopping cart given param(user email, sale index, new quantity amount wanted)
+        public String updateQuantityInShoppingCartRequest(String[] request) {
+            Customer customer = (Customer) mp.getUser(request[1]);
+            customer.getShoppingCart().getPurchase(Integer.parseInt(request[2])).setQuantity(Integer.parseInt(request[3]));
+            customer.getShoppingCart().recalculateTotalHeldProducts();
+            return "{updateQuantityInShoppingCart}";
+        }
+
+        //removes all products from given users shopping cart param(user email)
+        public String removeAllProductsFromShoppingCartRequest(String[] request) {
+            Customer customer = (Customer) mp.getUser(request[1]);
+            customer.getShoppingCart().setHeldPurchases(new ArrayList<>());
+            return "{removeAllProductsFromShoppingCart}";
+        }
+
+        //gets sales sorted list of store names given param(user email)
+        public String getSalesSortedStoresRequest(String[] request) {
+            String response = "";
+            ArrayList<Store> list;
+            if (Boolean.parseBoolean(request[1]))
+                list = mp.getSalesSortedStores(true);
+            else
+                list = mp.getSalesSortedStores(false);
+            for (Store s : list) {
+                if (list.indexOf(s) == list.size() - 1) response += s.getName();
+                else response += s.getName() + "|";
+            }
+            return "{getSalesSortedStores}," + response;
+        }
+
+        //gets user sales sorted list of store names given param(user email)
+        public String getUserSalesSortedStoresRequest(String[] request) {
+            String response = "";
+            User givenUser = mp.getUser(request[1]);
+            ArrayList<Store> list;
+            if (Boolean.parseBoolean(request[1]))
+                list = mp.getUserSalesSortedStores(givenUser, true);
+            else
+                list = mp.getUserSalesSortedStores(givenUser, true);
+            for (Store s : list) {
+                if (list.indexOf(s) == list.size() - 1) response += s.getName();
+                else response += s.getName() + "|";
+            }
+            return "{getUserSalesSortedStores}," + response;
+        }
+
+        //gets quantity of products bought by customer given param(user email, store name)
+        public String getQuantityOfProductsBoughtByCustomerRequest(String[] request) {
+            String response = "";
+            Customer customer = (Customer) mp.getUser(request[1]);
+            Store store = mp.getStore(request[2]);
+            int soldToUser = store.getQuantityOfProductsBoughtByCustomer(customer);
+
+            return "{getQuantityOfProductsBoughtByCustomer}," + soldToUser + "," + store.getTotalSoldProducts();
+        }
+
 
     }
 }

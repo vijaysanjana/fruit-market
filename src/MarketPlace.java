@@ -326,4 +326,27 @@ public class MarketPlace {
                 return s;
         return null;
      }
+
+    //gets user object by User's email
+    public User getUser(String email) {
+        for (User u : getCustomers())
+            if (u.getEmail().equals(email))
+                return u;
+        return null;
+    }
+
+    //gets product object by product's name
+    public Product getProduct(String productName) {
+        for (Product p : getProducts())
+            if (p.getName().equals(productName))
+                return p;
+        return null;
+    }
+
+    public Sale getSale(String saleName) {
+        for (Customer c : getCustomers())
+            if (saleName.contains(c.getUsername()))
+                return c.getShoppingCart().getHeldPurchases().get(c.getShoppingCart().getHeldPurchases().indexOf(saleName));
+        return null;
+    }
 }
