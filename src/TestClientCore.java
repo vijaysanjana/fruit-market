@@ -126,8 +126,8 @@ class TestClientCore {
 
                         customer_seller:
                         while (true) {
-                            String[] options = {"Customer", "Seller"};
-                            customerSeller = String.valueOf(JOptionPane.showOptionDialog(null, "Are you signing up to be a customer or seller?", "Signup", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]));
+                            String[] options1 = {"Customer", "Seller"};
+                            customerSeller = String.valueOf(JOptionPane.showOptionDialog(null, "Are you signing up to be a customer or seller?", "Signup", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options1, options1[0]));
                             System.out.println("Please enter: " + "\n[1] Customer" + "\n[2] Seller");
                             customerSeller = sc.nextLine();
 
@@ -336,7 +336,7 @@ class TestClientCore {
 
         for (Store s : stores) {
             ArrayList<Product> tempProds = s.getProducts();
-            availStores += "\n- " + s.getName());
+            availStores += "\n- " + s.getName();
             if (stores.isEmpty()) {
                 availStores += "\n--- No fruits found";
             } else {
@@ -628,11 +628,11 @@ class TestClientCore {
                                             while (!purchaseQuantity.matches("-?\\d+(\\.\\d+)?")
                                                     || (Integer.parseInt(purchaseQuantity) < 1)) {
                                                 purchaseQuantity = JOptionPane.showInputDialog("Entered quantity is not a valid integer! " +
-                                                        "Please enter a valid quantity: "));
+                                                        "Please enter a valid quantity: ");
                                             }
                                             while (p.getQuantity() - Integer.parseInt(purchaseQuantity) < 0) {
                                                 purchaseQuantity = JOptionPane.showInputDialog("There is only " + p.getQuantity() + " of " +
-                                                        "this fruit available to purchase. Please try a smaller quantity:"));
+                                                        "this fruit available to purchase. Please try a smaller quantity:");
                                             }
 
                                             shoppingCart.addPurchase(new Sale((Customer) user,
