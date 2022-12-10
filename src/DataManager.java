@@ -75,8 +75,9 @@ public class DataManager {
                 }
             }
         } catch(Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(new DataException("Loading of customer list failed!"));
+            throw new RuntimeException(
+                    new DataException(e.getMessage(), "Customer list loading", customerLocation)
+            );
         }
     }
 
@@ -98,8 +99,9 @@ public class DataManager {
                 }
             }
         } catch(Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(new DataException("Loading of seller list failed!"));
+            throw new RuntimeException(
+                    new DataException(e.getMessage(), "Seller list loading", sellerLocation)
+            );
         }
     }
 
@@ -137,8 +139,9 @@ public class DataManager {
                 }
             }
         } catch(Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(new DataException("Loading of stores failed!"));
+            throw new RuntimeException(
+                    new DataException(e.getMessage(), "Store loading", sellerLocation)
+            );
         }
     }
 
@@ -178,8 +181,9 @@ public class DataManager {
                 }
             }
         } catch(Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(new DataException("Loading of shopping carts failed!"));
+            throw new RuntimeException(
+                    new DataException(e.getMessage(), "Shopping cart loading", customerLocation)
+            );
         }
     }
 
@@ -224,23 +228,24 @@ public class DataManager {
                 }
             }
         } catch(Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(new DataException("Loading of purchase history failed!"));
+            throw new RuntimeException(
+                    new DataException(e.getMessage(), "Purchase history loading", customerLocation)
+            );
         }
     }
 
     public static void saveSellerStores(Seller seller) {
-        File iAmStore = new File(sellerDataFolder + File.separatorChar
-                + seller.getUsername() + File.separatorChar + "I_AM_A_GOOFY_GOOBER");
-        try {
-            iAmStore.createNewFile();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
         for(Store s : seller.getStores()) {
             File file = new File(sellerDataFolder + File.separatorChar
                     + seller.getUsername() + File.separatorChar + s.getName() + "_store");
+
+            try {
+                file.createNewFile();
+            } catch(Exception e) {
+                throw new RuntimeException(
+                        new DataException(e.getMessage(), "Seller store file creation", file)
+                );
+            }
 
             try(FileWriter fw = new FileWriter(file, false)) {
                 for(Product p : s.getProducts()) {
@@ -250,10 +255,10 @@ public class DataManager {
                             + p.getQuantity());
                     fw.write("\n");
                 }
-                fw.close();
             } catch(Exception e) {
-                e.printStackTrace();
-                throw new RuntimeException(new DataException("Saving of seller stores failed!"));
+                throw new RuntimeException(
+                        new DataException(e.getMessage(), "Seller store saving", file)
+                );
             }
         }
     }
@@ -263,6 +268,14 @@ public class DataManager {
             File file = new File(sellerDataFolder + File.separatorChar
                     + seller.getUsername() + File.separatorChar + s.getName() + "_sales");
 
+            try {
+                file.createNewFile();
+            } catch(Exception e) {
+                throw new RuntimeException(
+                        new DataException(e.getMessage(), "Seller sales file creation", file)
+                );
+            }
+
             try(FileWriter fw = new FileWriter(file, false)) {
                 for(Sale sa : s.getSales()) {
                     fw.write(sa.getProduct().getName() + ";"
@@ -271,10 +284,10 @@ public class DataManager {
                             + sa.getTotalCost());
                     fw.write("\n");
                 }
-                fw.close();
             } catch (Exception e) {
-                e.printStackTrace();
-                throw new RuntimeException(new DataException("Saving of seller sales failed!"));
+                throw new RuntimeException(
+                        new DataException(e.getMessage(), "Seller sales saving", file)
+                );
             }
         }
     }
@@ -283,6 +296,14 @@ public class DataManager {
         File file = new File(customerDataFolder + File.separatorChar
                 + customer.getUsername() + File.separatorChar + "purchase_history");
 
+        try {
+            file.createNewFile();
+        } catch(Exception e) {
+            throw new RuntimeException(
+                    new DataException(e.getMessage(), "Customer history file creation", file)
+            );
+        }
+
         try(FileWriter fw = new FileWriter(file, false)) {
             for(Sale s : customer.getPurchases()) {
                 fw.write(s.getName() + ";"
@@ -290,16 +311,24 @@ public class DataManager {
                         + s.getTotalCost());
                 fw.write("\n");
             }
-            fw.close();
         } catch(Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(new DataException("Saving of customer purchase history failed!"));
+            throw new RuntimeException(
+                    new DataException(e.getMessage(), "Customer history saving", file)
+            );
         }
     }
 
     public static void saveCustomerCart(Customer customer) {
         File file = new File(customerDataFolder + File.separatorChar
                 + customer.getUsername() + File.separatorChar + "shopping_cart");
+
+        try {
+            file.createNewFile();
+        } catch(Exception e) {
+            throw new RuntimeException(
+                    new DataException(e.getMessage(), "Customer shopping cart file creation", file)
+            );
+        }
 
         try(FileWriter fw = new FileWriter(file, false)) {
             for(Sale s : customer.getShoppingCart().getHeldPurchases()) {
@@ -309,8 +338,9 @@ public class DataManager {
             }
             fw.close();
         } catch(Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(new DataException("Saving of customer shopping cart failed!"));
+            throw new RuntimeException(
+                    new DataException(e.getMessage(), "Customer shopping cart saving", file)
+            );
         }
     }
 
@@ -337,6 +367,111 @@ public class DataManager {
     }
 
     /**
+     * Import a CSV and input it into seller's store data
+     *
+     * @param seller
+     * @param store
+     */
+    public static void importStoreCSV(Seller seller, Store store, File file) {
+        ArrayList<String> current = new ArrayList<>();
+        File storeFile = new File(sellerDataFolder + File.separatorChar
+                + seller.getUsername() + File.separatorChar + store.getName() + "_store");
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(storeFile));
+            String line = br.readLine();
+
+            while(line != null) {
+                current.add(line.substring(0,line.indexOf(";")));
+                line = br.readLine();
+            }
+
+        } catch(Exception e) {
+            throw new RuntimeException(
+                    new DataException(e.getMessage(), "Reading of current store file", storeFile)
+            );
+        }
+
+        try {
+            FileWriter fw = new FileWriter(storeFile, true);
+            BufferedReader br = new BufferedReader(new FileReader(file));
+            String line = br.readLine();
+
+            while(line != null) {
+                if(line.split(",").length != 4) {
+                    System.out.println("Invalid format; skipping line: " + line);
+                } else if(current.contains(line.substring(0,line.indexOf(",")))) {
+                    System.out.println("Product name already in use; skipping line: " + line);
+                } else {
+                    System.out.println("Adding new Product: " + line.substring(0,line.indexOf(",")));
+                    String[] arr = line.split(",");
+                    store.addProduct(new Product(arr[0], arr[1],
+                            Double.parseDouble(arr[2]), Integer.parseInt(arr[3])));
+                    fw.write(arr[0] + ";" + arr[1] + ";" + arr[2] + ";" + arr[3]);
+                    fw.write("\n");
+                }
+                line = br.readLine();
+            }
+
+            System.out.println("Successfully imported CSV");
+        } catch(Exception e) {
+            throw new RuntimeException(
+                    new DataException(e.getMessage(), "Reading of CSV file", file)
+            );
+        }
+    }
+
+    /**
+     * Export's seller's particular store as CSV
+     *
+     * @param seller
+     * @param store
+     */
+    public static void exportStoreCSV(Seller seller, Store store) {
+        File output = new File(seller.getUsername().replaceAll(" ", "_") + "_"
+                + store.getName().replaceAll(" ", "_") + ".csv");
+        try {
+            FileWriter fw = new FileWriter(output);
+            for(Product p : store.getProducts()) {
+                fw.write(p.getName() + "," + p.getDescription()
+                        + "," + p.getPrice() + "," + p.getQuantity());
+                fw.write("\n");
+            }
+
+            System.out.println("Store CSV outputted successfully");
+            System.out.println("File Format: name,description,price,quantity");
+        } catch(Exception e) {
+            throw new RuntimeException(
+                    new DataException(e.getMessage(), "Output of store CSV file", output)
+            );
+        }
+    }
+
+    /**
+     * Exports customer's purchase history as CSV
+     *
+     * @param customer
+     */
+    public static void exportCustomerHistory(Customer customer) {
+        File output = new File(customer.getUsername().replaceAll(" ", "_") + "_"
+                + "purchase_history.csv");
+
+        try {
+            FileWriter fw = new FileWriter(output);
+            for(Sale s : customer.getPurchases()) {
+                fw.write(s.getName() + "," + s.getQuantity() + "," + s.getTotalCost());
+                fw.write("\n");
+            }
+
+            System.out.println("History CSV outputted successfully");
+            System.out.println("File Format: name,quantityBought,totalCost");
+        } catch(Exception e) {
+            throw new RuntimeException(
+                    new DataException(e.getMessage(), "Output of history CSV file", output)
+            );
+        }
+    }
+
+    /**
      * Grabs a list of user logins
      *
      * @return ArrayList<String> {type[0], username[1], email[2], password[3]}
@@ -359,8 +494,9 @@ public class DataManager {
                 line = br.readLine();
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(new AccountException("Reading of login data failed!"));
+            throw new RuntimeException(
+                    new DataException(e.getMessage(), "User data loading", userDataFile)
+            );
         }
         return data;
     }
@@ -380,8 +516,9 @@ public class DataManager {
             try {
                 userDataFile.createNewFile();
             } catch (Exception e) {
-                e.printStackTrace();
-                throw new RuntimeException(new AccountException("Creation of login file failed!"));
+                throw new RuntimeException(
+                        new DataException(e.getMessage(), "User data file creation", userDataFile)
+                );
             }
         }
 
@@ -426,8 +563,9 @@ public class DataManager {
                     username, email, password));
             Files.write(f.toPath(), lines, StandardCharsets.UTF_8);
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(new AccountException("Writing of customer login failed!"));
+            throw new RuntimeException(
+                    new DataException(e.getMessage(), "User data of customer saving", userDataFile)
+            );
         }
     }
 
@@ -446,8 +584,9 @@ public class DataManager {
                     username, email, password));
             Files.write(f.toPath(), lines, StandardCharsets.UTF_8);
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(new AccountException("Writing of seller login failed!"));
+            throw new RuntimeException(
+                    new DataException(e.getMessage(), "User data of seller saving", userDataFile)
+            );
         }
     }
 
@@ -468,11 +607,15 @@ public class DataManager {
                 PrintWriter pw = new PrintWriter(t);
                 pw.print("");
                 pw.close();
+                t.delete();
             } catch (FileNotFoundException e) {
-                e.printStackTrace();
-                throw new RuntimeException(new AccountException("Deletion of account failed!"));
+                throw new RuntimeException(
+                        new DataException(e.getMessage(), "Customer/seller data deletion", t)
+                );
             }
         }
+        f.delete();
+
         ArrayList<ArrayList<String>> accounts = getUserLogins();
         ArrayList<ArrayList<String>> tempAcc = new ArrayList<>(accounts);
         for (int i = 0; i < accounts.size(); i++) {
@@ -491,8 +634,9 @@ public class DataManager {
             }
             pw.close();
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            throw new RuntimeException(new AccountException("Deletion of account failed!"));
+            throw new RuntimeException(
+                    new DataException(e.getMessage(), "User data account deletion", userDataFile)
+            );
         }
     }
 }
