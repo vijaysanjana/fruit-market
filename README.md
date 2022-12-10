@@ -1,11 +1,11 @@
 # Marketplace
 
-A virtual marketplace for Customers and Sellers to buy and list products. 
+A virtual fruit marketplace for Customers and Sellers to buy and list products. 
 
 
 ## Usage
 
-To compile and run the project, run the main method of the **Core** class.
+To compile and run the project, run the main method of the **Core** class. // TODO: CHANGE TO APPROPRIATE FILE NAMES
 
 ## Submission
 
