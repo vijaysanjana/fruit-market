@@ -129,8 +129,6 @@ class TestClientCore {
                         while (true) {
                             String[] options1 = {"Customer", "Seller"};
                             customerSeller = String.valueOf(JOptionPane.showOptionDialog(null, "Are you signing up to be a customer or seller?", "Signup", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options1, options1[0]));
-                            System.out.println("Please enter: " + "\n[1] Customer" + "\n[2] Seller");
-                            customerSeller = sc.nextLine();
 
                             if (customerSeller.equals("0")) {
                                 request = "{Signup}," + username + "," + email + "," + password + ",customer";
@@ -387,6 +385,10 @@ class TestClientCore {
                             productPick = JOptionPane.showInputDialog("There is no more of this fruit available to purchase! " +
                                     "Please enter another option: ");
                             if (productPick.matches("-?\\d+(\\.\\d+)?") && !(Integer.parseInt(productPick) < 1)) {
+                                p = products.get(Integer.parseInt(productPick) - 1);
+                                if (p.getQuantity() >= 1) {
+                                    if (p != null) {
+                                        showProductInfo(p);
                                 request = "{getProductByName}," + allProducts.get(Integer.parseInt(productPick) - 1);
                                 clientOut.println(request);
                                 response = interpretResponse(serverIn.readLine());
@@ -1023,7 +1025,6 @@ class TestClientCore {
                 availStores += "\n--- Total Products Sold to You: " + response[1];
             }
             String[] options = {"Sort Stores by Total Fruits Sold (High to Low)", "Sort Stores by Total Fruits Sold (Low to High)", "Sort Stores by Total Fruits Sold to You (High to Low)", "Sort Stores by Total Fruits Sold to You (Low to High)", "Return to Customer Menu"};
-            System.out.println(separator);
             int productPick = JOptionPane.showOptionDialog(null, "Please choose:", "Choice", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 
             if (productPick == 0) {
@@ -1056,10 +1057,9 @@ class TestClientCore {
      * @param sortMode
      */
     public static void customerSalesStatsDashboard(int sortMode) throws IOException {
-        System.out.println(separator);
-        System.out.println("Your Stores:");
+        String show = "Your Stores: \n";
         for (Store store : ((Seller) user).getStores()) {
-            System.out.println("- " + store.getName());
+            show = show + " - " + store.getName();
             ArrayList<Customer> customers = new ArrayList<>();
             switch (sortMode) {
                 case 1:
@@ -1073,26 +1073,26 @@ class TestClientCore {
             }
 
             if (customers.size() > 0) {
+                show = show + ", customers:";
                 for (Customer customer : customers) {
-                    System.out.println(customer.getUsername() + " ("
+                    show = show + " - " + customer.getUsername() + " ("
                             + store.getQuantityOfProductsBoughtByCustomer((Customer) user)
-                            + " Fruits Purchased)");
+                            + " Fruits Purchased)";
                 }
             } else {
-                System.out.println("--- No customers found");
+                show = show + " --- No customers found";
             }
+            show = show + "\n";
         }
 
-        System.out.println(separator);
-        System.out.println("Please enter:");
-        System.out.println("[1] Sort Customers by Purchases (High to Low)");
-        System.out.println("[2] Sort Customers by Purchases (Low to High)");
-        System.out.println("[Anything Else] Return to Statistics Dashboard Menu");
+        JOptionPane.showMessageDialog(null, show, "Statistics", JOptionPane.INFORMATION_MESSAGE);
 
-        String productPick = sc.nextLine();
-        if (productPick.equalsIgnoreCase("1")) {
+        String[] options = {"[1] Sort Products by Sales (High to Low)", "[2] Sort Products by Sales (Low to High)", "[Anything Else] Return to Statistics Dashboard Menu"};
+        int productPick = JOptionPane.showOptionDialog(null, "Please enter:", "Choice", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+
+        if (productPick == 0) {
             customerSalesStatsDashboard(1);
-        } else if (productPick.equalsIgnoreCase("2")) {
+        } else if (productPick == 1) {
             customerSalesStatsDashboard(2);
         } else { // TODO: needs testing
             dashboardMenu(0);
@@ -1105,10 +1105,9 @@ class TestClientCore {
      * @param sortMode
      */
     public static void productSalesStatsDashboard(int sortMode) throws IOException {
-        System.out.println(separator);
-        System.out.println("Your Stores:");
+        String show = "Your Stores: \n";
         for (Store store : ((Seller) user).getStores()) {
-            System.out.println("- " + store.getName());
+            show = show + " - " + store.getName();
             ArrayList<Product> products = new ArrayList<>();
             switch (sortMode) {
                 case 1:
@@ -1122,25 +1121,23 @@ class TestClientCore {
             }
 
             if (products.size() > 0) {
+                show = show + ", products:";
                 for (Product product : products) {
-                    System.out.println("--- " + product.getName() + " ("
-                            + store.getNumberOfProductsSold(product) + " Sold)");
+                    show = show + " - " + product.getName() + " ("
+                            + store.getNumberOfProductsSold(product) + " Sold)";
                 }
             } else {
-                System.out.println("--- No products found");
+                show = show + " --- No products found";
             }
+            show = show + "\n";
         }
 
-        System.out.println(separator);
-        System.out.println("Please enter:");
-        System.out.println("[1] Sort Products by Sales (High to Low)");
-        System.out.println("[2] Sort Products by Sales (Low to High)");
-        System.out.println("[Anything Else] Return to Statistics Dashboard Menu");
+        String[] options = {"[1] Sort Products by Sales (High to Low)", "[2] Sort Products by Sales (Low to High)", "[Anything Else] Return to Statistics Dashboard Menu"};
+        int productPick = JOptionPane.showOptionDialog(null, "Please enter:", "Choice", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 
-        String productPick = sc.nextLine();
-        if (productPick.equalsIgnoreCase("1")) {
+        if (productPick == 0) {
             productSalesStatsDashboard(1);
-        } else if (productPick.equalsIgnoreCase("2")) {
+        } else if (productPick == 1) {
             productSalesStatsDashboard(2);
         } else {
             dashboardMenu(0);
@@ -1178,28 +1175,20 @@ class TestClientCore {
      * Accesses seller main menu
      */
     public static void sellerMainMenu() throws IOException {
-        System.out.println(separator);
-        System.out.println("What would you like to do today?");
-        System.out.println("Please enter: ");
-        System.out.println("[1] View Your Stores");
-        System.out.println("[2] View Your Carted Fruits");
-        System.out.println("[3] View Sales History");
-        System.out.println("[4] View Statistics Dashboard");
-        System.out.println("[D] Delete Account");
-        System.out.println("[Q] Logout & Quit");
+        String[] options = {"View Your Stores", "View Your Carted Fruits", "View Sales History", "View Statistics Dashboard", "Delete Account", "Logout & Quit"};
+        int action = JOptionPane.showOptionDialog(null, "What would you like to do today? \n Please enter: ", "Menu", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 
-        String action = sc.nextLine();
-        if (action.equalsIgnoreCase("1")) {
+        if (action == 0) {
             storesMenu();
-        } else if (action.equalsIgnoreCase("2")) {
+        } else if (action == 1) {
             cartedProductsMenu();
-        } else if (action.equalsIgnoreCase("3")) {
+        } else if (action == 2) {
             salesMenu();
-        } else if (action.equalsIgnoreCase("4")) {
+        } else if (action == 3) {
             dashboardMenu(0);
-        } else if (action.equalsIgnoreCase("d")) {
+        } else if (action == 4) {
             deleteAccount(user);
-        } else if (action.equalsIgnoreCase("q")) {
+        } else if (action == 5) {
             printFarewell();
         } else {
             if (tryAgain("Invalid menu selection!")) {
@@ -1255,15 +1244,14 @@ class TestClientCore {
                     int counterAgain = 0;
                     Store store = ((Seller) user).getStores().get(
                             Integer.parseInt(storeAction) - 1);
-                    System.out.println(separator);
-                    System.out.println("Store: " + store.getName());
-                    System.out.println("Fruits: ");
+                    String show = "Store: " + store.getName() + "\n";
+                    show = show + "Fruits:";
                     if (store.getProducts().isEmpty()) {
-                        System.out.println("- No fruits found");
+                        show = show + " - No fruits found";
                     } else {
                         for (Product prod : store.getProducts()) {
-                            System.out.println("- #" + (counterAgain + 1) + " "
-                                    + prod.getName());
+                            show = show + " - #" + (counterAgain + 1) + " "
+                                    + prod.getName();
                             counterAgain++;
                         }
                     }
@@ -1320,11 +1308,11 @@ class TestClientCore {
                             }
                         }
 
-                        System.out.println("Returning to all stores menu...");
+                        JOptionPane.showMessageDialog(null, "Returning to all stores menu...", "menu", JOptionPane.INFORMATION_MESSAGE);
                         storesMenu();
                     } else if (productPick.equalsIgnoreCase("ex")) {
                         //FileManager.exportSellerCSV((Seller) user, store); //FILE MANAGER
-                        System.out.println("Returning to all stores menu...");
+                        JOptionPane.showMessageDialog(null, "Returning to all stores menu...", "menu", JOptionPane.INFORMATION_MESSAGE);
                         storesMenu();
                     } else {
                         sellerMainMenu();
@@ -1346,9 +1334,7 @@ class TestClientCore {
      * Adds a new store
      */
     public static void addNewStore() throws IOException {
-        System.out.println(separator);
-        System.out.println("Enter new store name: ");
-        String name = sc.nextLine();
+        String name = JOptionPane.showInputDialog("Enter new store name: ");
         if (name.contains(",") || name.contains(";")) {
             if (!tryAgain("Store name cannot contain ',' or ';'!")) {
                 sellerMainMenu();
@@ -1368,8 +1354,8 @@ class TestClientCore {
             Store store = new Store(name, "");
             ((Seller) user).addStore(store);
             //FileManager.createStoreFile((Seller) user, store); //FILE MANAGER
-            System.out.println("Successfully added new store! " +
-                    "Returning to all stores menu...");
+            JOptionPane.showMessageDialog(null, "Successfully added new store! " +
+                    "Returning to all stores menu...", "menu", JOptionPane.INFORMATION_MESSAGE);
             storesMenu();
         }
     }
@@ -1380,9 +1366,7 @@ class TestClientCore {
      * @param store
      */
     public static void addNewProduct(Store store) throws IOException {
-        System.out.println(separator);
-        System.out.println("Enter new fruit name: ");
-        String name = sc.nextLine();
+        String name = JOptionPane.showInputDialog("Enter new fruit name: ");
         if (name.contains(",") || name.contains(";")) {
             if (!tryAgain("Fruit name cannot contain ',' or ';'!")) {
                 sellerMainMenu();
@@ -1399,8 +1383,7 @@ class TestClientCore {
                     }
                 }
             }
-            System.out.println("Enter fruit description: ");
-            String desc = sc.nextLine();
+            String desc = JOptionPane.showInputDialog("Enter fruit description: ");
             if (desc.contains(",") || desc.contains(";")) {
                 if (!tryAgain("Fruit description cannot contain ',' or ';' ")) {
                     sellerMainMenu();
@@ -1409,8 +1392,8 @@ class TestClientCore {
                 }
             } else {
                 System.out.println("Enter fruit price: ");
+                String temp = JOptionPane.showInputDialog("Enter fruit price");
                 double price = 0;
-                String temp = sc.nextLine();
                 try {
                     price = Double.parseDouble(temp);
                 } catch (Exception e) {
@@ -1420,9 +1403,8 @@ class TestClientCore {
                         addNewProduct(store);
                     }
                 }
-                System.out.println("Enter fruit available quantity: ");
                 int quant = 0;
-                temp = sc.nextLine();
+                temp = JOptionPane.showInputDialog("Enter fruit available quantity: ");
                 try {
                     quant = Integer.parseInt(temp);
                 } catch (Exception e) {
@@ -1435,8 +1417,8 @@ class TestClientCore {
 
                 Product p = new Product(name, desc, price, quant);
                 store.addProduct(p);
-                System.out.println("Successfully added new fruit! " +
-                        "Returning to all stores menu...");
+                JOptionPane.showMessageDialog(null, "Successfully added new fruit! " +
+                        "Returning to all stores menu...", "menu", JOptionPane.INFORMATION_MESSAGE);
                 //FileManager.addSellerData((Seller) user, store, p); //FILE MANAGER
                 storesMenu();
             }
@@ -1450,28 +1432,23 @@ class TestClientCore {
      * @param product
      */
     public static void changeProductQuantity(Store store, Product product) throws IOException {
-        System.out.println(separator);
-        System.out.println("Please enter a new fruit quantity " +
+        String quant = JOptionPane.showInputDialog("Please enter a new fruit quantity " +
                 "(integer, at least 1): ");
-
-        String quant = sc.nextLine();
         while (!quant.matches("-?\\d+(\\.\\d+)?")
                 || (Integer.parseInt(quant) <= 0)) {
             if (!tryAgain("Invalid value! Quantity must be an integer and at least 1!")) {
                 storesMenu();
                 break;
             }
-            System.out.println("Please enter a new fruit quantity " +
+            quant = JOptionPane.showInputDialog("Please enter a new fruit quantity " +
                     "(integer, at least 1): ");
-            quant = sc.nextLine();
         }
 
         //FileManager.updateSellerDataQuantity((Seller) user, //FILE MANAGER
         //        store, product, Integer.parseInt(quant));
         product.setQuantity(Integer.parseInt(quant));
-        System.out.println("Successfully updated " + product.getName()
-                + "'s quantity available to: " + quant);
-        System.out.println("Returning to all stores menu...");
+        JOptionPane.showMessageDialog(null, "Successfully updated " + product.getName()
+                + "'s quantity available to: " + quant + "\nReturning to all stores menu...", "menu", JOptionPane.INFORMATION_MESSAGE);
         storesMenu();
     }
 
@@ -1482,10 +1459,7 @@ class TestClientCore {
      * @param product
      */
     public static void changeProductDescription(Store store, Product product) throws IOException {
-        System.out.println(separator);
-        System.out.println("Please enter a new fruit description: ");
-
-        String desc = sc.nextLine();
+        String desc = JOptionPane.showInputDialog("Please enter a new fruit description: ");
         while (desc.contains(",") || desc.contains(";")) {
             if (!tryAgain("Description cannot contain ',' or ';'!")) ;
             storesMenu();
@@ -1494,9 +1468,8 @@ class TestClientCore {
 
         //FileManager.updateSellerDataDescription((Seller) user, store, product, desc); //FILE MANAGER
         product.setDescription(desc);
-        System.out.println("Successfully updated " + product.getName()
-                + "'s description to: " + desc);
-        System.out.println("Returning to all stores menu...");
+        JOptionPane.showMessageDialog(null, "Successfully updated " + product.getName()
+                + "'s description available to: " + desc + "\nReturning to all stores menu...", "menu", JOptionPane.INFORMATION_MESSAGE);
         storesMenu();
     }
 
@@ -1507,10 +1480,7 @@ class TestClientCore {
      * @param product
      */
     public static void changeProductPrice(Store store, Product product) throws IOException {
-        System.out.println(separator);
-        System.out.println("Please enter a new price (double, at least 0.00): ");
-
-        String price = sc.nextLine();
+        String price = JOptionPane.showInputDialog("Please enter a new price (double, at least 0.00): ");
         String formatted = String.format("%.2f", Double.parseDouble(price));
         while (!formatted.matches("-?\\d+(\\.\\d+)?")
                 || (Double.parseDouble(formatted) < 0.00)) {
@@ -1518,17 +1488,15 @@ class TestClientCore {
                 storesMenu();
                 break;
             }
-            System.out.println("Please enter a new price (double, at least 0.00): ");
-            price = sc.nextLine();
+            price = JOptionPane.showInputDialog("Please enter a new price (double, at least 0.00): ");
             formatted = String.format("%.2f", Double.parseDouble(price));
         }
 
         //FileManager.updateSellerDataPrice((Seller) user, store, //FILE MANAGER
         //        product, Double.parseDouble(formatted));
         product.setPrice(Double.parseDouble(formatted));
-        System.out.println("Successfully updated " + product.getName()
-                + "'s description to: " + formatted);
-        System.out.println("Returning to all stores menu...");
+        JOptionPane.showMessageDialog(null, "Successfully updated " + product.getName()
+                + "'s price available to: " + formatted + "\nReturning to all stores menu...", "menu", JOptionPane.INFORMATION_MESSAGE);
         storesMenu();
     }
 
