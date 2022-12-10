@@ -384,38 +384,34 @@ class TestClientCore {
                         while (Integer.parseInt(response[4]) <= 0) { //quantity <= 0
                             productPick = JOptionPane.showInputDialog("There is no more of this fruit available to purchase! " +
                                     "Please enter another option: ");
-                            if (productPick.matches("-?\\d+(\\.\\d+)?") && !(Integer.parseInt(productPick) < 1)) {
-                                p = products.get(Integer.parseInt(productPick) - 1);
-                                if (p.getQuantity() >= 1) {
-                                    if (p != null) {
-                                        showProductInfo(p);
+                            if (productPick.matches("-?\\d+(\\.\\d+)?")
+                                    && (Integer.parseInt(productPick) > 1)) {
                                 request = "{getProductByName}," + allProducts.get(Integer.parseInt(productPick) - 1);
                                 clientOut.println(request);
                                 response = interpretResponse(serverIn.readLine());
-                                currentProduct = response;
-                                if (Integer.parseInt(response[4]) >= 1) { //quantity >= 1
-                                    if (response[0].equals("{getProductByName}")) { //product returned
+                                if (Integer.parseInt(response[4]) >= 1) {
+                                    if (response[0].equals("{getProductByName}")) { // TODO: needs testing
                                         showProductInfo(response);
-                                        String[] options = {"Add to Shopping Cart", "Return to All Fruits Page"};
-                                        int productAction = JOptionPane.showOptionDialog(null, "Please choose one.", "Choice", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
-
+                                        String[] options = {"Add to Shopping Cart", "Return to Search Page"};
+                                        int productAction = JOptionPane.showOptionDialog(null, "Please choose.", "Choice", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
                                         if (productAction == 0) {
                                             String purchaseQuantity = JOptionPane.showInputDialog("Please enter a purchase quantity: ");
-                                            while (!purchaseQuantity.matches("-?\\d+(\\.\\d+)?") ||
-                                                    (Integer.parseInt(purchaseQuantity) < 1)) {
+                                            while (!purchaseQuantity.matches("-?\\d+(\\.\\d+)?")
+                                                    || (Integer.parseInt(purchaseQuantity) < 1)) {
                                                 purchaseQuantity = JOptionPane.showInputDialog("Entered quantity is not a valid integer! " +
                                                         "Please enter a valid quantity: ");
                                             }
-                                            while (Integer.parseInt(response[4]) - Integer.parseInt(purchaseQuantity) < 0) { // quantity - purchase quantity
-                                                purchaseQuantity = JOptionPane.showInputDialog("There is only " + response[4] + " of " +
-                                                        "this fruit available to purchase. Please try a smaller quantity: ");
+                                            while (Integer.parseInt(response[4]) - Integer.parseInt(purchaseQuantity) < 0) {
+                                                purchaseQuantity = JOptionPane.showInputDialog("There is only " + Integer.parseInt(response[4]) + " of " +
+                                                        "this fruit available to purchase. Please try a smaller quantity:");
                                             }
+
                                             request =
                                                     "{addToCustomerShoppingCart}," + userEmail + "," + allProducts.get(Integer.parseInt(productPick) - 1) + "," + purchaseQuantity;
                                             clientOut.println(request);
                                             serverIn.readLine();
                                             request =
-                                                    "{subtractProductQuantity}," + currentProduct[1] + "," + Integer.parseInt(purchaseQuantity);
+                                                    "{subtractProductQuantity}," + response[1] + "," + Integer.parseInt(purchaseQuantity);
                                             clientOut.println(request);
                                             serverIn.readLine();
                                             // TESTING
