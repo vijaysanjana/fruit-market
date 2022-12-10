@@ -1,5 +1,6 @@
 import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
 
 // Server class
 class ServerCore {
@@ -78,7 +79,7 @@ class ServerCore {
                 System.out.println("Server looking for request..."); //Test
                 String[] request = interpretRequest(clientIn.readLine());
                 System.out.println("Server interpreted request"); //Test
-                String response;
+                String response = "";
                 while (request != null) {
                     System.out.println("Request is not null"); //Test
 
@@ -86,7 +87,6 @@ class ServerCore {
                         case "{Login}":
                             response = loginRequest(request);
                             serverOut.println(response);
-                            System.out.println("Response sent"); //Test
                             //Interpret Request
                             //Update Data Classes
                             //Construct Necessary Data for Client in Response Format
@@ -107,15 +107,80 @@ class ServerCore {
 
 
                         case "{getStoreNames}":
-
-                            //serverOut.println(response);
+                            response = getStoreNamesRequest(request);
+                            serverOut.println(response);
                             break;
 
+
+                        case "{getProductNames}":
+                            response = getProductNamesRequest(request);
+                            serverOut.println(response);
+                            break;
+
+
+                        case "{getProductInfo}":
+                            response = getProductInfoRequest(request);
+                            serverOut.println(response);
+                            break;
+
+
+                        case "{changeProductQuantity}":
+                            response = changeProductQuantityRequest(request);
+                            serverOut.println(response);
+                            break;
+
+
+                        case "{changeProductDescription}":
+                            response = changeProductDescriptionRequest(request);
+                            serverOut.println(response);
+                            break;
+
+
+                        case "{changeProductPrice}":
+                            response = changeProductPriceRequest(request);
+                            serverOut.println(response);
+                            break;
+
+
+                        case "{removeProduct}":
+                            response = removeProductRequest(request);
+                            serverOut.println(response);
+                            break;
+
+
+                        case "{addProduct}":
+                            response = addProductRequest(request);
+                            serverOut.println(response);
+                            break;
+
+                        case "{addStore}":
+                            response = addStoreRequest(request);
+                            serverOut.println(response);
+                            break;
+
+
+                        case "{getCartedProducts}":
+                            response = getCartedProductsRequest(request);
+                            serverOut.println(response);
+                            break;
+
+
+                        case "{getSales}":
+                            response = getSalesRequest(request);
+                            serverOut.println(response);
+                            break;
+
+
+                        case "{getCustomerStats}":
+                            response = getCustomerStatsRequest(request);
+                            serverOut.println(response);
+                            break;
 
 
                         default:
                     }
 
+                    System.out.println("Response sent: " + response); //Test
                     DataManager.saveEverything(mp);
                     System.out.println("Server looking for request..."); //Test
                     request = interpretRequest(clientIn.readLine());
@@ -166,7 +231,7 @@ class ServerCore {
             String email = request[1];
             String password = request[2];
 
-            user = AccountManager.login(email, password);
+            user = AccountManager.login(mp, email, password);
             if (user != null) {
                 String userType = (user instanceof Customer) ? "C" : "S";
                 String response = "{Login}," + userType + "," + user.getUsername();
@@ -176,7 +241,7 @@ class ServerCore {
                 //System.out.println(mp.getCustomer(2).getUsername());
                 return response;
             }
-            return null;
+            return "null";
         }
 
         public String signupRequest(String[] request) {
@@ -194,15 +259,202 @@ class ServerCore {
                 }
                 return "{Signup}";
             }
-            return null;
+            return "null";
         }
 
         public String getTotalHeldProductsRequest(String[] request) {
-            return "{getTotalHeldProducts}, " + ((Customer) user).getShoppingCart().getTotalheldProducts();
+            return "{getTotalHeldProducts}," + ((Customer) user).getShoppingCart().getTotalheldProducts();
         }
 
-        //public String getStoreNamesRequest(String[] request) {
+        public String getStoreNamesRequest(String[] request) {
+            String response = "{getStoreNames}";
+            for (Store store : ((Seller) user).getStores()) {
+                response += "," + store.getName();
+            }
+            return response;
+        }
 
-        //}
+        public String getProductNamesRequest(String[] request) {
+            String response = "{getProductNames}";
+            Store store = null;
+            for (Store st : ((Seller) user).getStores()) {
+                if (st.getName().equals(request[1])) {
+                    store = st;
+                }
+            }
+            if (store != null) {
+                for (Product product : store.getProducts()) {
+                    response += "," + product.getName();
+                }
+                return response;
+            }
+            return "null";
+        }
+
+        public String getProductInfoRequest(String[] request) {
+            String response = "{getProductInfo}";
+            Product product = null;
+            for (Product pr : mp.getProducts()) {
+                if (pr.getName().equals(request[1])) {
+                    product = pr;
+                }
+            }
+            if (product != null) {
+                response += "," + product.getName();
+                response += "," + product.getDescription();
+                response += "," + String.format("%.2f", product.getPrice());
+                response += "," + product.getQuantity();
+                return response;
+            }
+            return "null";
+        }
+
+        public String changeProductQuantityRequest(String[] request) {
+            String response = "{changeProductQuantity}";
+            Product product = null;
+            for (Product pr : mp.getProducts()) {
+                if (pr.getName().equals(request[1])) {
+                    product = pr;
+                }
+            }
+            if (product != null) {
+                product.setQuantity(Integer.parseInt(request[2]));
+                return response;
+            }
+            return "null";
+        }
+
+        public String changeProductDescriptionRequest(String[] request) {
+            String response = "{changeProductDescription}";
+            Product product = null;
+            for (Product pr : mp.getProducts()) {
+                if (pr.getName().equals(request[1])) {
+                    product = pr;
+                }
+            }
+            if (product != null) {
+                product.setDescription(request[2]);
+                return response;
+            }
+            return "null";
+        }
+
+        public String changeProductPriceRequest(String[] request) {
+            String response = "{changeProductPrice}";
+            Product product = null;
+            for (Product pr : mp.getProducts()) {
+                if (pr.getName().equals(request[1])) {
+                    product = pr;
+                }
+            }
+            if (product != null) {
+                product.setPrice(Double.parseDouble(request[2]));
+                return response;
+            }
+            return "null";
+        }
+
+        public String removeProductRequest(String[] request) {
+            String response = "{removeProduct}";
+            Store store = null;
+            for (Store st : ((Seller) user).getStores()) {
+                if (st.getName().equals(request[1])) {
+                    store = st;
+                }
+            }
+            if (store != null) {
+                for (Product pr : store.getProducts()) {
+                    if (pr.getName().equals(request[2])) {
+                        store.removeProduct(pr);
+                        return response;
+                    }
+                }
+            }
+            return "null";
+        }
+
+        public String addProductRequest(String[] request) {
+            String response = "{addProduct}";
+            Store store = null;
+            for (Store st : ((Seller) user).getStores()) {
+                if (st.getName().equals(request[1])) {
+                    store = st;
+                }
+            }
+            if (store != null) {
+                Product product = new Product(request[2], request[3], Double.parseDouble(request[4]), Integer.parseInt(request[5]));
+                store.addProduct(product);
+                return response;
+            }
+            return "null";
+        }
+
+        public String addStoreRequest(String[] request) {
+            String response = "{addStore}";
+            Store store = new Store(request[1], "");
+            ((Seller) user).addStore(store);
+            return response;
+        }
+
+        public String getCartedProductsRequest(String[] request) {
+            String response = "{getCartedProducts}";
+            for (Customer customer : mp.getCustomers()) {
+                boolean cartedMine = false;
+                for (Sale sale : customer.getShoppingCart().getHeldPurchases()) {
+                    if (((Seller) user).getAllProducts().contains(sale.getProduct())) {
+                        if (!cartedMine) {
+                            response += ",;" + customer.getUsername();
+                            cartedMine = true;
+                        }
+                        response += "," + sale.getProduct().getName() + "~" + sale.getQuantity();
+                    }
+                }
+            }
+            return response;
+        }
+
+        public String getSalesRequest(String[] request) {
+            String response = "{getSales}";
+            for (Store store : ((Seller) user).getStores()) {
+                boolean saleSeen = false;
+                for (Sale sale : store.getSales()) {
+                    if (!saleSeen) {
+                        response += ",;" + store.getName();
+                        saleSeen = true;
+                    }
+                    response += "," + sale.getProduct().getName() + "~" + sale.getQuantity();
+                }
+            }
+            return response;
+        }
+
+        public String getCustomerStatsRequest(String[] request) {
+            String response = "{getCustomerStats}";
+            for (Store store : ((Seller) user).getStores()) {
+                ArrayList<Customer> customers;
+                switch (Integer.parseInt(request[1])) {
+                    case 1:
+                        customers = mp.getStoreSalesSortedCustomers(store, true);
+                        break;
+                    case 2:
+                        customers = mp.getStoreSalesSortedCustomers(store, false);
+                        break;
+                    default:
+                        customers = store.getAllCustomers();
+                }
+
+                if (customers.size() > 0) {
+                    response += ",;" + store.getName();
+                    for (Customer customer : customers) {
+                        response += "," + customer.getUsername() + "~" + store.getQuantityOfProductsBoughtByCustomer((customer));
+                        //System.out.println(customer.getUsername() + " ("
+                        //        + store.getQuantityOfProductsBoughtByCustomer((Customer) user)
+                        //        + " Fruits Purchased)");
+                    }
+                }
+            }
+            return response;
+        }
+
     }
 }

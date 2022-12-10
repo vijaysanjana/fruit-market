@@ -18,6 +18,11 @@ class TestClientCore {
     private static String[] response; //Response to be sent from ServerCore
     private static PrintWriter clientOut;
     private static BufferedReader serverIn;
+    private static String email;
+    private static String password;
+    private static String loginSignup;
+    private static String customerSeller;
+    private static String username;
 
     /**
      * Main method for the marketplace system. Arranges login/signup and customer/seller menus
@@ -36,11 +41,11 @@ class TestClientCore {
 
             system_loop:
             while (true) {
-                String email;
-                String password;
-                String loginSignup;
-                String customerSeller;
-                String username;
+                //String email;
+                //String password;
+                //String loginSignup;
+                //String customerSeller;
+                //String username;
 
                 System.out.println("Welcome to The Marketplace!");
                 System.out.println(separator);
@@ -68,15 +73,13 @@ class TestClientCore {
 
                             //user = AccountManager.login(email, password); //TODO: Remove user
                             //if (user == null) {
-                            if (response == null) {
-                                if (!tryAgain("Email and password combinations are invalid!")) {
-                                    printFarewell();
-                                    break system_loop;
-                                }
-                            } else {
+                            if (response != null) {
                                 customerSeller = response[1];
                                 username = response[2];
                                 break;
+                            } else if (!tryAgain("Email and password combinations are invalid!")) {
+                                printFarewell();
+                                break system_loop;
                             }
                         }
                         //if (user instanceof Customer) {
@@ -398,7 +401,7 @@ class TestClientCore {
                                 p = products.get(Integer.parseInt(productPick) - 1);
                                 if (p.getQuantity() >= 1) {
                                     if (p != null) {
-                                        showProductInfo(p);
+                                        //showProductInfo(p);
                                         System.out.println(separator);
                                         System.out.println("Please enter: ");
                                         System.out.println("[1] Add to Shopping Cart");
@@ -449,7 +452,7 @@ class TestClientCore {
                         }
                     } else {
                         if (p != null) {
-                            showProductInfo(p);
+                            //showProductInfo(p);
                             System.out.println(separator);
                             System.out.println("Please enter: ");
                             System.out.println("[1] Add to Shopping Cart");
@@ -534,14 +537,17 @@ class TestClientCore {
     /**
      * Displays information about a given product
      *
-     * @param product
+     * @param name
+     * @param description
+     * @param price
+     * @param quantity
      */
-    private static void showProductInfo(Product product) {
+    private static void showProductInfo(String name, String description, String price, String quantity) {
         System.out.println(separator);
-        System.out.println("Fruit: " + product.getName());
-        System.out.println("Description: " + product.getDescription());
-        System.out.println("Price: " + String.format("%.2f", product.getPrice()));
-        System.out.println("Quantity Available: " + product.getQuantity());
+        System.out.println("Fruit: " + name);
+        System.out.println("Description: " + description);
+        System.out.println("Price: " + price);
+        System.out.println("Quantity Available: " + quantity);
     }
 
     public static void searchMenu() throws IOException {
@@ -668,7 +674,7 @@ class TestClientCore {
                                 p = productsFound.get(Integer.parseInt(productPick) - 1);
                                 if (p.getQuantity() >= 1) {
                                     if (p != null) { // TODO: needs testing
-                                        showProductInfo(p);
+                                        //showProductInfo(p);
                                         System.out.println(separator);
                                         System.out.println("Please enter: ");
                                         System.out.println("[1] Add to Shopping Cart");
@@ -719,7 +725,7 @@ class TestClientCore {
                         }
                     } else {
                         if (p != null) { // TODO: needs testing
-                            showProductInfo(p);
+                            //showProductInfo(p);
                             System.out.println(separator);
                             System.out.println("Please enter: ");
                             System.out.println("[1] Add to Shopping Cart");
@@ -823,7 +829,7 @@ class TestClientCore {
                 Sale s = shoppingCart.getPurchase(Integer.parseInt(cartPick) - 1);
                 Product p = s.getProduct();
                 if (p != null) {
-                    showProductInfo(p);
+                    //showProductInfo(p);
                     System.out.println(separator);
                     System.out.println("Please enter: ");
                     System.out.println("[1] Remove from Shopping Cart");
@@ -1072,28 +1078,19 @@ class TestClientCore {
     public static void customerSalesStatsDashboard(int sortMode) throws IOException {
         System.out.println(separator);
         System.out.println("Your Stores:");
-        for (Store store : ((Seller) user).getStores()) {
-            System.out.println("- " + store.getName());
-            ArrayList<Customer> customers = new ArrayList<>();
-            switch (sortMode) {
-                case 1:
-                    customers = mp.getStoreSalesSortedCustomers(store, true);
-                    break;
-                case 2:
-                    customers = mp.getStoreSalesSortedCustomers(store, false);
-                    break;
-                default:
-                    customers = store.getAllCustomers();
-            }
 
-            if (customers.size() > 0) {
-                for (Customer customer : customers) {
-                    System.out.println(customer.getUsername() + " ("
-                            + store.getQuantityOfProductsBoughtByCustomer((Customer) user)
-                            + " Fruits Purchased)");
-                }
+        request = "{getCustomerStats}," + sortMode;
+        clientOut.println(request);
+        response = interpretResponse(serverIn.readLine());
+
+        for (int i = 1; i < response.length; i++) {
+            if (response[i].contains(";")) {
+                System.out.println("- " + response[i].substring(1));
             } else {
-                System.out.println("--- No customers found");
+                String customerName = response[i].substring(0, response[i].indexOf("~"));
+                String saleQuantity = response[i].substring(response[i].indexOf("~") + 1);
+
+                System.out.println(customerName + " (" + saleQuantity + " Fruits Purchased)");
             }
         }
 
@@ -1230,9 +1227,10 @@ class TestClientCore {
      */
     public static void storesMenu() throws IOException {
 
-        request = "{getStoreNames}";
+        request = "{getStoreNames}," + username;
         clientOut.println(request);
         response = interpretResponse(serverIn.readLine());
+        String[] yourStores = null;
 
         //int counter = 0;
         System.out.println(separator);
@@ -1241,7 +1239,9 @@ class TestClientCore {
         if (response.length <= 1) {
             System.out.println("- No stores found");
         } else {
+            yourStores = new String[response.length - 1];
             for (int i = 1; i < response.length; i++) {
+                yourStores[i-1] = response[i];
                 System.out.println("- #" + (i) + " " + response[i]);
             }
         }
@@ -1265,22 +1265,37 @@ class TestClientCore {
 
         String storeAction = sc.nextLine();
         if (storeAction.matches("-?\\d+(\\.\\d+)?")) {
-            if (!((Seller) user).getStores().isEmpty()) {
+            if (yourStores != null) {
+                //if (!((Seller) user).getStores().isEmpty()) {
                 try {
-                    int counterAgain = 0;
-                    Store store = ((Seller) user).getStores().get(
-                            Integer.parseInt(storeAction) - 1);
+                    //int counterAgain = 0;
+                    String storeName = yourStores[Integer.parseInt(storeAction) - 1];
+                    //Store store = ((Seller) user).getStores().get( //TODO: Remove this
+                    //        Integer.parseInt(storeAction) - 1);
                     System.out.println(separator);
-                    System.out.println("Store: " + store.getName());
+                    System.out.println("Store: " + storeName);
+                    //System.out.println("Store: " + store.getName());
                     System.out.println("Fruits: ");
-                    if (store.getProducts().isEmpty()) {
+
+                    request = "{getProductNames}," + storeName;
+                    clientOut.println(request);
+                    response = interpretResponse(serverIn.readLine());
+                    String[] products = null;
+
+                    if (response.length <= 1) {
+                    //if (store.getProducts().isEmpty()) {
                         System.out.println("- No fruits found");
                     } else {
-                        for (Product prod : store.getProducts()) {
-                            System.out.println("- #" + (counterAgain + 1) + " "
-                                    + prod.getName());
-                            counterAgain++;
+                        products = new String[response.length - 1];
+                        for (int i = 1; i < response.length; i++) {
+                            products[i - 1] = response[i];
+                            System.out.println("- #" + i + " " + response[i]);
                         }
+                        //for (Product prod : store.getProducts()) {
+                        //    System.out.println("- #" + (counterAgain + 1) + " "
+                        //            + prod.getName());
+                        //    counterAgain++;
+                        //}
                     }
 
                     System.out.println(separator);
@@ -1292,11 +1307,18 @@ class TestClientCore {
                     System.out.println("[Anything Else] Return to Seller Menu");
 
                     String productPick = sc.nextLine();
+
                     if (productPick.matches("-?\\d+(\\.\\d+)?")) {
-                        if (!store.getProducts().isEmpty()) {
-                            Product prod = store.getProducts().get(
-                                    Integer.parseInt(productPick) - 1);
-                            showProductInfo(prod);
+                        if (products != null) {
+                        //if (!store.getProducts().isEmpty()) {
+                            String productName = products[Integer.parseInt(productPick) - 1];
+                            request = "{getProductInfo}," + productName;
+                            clientOut.println(request);
+                            response = interpretResponse(serverIn.readLine());
+                            showProductInfo(response[1], response[2], response[3], response[4]);
+                            //Product prod = store.getProducts().get(
+                            //        Integer.parseInt(productPick) - 1);
+                            //showProductInfo(prod);
 
                             System.out.println(separator);
                             System.out.println("Please enter: ");
@@ -1308,6 +1330,131 @@ class TestClientCore {
 
                             String productAction = sc.nextLine();
                             if (productAction.equalsIgnoreCase("qu")) {
+                                System.out.println(separator);
+                                System.out.println("Please enter a new fruit quantity " +
+                                        "(integer, at least 1): ");
+
+                                String quant = sc.nextLine();
+                                while (!quant.matches("-?\\d+(\\.\\d+)?")
+                                        || (Integer.parseInt(quant) <= 0)) {
+                                    if (!tryAgain("Invalid value! Quantity must be an integer and at least 1!")) {
+                                        storesMenu();
+                                        break;
+                                    }
+                                    System.out.println("Please enter a new fruit quantity " +
+                                            "(integer, at least 1): ");
+                                    quant = sc.nextLine();
+                                }
+
+                                request = "{changeProductQuantity}," + productName + "," + quant;
+                                clientOut.println(request);
+                                response = interpretResponse(serverIn.readLine());
+                                //changeProductQuantity(store, prod);
+
+                                System.out.println("Successfully updated " + productName
+                                        + "'s quantity available to: " + quant);
+                                System.out.println("Returning to all stores menu...");
+                                storesMenu();
+
+
+                            } else if (productAction.equalsIgnoreCase("de")) {
+
+                                System.out.println(separator);
+                                System.out.println("Please enter a new fruit description: ");
+
+                                String desc = sc.nextLine();
+                                while (desc.contains(",") || desc.contains(";")) {
+                                    if (!tryAgain("Description cannot contain ',' or ';'!")) ;
+                                    storesMenu();
+                                    break;
+                                }
+
+                                request = "{changeProductDescription}," + productName + "," + desc;
+                                clientOut.println(request);
+                                response = interpretResponse(serverIn.readLine());
+                                //changeProductDescription(store, prod);
+                                //FileManager.updateSellerDataDescription((Seller) user, store, product, desc); //FILE MANAGER
+                                //product.setDescription(desc);
+
+                                System.out.println("Successfully updated " + productName
+                                        + "'s description to: " + desc);
+                                System.out.println("Returning to all stores menu...");
+                                storesMenu();
+
+
+                            } else if (productAction.equalsIgnoreCase("pr")) {
+
+                                System.out.println(separator);
+                                System.out.println("Please enter a new price (double, at least 0.00): ");
+
+                                String price = sc.nextLine();
+                                String formatted = String.format("%.2f", Double.parseDouble(price));
+                                while (!formatted.matches("-?\\d+(\\.\\d+)?")
+                                        || (Double.parseDouble(formatted) < 0.00)) {
+                                    if (!tryAgain("Invalid value! Price must be a double and at least 0.00!")) {
+                                        storesMenu();
+                                        break;
+                                    }
+                                    System.out.println("Please enter a new price (double, at least 0.00): ");
+                                    price = sc.nextLine();
+                                    formatted = String.format("%.2f", Double.parseDouble(price));
+                                }
+
+                                request = "{changeProductPrice}," + productName + "," + formatted;
+                                clientOut.println(request);
+                                response = interpretResponse(serverIn.readLine());
+                                //changeProductPrice(store, prod);
+                                //FileManager.updateSellerDataPrice((Seller) user, store, //FILE MANAGER
+                                //        product, Double.parseDouble(formatted));
+                                //product.setPrice(Double.parseDouble(formatted));
+                                System.out.println("Successfully updated " + productName
+                                        + "'s description to: " + formatted);
+                                System.out.println("Returning to all stores menu...");
+                                storesMenu();
+
+
+                            } else if (productAction.equalsIgnoreCase("rm")) {
+                                System.out.println(separator);
+                                System.out.println("WARNING: Are you sure you want to remove this product?");
+                                System.out.println("WARNING: All seller data " +
+                                        "corresponding with this product will be deleted.");
+                                System.out.println("WARNING: THIS DECISION IS FINAL");
+                                System.out.println(separator);
+                                System.out.println("Please enter: ");
+                                System.out.println("[DELETE] Delete Product (All Caps Required)");
+                                System.out.println("[Anything Else] Return to Seller Menu");
+                                System.out.println(separator);
+
+                                String action = sc.nextLine();
+                                if (action.equals("DELETE")) {
+                                    request = "{removeProduct}," + storeName + "," + productName;
+                                    clientOut.println(request);
+                                    response = interpretResponse(serverIn.readLine());
+                                    //removeProduct(store, prod);
+                                    //FileManager.removeSellerDataProduct((Seller) user, store, product); //FILE MANAGER
+
+                                    //mp = new MarketPlace();
+                                    //FileManager.loadAllStores(mp, true); //FILE MANAGER
+                                    /*
+                                    for (Seller seller : mp.getSellers()) {
+                                        if (seller.getUsername().equalsIgnoreCase(user.getUsername())
+                                                && seller.getEmail().equalsIgnoreCase(user.getEmail())) {
+                                            user = seller;
+                                        }
+                                    }
+                                    */
+                                    System.out.println("Successfully deleted " + productName);
+                                    System.out.println("Returning to seller menu...");
+                                    sellerMainMenu();
+                                } else {
+                                    sellerMainMenu();
+                                }
+
+                            } else {
+                                sellerMainMenu();
+                            }
+                            /*
+                            if (productAction.equalsIgnoreCase("qu")) {
                                 changeProductQuantity(store, prod);
                             } else if (productAction.equalsIgnoreCase("de")) {
                                 changeProductDescription(store, prod);
@@ -1318,23 +1465,25 @@ class TestClientCore {
                             } else {
                                 sellerMainMenu();
                             }
+                            */
                         } else {
                             sellerMainMenu();
                         }
                     } else if (productPick.equalsIgnoreCase("ad")) {
-                        addNewProduct(store);
+                        addNewProduct(storeName);
                     } else if (productPick.equalsIgnoreCase("im")) {
                         //FileManager.importSellerCSV((Seller) user, store); //FILE MANAGER
 
-                        mp = new MarketPlace();
+                        //mp = new MarketPlace();
                         //FileManager.loadAllStores(mp, true); //FILE MANAGER
+                        /*
                         for (Seller seller : mp.getSellers()) {
                             if (seller.getUsername().equalsIgnoreCase(user.getUsername())
                                     && seller.getEmail().equalsIgnoreCase(user.getEmail())) {
                                 user = seller;
                             }
                         }
-
+                        */
                         System.out.println("Returning to all stores menu...");
                         storesMenu();
                     } else if (productPick.equalsIgnoreCase("ex")) {
@@ -1344,6 +1493,8 @@ class TestClientCore {
                     } else {
                         sellerMainMenu();
                     }
+
+                    //sellerMainMenu();
                 } catch (Exception e) {
                     sellerMainMenu();
                 }
@@ -1371,8 +1522,12 @@ class TestClientCore {
                 addNewStore();
             }
         } else {
-            for (Store s : mp.getStores()) {
-                if (s.getName().equalsIgnoreCase(name)) {
+
+            request = "{getStoreNames}";
+            clientOut.println(request);
+            response = interpretResponse(serverIn.readLine());
+            for (int i = 1; i < response.length; i++) {
+                if (response[i].equalsIgnoreCase(name)) {
                     if (!tryAgain("Store name is already used!")) {
                         sellerMainMenu();
                     } else {
@@ -1380,8 +1535,11 @@ class TestClientCore {
                     }
                 }
             }
-            Store store = new Store(name, "");
-            ((Seller) user).addStore(store);
+            request = "{addStore}," + name;
+            clientOut.println(request);
+            response = interpretResponse(serverIn.readLine());
+            //Store store = new Store(name, "");
+            //((Seller) user).addStore(store);
             //FileManager.createStoreFile((Seller) user, store); //FILE MANAGER
             System.out.println("Successfully added new store! " +
                     "Returning to all stores menu...");
@@ -1392,9 +1550,9 @@ class TestClientCore {
     /**
      * Adds a new product
      *
-     * @param store
+     * @param storeName
      */
-    public static void addNewProduct(Store store) throws IOException {
+    public static void addNewProduct(String storeName) throws IOException {
         System.out.println(separator);
         System.out.println("Enter new fruit name: ");
         String name = sc.nextLine();
@@ -1402,15 +1560,18 @@ class TestClientCore {
             if (!tryAgain("Fruit name cannot contain ',' or ';'!")) {
                 sellerMainMenu();
             } else {
-                addNewProduct(store);
+                addNewProduct(storeName);
             }
         } else {
-            for (Product prod : mp.getProducts()) {
-                if (prod.getName().equalsIgnoreCase(name)) {
+            request = "{getProductNames}," + storeName;
+            clientOut.println(request);
+            response = interpretResponse(serverIn.readLine());
+            for (int i = 1; i < response.length; i++) {
+                if (response[i].equalsIgnoreCase(name)) {
                     if (!tryAgain("Fruit is already used!")) {
                         sellerMainMenu();
                     } else {
-                        addNewProduct(store);
+                        addNewProduct(storeName);
                     }
                 }
             }
@@ -1432,7 +1593,7 @@ class TestClientCore {
                     if (!tryAgain("Price must be a double!")) {
                         sellerMainMenu();
                     } else {
-                        addNewProduct(store);
+                        addNewProduct(storeName);
                     }
                 }
                 System.out.println("Enter fruit available quantity: ");
@@ -1444,12 +1605,16 @@ class TestClientCore {
                     if (!tryAgain("Quantity must be an integer!")) {
                         sellerMainMenu();
                     } else {
-                        addNewProduct(store);
+                        addNewProduct(storeName);
                     }
                 }
 
-                Product p = new Product(name, desc, price, quant);
-                store.addProduct(p);
+                request = "{addProduct}," + storeName + "," + name + "," + desc + "," + price + "," + quant;
+                clientOut.println(request);
+                response = interpretResponse(serverIn.readLine());
+
+                //Product p = new Product(name, desc, price, quant);
+                //store.addProduct(p);
                 System.out.println("Successfully added new fruit! " +
                         "Returning to all stores menu...");
                 //FileManager.addSellerData((Seller) user, store, p); //FILE MANAGER
@@ -1594,6 +1759,30 @@ class TestClientCore {
         System.out.println("All carted items:");
         ArrayList<ArrayList<String>> data = null; //(Added "null;" so this could run)
                 //FileManager.getAllCarts(); //FILE MANAGER
+
+        request = "{getCartedProducts}";
+        clientOut.println(request);
+        response = interpretResponse(serverIn.readLine());
+
+        for (int i = 1; i < response.length; i++) {
+            if (response[i].contains(";")) {
+                System.out.println("- Customer: " + response[i].substring(1));
+            } else {
+                String productName = response[i].substring(0, response[i].indexOf("~"));
+                String heldQuantity = response[i].substring(response[i].indexOf("~") + 1);
+
+                request = "{getProductInfo}," + productName;
+                clientOut.println(request);
+                String[] infoResponse = interpretResponse(serverIn.readLine());
+
+                System.out.println("--- Item: " + productName + " (#Held: " + heldQuantity + ")");
+                System.out.println("----- Description: " + infoResponse[2]);
+                System.out.println("----- Price: " + infoResponse[3]);
+                System.out.println("----- Quantity Available: " + infoResponse[4]);
+            }
+        }
+
+        /*
         for (int j = 0; j < data.size(); j++) {
             ArrayList<String> arr = data.get(j);
             System.out.println(separator);
@@ -1617,6 +1806,7 @@ class TestClientCore {
                 System.out.println("----- Quantity Available: " + quantAvail);
             }
         }
+        */
 
         System.out.println(separator);
         System.out.println("Type [Anything] to return to Seller Menu");
@@ -1631,6 +1821,32 @@ class TestClientCore {
         System.out.println(separator);
         System.out.println("Your sales:");
 
+        request = "{getSales}";
+        clientOut.println(request);
+        response = interpretResponse(serverIn.readLine());
+
+        for (int i = 1; i < response.length; i++) {
+            if (response[i].contains(";")) {
+                System.out.println("- Store: " + response[i].substring(1));
+            } else {
+                String productName = response[i].substring(0, response[i].indexOf("~"));
+                String saleQuantity = response[i].substring(response[i].indexOf("~") + 1);
+
+                request = "{getProductInfo}," + productName;
+                clientOut.println(request);
+                String[] infoResponse = interpretResponse(serverIn.readLine());
+
+                System.out.println("--- Item: " + productName);
+                System.out.println("----- Price: " + infoResponse[3]);
+                System.out.println("----- Quantity Sold: " + saleQuantity);
+
+                String formatted = String.format("%.2f",
+                        Double.parseDouble(String.valueOf(Integer.parseInt(saleQuantity) * Double.parseDouble(infoResponse[3]))));
+                System.out.println("----- Profit Made: " + formatted);
+            }
+        }
+
+        /*
         ArrayList<ArrayList<Object>> temp = null; //(Added "null;" so this could run)
         //        FileManager.getSellerAllData((Seller) user); //FILE MANAGER
         for (int i = 0; i < temp.size(); i++) {
@@ -1649,6 +1865,7 @@ class TestClientCore {
                 System.out.println("----- Profit Made: " + formatted);
             }
         }
+        */
 
         System.out.println(separator);
         System.out.println("Type [Anything] to return to Seller Menu");
@@ -1666,7 +1883,7 @@ class TestClientCore {
     }
 
     public static String[] interpretResponse(String response) {
-        if (response == null) {
+        if (response.equals("null")) {
             return null;
         }
         return response.split(",");

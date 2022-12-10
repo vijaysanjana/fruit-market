@@ -127,7 +127,7 @@ public class DataManager {
                                             line = br.readLine();
                                         }
                                         s.addStore(store);
-                                        break;
+                                        //break;
                                     }
                                 }
                                 break;
@@ -244,7 +244,6 @@ public class DataManager {
 
             try(FileWriter fw = new FileWriter(file, false)) {
                 for(Product p : s.getProducts()) {
-                    System.out.println(p.getName());
                     fw.write(p.getName() + ";"
                             + p.getDescription() + ";"
                             + p.getPrice() + ";"
