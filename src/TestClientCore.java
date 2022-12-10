@@ -349,6 +349,7 @@ class TestClientCore {
                 }
             }
         }
+        JOptionPane.showMessageDialog(null, availStores);
 
         if (!products.isEmpty()) {
             String choices = "";
