@@ -879,31 +879,28 @@ class TestClientCore {
     public static void historyMenu() throws IOException {
         ArrayList<ArrayList<Object>> history = null; //(added "null;" so this could run)
         //        FileManager.getCustomerData((Customer) user); //FILE MANAGER
-
-        System.out.println(separator);
-        System.out.println("Your purchase history:");
+        String hist = "";
+        hist += "Your purchase history:";
         if (history == null || history.size() == 0) {
-            System.out.println("- No purchases found");
+            hist += "\n- No purchases found";
         } else {
             for (ArrayList<Object> arr : history) {
                 int quant = Integer.parseInt((String) arr.get(0));
                 Product prod = (Product) arr.get(1);
-                System.out.println("- " + prod.getName());
-                System.out.println("--- Price Each: " + prod.getPrice());
-                System.out.println("--- Quantity Purchased: " + quant);
-                System.out.println("--- Total Price: " +
-                        String.format("%.2f", (prod.getPrice() * quant)));
+                hist += "\n- " + prod.getName();
+                hist += "\n--- Price Each: " + prod.getPrice();
+                hist += "\n--- Quantity Purchased: " + quant;
+                hist += "\n--- Total Price: " +
+                        String.format("%.2f", (prod.getPrice() * quant));
             }
-            System.out.println("You have purchased " +
-                    ((Customer) user).getTotalPurchasedProducts() + "fruits in total!");
+            hist += "\nYou have purchased " +
+                    ((Customer) user).getTotalPurchasedProducts() + "fruits in total!";
         }
-        System.out.println(separator);
-        System.out.println("Please enter:");
-        System.out.println("[EX] Export Purchase History CSV");
-        System.out.println("[Anything Else] Return to Customer Menu: ");
-        String action = sc.nextLine();
+        JOptionPane.showMessageDialog(null, hist);
+        String[] options = {"Export Purchase History CSV", "Return to Customer Menu"};
+        int action = JOptionPane.showOptionDialog(null, "Please choose:", "Choice", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 
-        if (action.equalsIgnoreCase("ex")) {
+        if (action == 0) {
             //FileManager.exportCustomerHistory((Customer) user); //FILE MANAGER
             System.out.println("Returning to customer menu...");
         }
@@ -912,8 +909,8 @@ class TestClientCore {
 
     public static void dashboardMenu(int sortMode) throws IOException {
         if (user instanceof Customer) {
-            System.out.println(separator);
-            System.out.println("All Available Stores:");
+            String availStores = "";
+            availStores += "All Available Stores:";
             ArrayList<Store> stores = new ArrayList<>();
             switch (sortMode) {
                 case 1:
@@ -934,42 +931,32 @@ class TestClientCore {
 
             for (Store store : stores) {
                 int soldToUser = store.getQuantityOfProductsBoughtByCustomer((Customer) user);
-                System.out.println("- " + store.getName());
-                System.out.println("--- Total Products Sold: " +
-                        store.getTotalSoldProducts());
-                System.out.println("--- Total Products Sold to You: " + soldToUser);
+                availStores += "\n- " + store.getName();
+                availStores += "\n--- Total Products Sold: " +
+                        store.getTotalSoldProducts();
+                availStores += "\n--- Total Products Sold to You: " + soldToUser;
             }
+            String[] options = {"Sort Stores by Total Fruits Sold (High to Low)", "Sort Stores by Total Fruits Sold (Low to High)", "Sort Stores by Total Fruits Sold to You (High to Low)", "Sort Stores by Total Fruits Sold to You (Low to High)", "Return to Customer Menu"};
             System.out.println(separator);
-            System.out.println("Please enter:");
-            System.out.println("[1] Sort Stores by Total Fruits Sold (High to Low)");
-            System.out.println("[2] Sort Stores by Total Fruits Sold (Low to High)");
-            System.out.println("[3] Sort Stores by Total Fruits Sold to You (High to Low)");
-            System.out.println("[4] Sort Stores by Total Fruits Sold to You (Low to High)");
-            System.out.println("[Anything Else] Return to Customer Menu");
+            int productPick = JOptionPane.showOptionDialog(null, "Please choose:", "Choice", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 
-            String productPick = sc.nextLine();
-            if (productPick.equalsIgnoreCase("1")) {
+            if (productPick == 0) {
                 dashboardMenu(1);
-            } else if (productPick.equalsIgnoreCase("2")) {
+            } else if (productPick == 1) {
                 dashboardMenu(2);
-            } else if (productPick.equalsIgnoreCase("3")) {
+            } else if (productPick == 2) {
                 dashboardMenu(3);
-            } else if (productPick.equalsIgnoreCase("4")) {
+            } else if (productPick == 3) {
                 dashboardMenu(4);
             } else {
                 customerMainMenu();
             }
         } else if (user instanceof Seller) {
-            System.out.println(separator);
-            System.out.println("Please enter:");
-            System.out.println("[1] View Sales Statistics");
-            System.out.println("[2] View Customer Statistics");
-            System.out.println("[Anything Else] Return to Seller Menu");
-
-            String statChoice = sc.nextLine();
-            if (statChoice.equalsIgnoreCase("1")) {
+            String[] options = {"View Sales Statistics", "View Customer Statistics", "Return to Seller Menu"};
+            int statChoice = JOptionPane.showOptionDialog(null, "Please Choose:", "Choice", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+            if (statChoice == 0) {
                 productSalesStatsDashboard(0);
-            } else if (statChoice.equalsIgnoreCase("2")) {
+            } else if (statChoice == 1) {
                 customerSalesStatsDashboard(0);
             } else {
                 sellerMainMenu();
@@ -1081,17 +1068,13 @@ class TestClientCore {
      * @param user
      */
     public static void deleteAccount(User user) throws IOException {
-        System.out.println(separator);
-        System.out.println("WARNING: Are you sure you want to delete your account?");
-        System.out.println("WARNING: All user data will be lost and will NOT be recoverable!");
-        System.out.println("WARNING: THIS DECISION IS FINAL!");
-        System.out.println(separator);
-        System.out.println("Please enter: ");
-        System.out.println("[DELETE] Delete Account (All Caps Required)");
-        System.out.println("[Anything Else] Cancel & Return to Main Menu");
-
-        String action = sc.nextLine();
-        if (action.equals("DELETE")) {
+        String warning = "";
+        warning += "WARNING: Are you sure you want to delete your account?";
+        warning += "\nAll user data will be lost and will NOT be recoverable!";
+        warning += "\nTHIS DECISION IS FINAL!";
+        String[] options = {"Delete Account", "Cancel & Return to Main Menu"};
+        int action = JOptionPane.showOptionDialog(null, warning, "Warning", JOptionPane.WARNING_MESSAGE, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+        if (action == 0) {
             //FileManager.removeAccount(user); //FILE MANAGER
         } else {
             if (user instanceof Customer) {
