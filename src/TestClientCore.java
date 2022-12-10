@@ -98,8 +98,7 @@ class TestClientCore {
                             break system_loop;
                             //} else if (user instanceof Seller) {
                         } else if (customerSeller.equals("S")) {
-                            System.out.println(separator);
-                            System.out.println("Welcome seller: " + username);
+                            JOptionPane.showMessageDialog(null, "Welcome seller: " + username);
                             //System.out.println("Welcome seller: " + user.getUsername());
 
                             // TESTING
@@ -127,23 +126,23 @@ class TestClientCore {
 
                         customer_seller:
                         while (true) {
-                            System.out.println("Are you signing up to be a customer or seller?");
+                            String[] options = {"Customer", "Seller"};
+                            customerSeller = String.valueOf(JOptionPane.showOptionDialog(null, "Are you signing up to be a customer or seller?", "Signup", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]));
                             System.out.println("Please enter: " + "\n[1] Customer" + "\n[2] Seller");
                             customerSeller = sc.nextLine();
 
-                            if (customerSeller.equals("1")) {
+                            if (customerSeller.equals("0")) {
                                 request = "{Signup}," + username + "," + email + "," + password + ",customer";
                                 clientOut.println(request);
                                 response = interpretResponse(serverIn.readLine());
                                 if (response != null) {
-                                    System.out.println("Successfully signed up! Logging you in...");
+                                    JOptionPane.showMessageDialog(null, "Successfully signed up! Logging you in...");
                                     request = "{Login}," + email + "," + password;
                                     clientOut.println(request);
                                     response = interpretResponse(serverIn.readLine());
                                     customerSeller = response[1];
                                     if (customerSeller.equals("C")) {
-                                        System.out.println(separator);
-                                        System.out.println("Welcome customer: " + username);
+                                        JOptionPane.showMessageDialog(null, "Welcome customer: " + username);
                                         customerMainMenu();
                                         //System.out.println("Welcome customer: " + user.getUsername());
                                         break system_loop;
@@ -167,14 +166,13 @@ class TestClientCore {
                                 clientOut.println(request);
                                 response = interpretResponse(serverIn.readLine());
                                 if (response != null) {
-                                    System.out.println("Successfully signed up! Logging you in...");
+                                    JOptionPane.showMessageDialog(null, "Successfully signed up! Logging you in...");
                                     request = "{Login}," + email + "," + password;
                                     clientOut.println(request);
                                     response = interpretResponse(serverIn.readLine());
                                     customerSeller = response[1];
                                     if (customerSeller.equals("S")) {
-                                        System.out.println(separator);
-                                        System.out.println("Welcome seller: " + username);
+                                        JOptionPane.showMessageDialog(null, "Welcome seller: " + username);
                                         sellerMainMenu();
                                         //System.out.println("Welcome seller: " + user.getUsername());
                                         break system_loop;
@@ -902,7 +900,7 @@ class TestClientCore {
 
         if (action == 0) {
             //FileManager.exportCustomerHistory((Customer) user); //FILE MANAGER
-            System.out.println("Returning to customer menu...");
+            JOptionPane.showMessageDialog(null, "Returning to customer menu...");
         }
         customerMainMenu();
     }
