@@ -1072,7 +1072,7 @@ class TestClientCore {
                 String saleQuantity = response[i].substring(response[i].indexOf("~") + 1);
                 show = show + ", cusomters:";
                 show = show + " - " + customerName + " ("
-                        + salequantity + " Fruits Purchased)";
+                        + saleQuantity + " Fruits Purchased)";
             }
             show = show + "\n";
         }
@@ -1199,6 +1199,7 @@ class TestClientCore {
         request = "{getStoreNames}";
         clientOut.println(request);
         response = interpretResponse(serverIn.readLine());
+        String[] yourStores = new String[response.length - 1];
 
         //int counter = 0;
         System.out.println(separator);
@@ -1209,6 +1210,7 @@ class TestClientCore {
         } else {
             for (int i = 1; i < response.length; i++) {
                 System.out.println("- #" + (i) + " " + response[i]);
+                yourStores[i - 1] = response[i];
             }
         }
 
@@ -1238,7 +1240,7 @@ class TestClientCore {
                     String storeName = yourStores[Integer.parseInt(storeAction) - 1];
                     //Store store = ((Seller) user).getStores().get( //TODO: Remove this
                     //        Integer.parseInt(storeAction) - 1);
-                    String show = "Store: " + store.getName() + "\n";
+                    String show = "Store: " + storeName + "\n";
                     show = show + "Fruits:";
 
                     request = "{getProductNames}," + storeName;
@@ -1280,7 +1282,7 @@ class TestClientCore {
                             request = "{getProductInfo}," + productName;
                             clientOut.println(request);
                             response = interpretResponse(serverIn.readLine());
-                            showProductInfo(response[1], response[2], response[3], response[4]);
+                            showProductInfo(response);
                             //Product prod = store.getProducts().get(
                             //        Integer.parseInt(productPick) - 1);
                             //showProductInfo(prod);
@@ -1516,9 +1518,9 @@ class TestClientCore {
      *
      * @param storeName
      */
-    public static void addNewProduct(Store store) throws IOException {
-                String name = JOptionPane.showInputDialog("Enter new fruit name: ");
-        String name = sc.nextLine();
+    public static void addNewProduct(String storeName) throws IOException {
+        String name = JOptionPane.showInputDialog("Enter new fruit name: ");
+        //String name = sc.nextLine();
         if (name.contains(",") || name.contains(";")) {
             if (!tryAgain("Fruit name cannot contain ',' or ';'!")) {
                 sellerMainMenu();
