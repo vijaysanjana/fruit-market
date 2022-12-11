@@ -307,7 +307,7 @@ class TestClientCore {
         } else if (action == 4) {
             dashboardMenu(0);
         } else if (action == 5) {
-            deleteAccount(user);
+            deleteAccount(userEmail);
         } else if (action == 6) {
             printFarewell();
         } else {
@@ -893,44 +893,10 @@ class TestClientCore {
                     + response[2]
                     + " fruits for $" + allTotalPrice + ". Would you like to complete the purchase?", "Choose", JOptionPane.YES_NO_OPTION, JOptionPane.NO_OPTION, null, options, options[0]);
             if (purchaseAction == 0) {
-                for (String sale : heldSales) {
-                    request = "{getSaleByName}," + sale;
+                for (String sale : heldSales) { //purchase sales add to customer and store
+                    request = "{purchaseAllHeldSales}," + userEmail;
                     clientOut.println(request);
-                    response = interpretResponse(serverIn.readLine());
-
-                    /* //FILE MANAGER
-                    int quantitySold = FileManager.getCustomerShoppingCartQuantity((Customer) user, p);
-                    ((Customer) user).addSale(heldPurchase);
-                    FileManager.addCustomerData((Customer) user,
-                            heldPurchase.getProduct(), quantitySold); //add to history
-                    System.out.println("Purchased " + quantitySold
-                            + " " + p.getName() + "!"); //announce purchase
-                    FileManager.updateCustomerShoppingCart((Customer)
-                            user, p, 0); //remove from cart
-                     */
-                    //TODO: SELLER END SERVER STUFF FOR NATHAN
-                    /*
-                    Seller tempSeller = null;
-                    Store tempStore = null;
-                    seller_find_loop:
-                    for (Seller seller : mp.getSellers()) {
-                        for (Store store : seller.getStores()) {
-                            for (Product prod : store.getProducts()) {
-                                if (prod.getName().equals(p.getName())
-                                        && prod.getDescription().equals(p.getDescription())
-                                        && prod.getPrice() == p.getPrice()) {
-                                    store.addSale(heldPurchase);
-                                    tempSeller = seller;
-                                    tempStore = store;
-                                    break seller_find_loop;
-                                }
-                            }
-                        }
-                    }
-                    */
-                    //TODO: ^^^^^
-                    //FileManager.updateSellerData(tempSeller, tempStore, //FILE MANAGER
-                    //        p, p.getQuantity(), quantitySold);
+                    serverIn.readLine();
                 }
                 request = "{removeAllProductsFromShoppingCart}," + userEmail;
                 clientOut.println(request);
@@ -980,7 +946,11 @@ class TestClientCore {
     }
 
     public static void dashboardMenu(int sortMode) throws IOException {
-        if (user instanceof Customer) {
+        request = "{getUserBasicData}," + userEmail;
+        clientOut.println(request);
+        response = interpretResponse(serverIn.readLine());
+        String userType = response[3];
+        if (userType.equals("C")) {
             String availStores = "";
             availStores += "All Available Stores:";
             ArrayList<String> stores = new ArrayList<>();
@@ -1039,7 +1009,7 @@ class TestClientCore {
             } else {
                 customerMainMenu();
             }
-        } else if (user instanceof Seller) {
+        } else if (userType.equals("S")) {
             String[] options = {"View Sales Statistics", "View Customer Statistics", "Return to Seller Menu"};
             int statChoice = JOptionPane.showOptionDialog(null, "Please Choose:", "Choice", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
             if (statChoice == 0) {
@@ -1140,9 +1110,9 @@ class TestClientCore {
     /**
      * Deletes an account
      *
-     * @param user
+     * @param userEmail
      */
-    public static void deleteAccount(User user) throws IOException {
+    public static void deleteAccount(String userEmail) throws IOException {
         String warning = "";
         warning += "WARNING: Are you sure you want to delete your account?";
         warning += "\nAll user data will be lost and will NOT be recoverable!";
@@ -1150,7 +1120,9 @@ class TestClientCore {
         String[] options = {"Delete Account", "Cancel & Return to Main Menu"};
         int action = JOptionPane.showOptionDialog(null, warning, "Warning", JOptionPane.WARNING_MESSAGE, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
         if (action == 0) {
-            //FileManager.removeAccount(user); //FILE MANAGER
+            request = "{getDeleteAccount}," + userEmail;
+            clientOut.println(request);
+            serverIn.readLine();
         } else {
             request = "{getUserBasicData}," + userEmail;
             clientOut.println(request);
@@ -1179,7 +1151,7 @@ class TestClientCore {
         } else if (action == 3) {
             dashboardMenu(0);
         } else if (action == 4) {
-            deleteAccount(user);
+            deleteAccount(userEmail);
         } else if (action == 5) {
             printFarewell();
         } else {

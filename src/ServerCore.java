@@ -266,6 +266,15 @@ class ServerCore {
                             serverOut.println(response);
                             break;
 
+                        case "{getDeleteAccount}":
+                            response = getDeleteAccountRequest(request);
+                            serverOut.println(response);
+                            break;
+
+                        case "{purchaseAllHeldSales}":
+                            response = purchaseAllHeldSalesRequest(request);
+                            serverOut.println(response);
+                            break;
 
                         default:
                     }
@@ -625,6 +634,14 @@ class ServerCore {
             return "{getUserBasicData}," + givenUser.getEmail() + "," + givenUser.getUsername() + "," + userType;
         }
 
+        public String getDeleteAccountRequest(String[] request) {
+            User givenUser = mp.getUser(request[1]);
+            String userType;
+            DataManager.removeAccount(givenUser);
+            return "{getDeleteAccount}";
+        }
+
+
         // adds product to customers shopping cart using param(email, product name, quantity being purchased)
         public String addToCustomerShoppingCartRequest(String[] request) {
             Customer customer = (Customer) mp.getUser(request[1]);
@@ -759,6 +776,18 @@ class ServerCore {
             return "{getQuantityOfProductsBoughtByCustomer}," + soldToUser + "," + store.getTotalSoldProducts();
         }
 
+        public String purchaseAllHeldSalesRequest(String[] request) {
+            Customer customer = (Customer) mp.getUser(request[1]);
+            for (Sale sale : customer.getShoppingCart().getHeldPurchases()) {
+                customer.addSale(sale);
+                for (Store store : mp.getStores()) {
+                    if (store.getProducts().contains(sale.getProduct())) {
+                        store.addSale(sale);
+                    }
+                }
+            }
+            return "{purchaseAllHeldSales}";
+        }
 
     }
 }
