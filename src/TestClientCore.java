@@ -1086,7 +1086,7 @@ class TestClientCore {
     public static void productSalesStatsDashboard(int sortMode) throws IOException {
         String show = "Your Stores: \n";
 
-        request = "{getProductStats}" + sortMode;
+        request = "{getProductStats}," + sortMode;
         clientOut.println(request);
         response = interpretResponse(serverIn.readLine());
 
@@ -1102,6 +1102,8 @@ class TestClientCore {
             }
             show = show + "\n";
         }
+
+        JOptionPane.showMessageDialog(null, show, "Statistics", JOptionPane.INFORMATION_MESSAGE);
 
         String[] options = {"[1] Sort Products by Sales (High to Low)", "[2] Sort Products by Sales (Low to High)", "[Anything Else] Return to Statistics Dashboard Menu"};
         int productPick = JOptionPane.showOptionDialog(null, "Please enter:", "Choice", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);

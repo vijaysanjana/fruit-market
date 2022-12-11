@@ -276,6 +276,11 @@ class ServerCore {
                             serverOut.println(response);
                             break;
 
+                        case "{getProductStats}":
+                            response = getProductStatsRequest(request);
+                            serverOut.println(response);
+                            break;
+
                         default:
                     }
 
@@ -552,6 +557,7 @@ class ServerCore {
 
         public String getProductStatsRequest(String[] request) {
 
+            System.out.println("stats method in");
             String response = "{getProductStats}";
             for (Store store : ((Seller) user).getStores()) {
                 ArrayList<Product> products;
@@ -566,6 +572,8 @@ class ServerCore {
                         products = store.getProducts();
                 }
 
+                System.out.println("got the products");
+
                 if (products.size() > 0) {
                     response += ",;" + store.getName();
                     for (Product product : products) {
@@ -573,6 +581,7 @@ class ServerCore {
                     }
                 }
             }
+            System.out.println("returning this: " + response);
             return response;
         }
 
