@@ -76,7 +76,7 @@ class ServerCore {
                 System.out.println("Server interpreted request"); //Test
                 String response = "";
                 while (request != null) {
-                    System.out.println("Request is not null"); //Test
+                    System.out.println("Request recieved: " + request[0]); //Test
 
                     switch (request[0]) {
                         case "{Login}":
@@ -578,6 +578,7 @@ class ServerCore {
 
         //gets all products and their data of certain store
         public String getProductsRequest(String[] request) {
+            System.out.println("getMeSomeProducts");
             String temp = "";
             String storeName = request[1];
             Store store = mp.getStore(storeName);
@@ -586,6 +587,7 @@ class ServerCore {
                 if (store.getProducts().indexOf(p) != store.getProducts().size() - 1) // not last item in list
                     temp += ",";
             }
+            System.out.println("Returning this thing!!" + temp);
             return "{getProducts}," + temp;
         }
 
@@ -631,6 +633,7 @@ class ServerCore {
             if (givenUser instanceof Customer)
                 userType = "C";
             else userType = "S";
+            System.out.println("UserType: " + userType);
             return "{getUserBasicData}," + givenUser.getEmail() + "," + givenUser.getUsername() + "," + userType;
         }
 

@@ -164,7 +164,7 @@ class TestClientCore {
                                         break system_loop;
                                     }
                                 }
-                            } else if (customerSeller.equals("2")) {
+                            } else if (customerSeller.equals("1")) {
 
                                 request = "{Signup}," + username + "," + email + "," + password + ",seller";
                                 clientOut.println(request);
@@ -292,7 +292,7 @@ class TestClientCore {
         String totalHeldProducts = response[1];
 
         String[] options = {"Open Marketplace", "Search for Fruit", "View Shopping Cart ("
-                + shoppingCart.getTotalheldProducts() + " Fruits)", "View Purchase History", "View Statistics Dashboard", "Delete Account", "Logout & Quit"};
+                + totalHeldProducts + " Fruits)", "View Purchase History", "View Statistics Dashboard", "Delete Account", "Logout & Quit"};
         int action = JOptionPane.showOptionDialog(null, "What would you like to do today?", "Choice", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 
         if (action == 0) {
@@ -330,20 +330,35 @@ class TestClientCore {
 
         availStores += "All available stores:";
 
-        int counter = 0;
-
         for (String s : storeNames) {
-            request = "{getProductsRequest}," + s;
+            System.out.println("Store Name: " + s);
+        }
+
+        int counter = 0;
+        System.out.println("found the stores"); //TODO: TEST
+        for (String s : storeNames) {
+            System.out.println("finding products in store"); //TODO: TEST
+            request = "{getProducts}," + s;
             clientOut.println(request);
             response = interpretResponse(serverIn.readLine());
-            products.addAll(Arrays.asList(interpretListedResponse(response[1])));
+            for (String listedResponse : response) {
+                if (!listedResponse.equals("{getProducts}")) {
+                    products.add(interpretListedResponse(listedResponse)[0]);
+                }
+            }
+            //products.addAll(Arrays.asList(interpretListedResponse(response[1])));
+            for (String p : products) {
+                System.out.println("product: " + p);
+            }
             availStores += "\n- " + s;
             if (storeNames.length == 0) {
                 availStores += "\n--- No fruits found";
             } else {
                 for (String p : products) {
+                    System.out.println("goin through the products");
                     allProducts.add(p);
-                    request = "{getProductByName}," + p;
+                    //request = "{getProductByName}," + s + p;
+                    request = "{getProductInfo}," + p;
                     clientOut.println(request);
                     response = interpretResponse(serverIn.readLine());
                     availStores += "\n--- #" + (counter + 1) + " " +
@@ -353,6 +368,7 @@ class TestClientCore {
                 }
             }
         }
+        System.out.println("bouta print some info"); //TODO: TEST
         JOptionPane.showMessageDialog(null, availStores);
 
         if (!products.isEmpty()) {
@@ -945,6 +961,7 @@ class TestClientCore {
     }
 
     public static void dashboardMenu(int sortMode) throws IOException {
+        System.out.println("dashboard attempted");
         request = "{getUserBasicData}," + userEmail;
         clientOut.println(request);
         response = interpretResponse(serverIn.readLine());
@@ -1009,6 +1026,7 @@ class TestClientCore {
                 customerMainMenu();
             }
         } else if (userType.equals("S")) {
+            System.out.println("seller detected");
             String[] options = {"View Sales Statistics", "View Customer Statistics", "Return to Seller Menu"};
             int statChoice = JOptionPane.showOptionDialog(null, "Please Choose:", "Choice", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
             if (statChoice == 0) {
@@ -1763,6 +1781,7 @@ class TestClientCore {
     }
 
     public static String[] interpretResponse(String response) {
+        System.out.println(response);
         if (response.equals("null")) {
             return null;
         }
