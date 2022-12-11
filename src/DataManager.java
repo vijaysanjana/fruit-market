@@ -311,7 +311,9 @@ public class DataManager {
                                                     }
 
                                                     if(hasProduct && prod != null) {
-                                                        Sale sale = new Sale(c, prod, Integer.parseInt(hist[1]));
+                                                        Sale sale = new Sale(c, prod,
+                                                                Integer.parseInt(hist[1]),
+                                                                Double.parseDouble(hist[2]));
                                                         c.addSale(sale);
                                                         store.addSale(sale);
                                                     } else {
@@ -319,7 +321,9 @@ public class DataManager {
                                                                 (Double.parseDouble(hist[2])
                                                                         /Integer.parseInt(hist[1])),
                                                                 Integer.parseInt(hist[1]));
-                                                        Sale sale = new Sale(c, prod, Integer.parseInt(hist[1]));
+                                                        Sale sale = new Sale(c, prod,
+                                                                Integer.parseInt(hist[1]),
+                                                                Double.parseDouble(hist[2]));
                                                         c.addSale(sale);
                                                     }
 
