@@ -332,6 +332,9 @@ public class MarketPlace {
         for (User u : getCustomers())
             if (u.getEmail().equals(email))
                 return u;
+        for (User u : getSellers())
+            if (u.getEmail().equals(email))
+                return u;
         return null;
     }
 
