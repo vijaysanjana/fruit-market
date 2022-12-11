@@ -322,7 +322,7 @@ public class MarketPlace {
     //get Store object by store name
      public Store getStore(String storeName) {
         for (Store s : getStores())
-            if (s.getName().equals(storeName))
+            if (s.getName().equalsIgnoreCase(storeName))
                 return s;
         return null;
      }
@@ -330,10 +330,10 @@ public class MarketPlace {
     //gets user object by User's email
     public User getUser(String email) {
         for (User u : getCustomers())
-            if (u.getEmail().equals(email))
+            if (u.getEmail().equalsIgnoreCase(email))
                 return u;
         for (User u : getSellers())
-            if (u.getEmail().equals(email))
+            if (u.getEmail().equalsIgnoreCase(email))
                 return u;
         return null;
     }
@@ -341,7 +341,7 @@ public class MarketPlace {
     //gets product object by product's name
     public Product getProduct(String productName) {
         for (Product p : getProducts())
-            if (p.getName().equals(productName))
+            if (p.getName().equalsIgnoreCase(productName))
                 return p;
         return null;
     }
