@@ -37,6 +37,14 @@ public class Sale {
         this.name = customer.getUsername() + customer.getPurchases().size();
     }
 
+    public Sale(Customer customer, Product product, int quantity, double totalCost) {
+        this.customer = customer;
+        this.product = product;
+        this.quantity = quantity;
+        this.totalCost = totalCost;
+        this.name = customer.getUsername() + customer.getPurchases().size();
+    }
+
 
     //Getters and Setters
     public Customer getCustomer() {

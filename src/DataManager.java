@@ -30,14 +30,41 @@ public class DataManager {
 
     public static void main(String[] args) {
         MarketPlace mp = new MarketPlace();
+        loadEverything(mp);
+
         Product p1 = new Product("RGB Apples", "It's apples but with a hint of artificial coloring!", 29.99, 5);
         Product p2 = new Product("Gamer Fuel", "It's fuel, but for gamers!", 5.99, 100);
         Store s1 = new Store("Gamer Store", "");
+        Seller sel = new Seller("jack", "jack@gmail.com", "pw");
+        Customer cus = new Customer("john", "john@gmail.com", "pw");
 
-        s1.addProduct(p1);
-        s1.addProduct(p2);
+        for(Store s : mp.getStores()) {
+            System.out.println("STORE: " + s.getName());
+        }
+        for(Product p : mp.getProducts()) {
+            System.out.println("PROD: " + p.getName());
+        }
 
-        loadEverything(mp);
+//        ShoppingCart sc = mp.getCustomer(0).getShoppingCart();
+//        ArrayList<Sale> ss = sc.getHeldPurchases();
+//        ss.add(new Sale(mp.getCustomer(0), mp.getProduct("busan berry"), 27));
+//        mp.getCustomer(0).setShoppingCart(sc);
+
+//        ArrayList<Sale> pur = new ArrayList<>();
+//        pur.add(new Sale(mp.getCustomer(0), mp.getProduct("rgb apples"), 3));
+//        mp.getCustomer(0).setPurchases(pur);
+
+//        for(Sale s : mp.getCustomer(0).getShoppingCart().getHeldPurchases()) {
+//            System.out.println("CUST: " + s.getCustomer());
+//            System.out.println("PRODNAME: " + s.getProduct().getName());
+//            System.out.println("QUANT: " + s.getQuantity());
+//        }
+
+        for(Sale s : mp.getCustomer(0).getPurchases()) {
+            System.out.println(s.getProduct().getName());
+            System.out.println();
+        }
+
         saveEverything(mp);
     }
 
@@ -97,7 +124,9 @@ public class DataManager {
                                 customer = new Customer(logs.get(1), logs.get(2), logs.get(3));
                             }
                         }
-                        mp.addCustomer(customer);
+                        if(customer != null) {
+                            mp.addCustomer(customer);
+                        }
                     }
                 }
             }
@@ -128,7 +157,9 @@ public class DataManager {
                                 seller = new Seller(logs.get(1), logs.get(2), logs.get(3));
                             }
                         }
-                        mp.addSeller(seller);
+                        if(seller != null) {
+                            mp.addSeller(seller);
+                        }
                     }
                 }
             }
@@ -170,7 +201,6 @@ public class DataManager {
                                                     line = br.readLine();
                                                 }
                                                 s.addStore(store);
-                                                break;
                                             }
                                         }
                                         break;
@@ -214,7 +244,8 @@ public class DataManager {
 
                                                     for (Product p : mp.getProducts()) {
                                                         if (p.getName().equalsIgnoreCase(name)) {
-                                                            c.getShoppingCart().addPurchase(new Sale(c, p));
+                                                            Sale sale = new Sale(c, p, Integer.parseInt(cart[1]));
+                                                            c.getShoppingCart().addPurchase(sale);
                                                             break;
                                                         }
                                                     }
@@ -263,16 +294,37 @@ public class DataManager {
                                                     String[] hist = line.split(";");
                                                     String name = hist[0];
 
+                                                    boolean hasProduct = false;
+                                                    Product prod = null;
+                                                    Store store = null;
+
                                                     store_loop:
                                                     for (Store s : mp.getStores()) {
                                                         for (Product p : s.getProducts()) {
                                                             if (p.getName().equalsIgnoreCase(name)) {
-                                                                Sale sale = new Sale(c, p, Integer.parseInt(hist[1]));
-                                                                c.addSale(sale);
-                                                                s.addSale(sale);
+                                                                hasProduct = true;
+                                                                prod = p;
+                                                                store = s;
+                                                                break store_loop;
                                                             }
-                                                            break store_loop;
                                                         }
+                                                    }
+
+                                                    if(hasProduct && prod != null) {
+                                                        Sale sale = new Sale(c, prod,
+                                                                Integer.parseInt(hist[1]),
+                                                                Double.parseDouble(hist[2]));
+                                                        c.addSale(sale);
+                                                        store.addSale(sale);
+                                                    } else {
+                                                        prod = new Product(name, "",
+                                                                (Double.parseDouble(hist[2])
+                                                                        /Integer.parseInt(hist[1])),
+                                                                Integer.parseInt(hist[1]));
+                                                        Sale sale = new Sale(c, prod,
+                                                                Integer.parseInt(hist[1]),
+                                                                Double.parseDouble(hist[2]));
+                                                        c.addSale(sale);
                                                     }
 
                                                     line = br.readLine();
@@ -315,7 +367,6 @@ public class DataManager {
 
             try (FileWriter fw = new FileWriter(file, false)) {
                 for (Product p : s.getProducts()) {
-                    System.out.println(p.getName());
                     fw.write(p.getName() + ";"
                             + p.getDescription() + ";"
                             + p.getPrice() + ";"
@@ -383,7 +434,7 @@ public class DataManager {
 
         try (FileWriter fw = new FileWriter(file, false)) {
             for (Sale s : customer.getPurchases()) {
-                fw.write(s.getName() + ";"
+                fw.write(s.getProduct().getName() + ";"
                         + s.getQuantity() + ";"
                         + s.getTotalCost());
                 fw.write("\n");
@@ -414,7 +465,7 @@ public class DataManager {
 
         try (FileWriter fw = new FileWriter(file, false)) {
             for (Sale s : customer.getShoppingCart().getHeldPurchases()) {
-                fw.write(s.getName() + ";"
+                fw.write(s.getProduct().getName() + ";"
                         + s.getQuantity());
                 fw.write("\n");
             }
@@ -545,7 +596,7 @@ public class DataManager {
         try {
             FileWriter fw = new FileWriter(output);
             for (Sale s : customer.getPurchases()) {
-                fw.write(s.getName() + "," + s.getQuantity() + "," + s.getTotalCost());
+                fw.write(s.getProduct().getName() + "," + s.getQuantity() + "," + s.getTotalCost());
                 fw.write("\n");
             }
 
@@ -564,6 +615,16 @@ public class DataManager {
      * @return ArrayList<String> {type[0], username[1], email[2], password[3]}
      */
     public static ArrayList<ArrayList<String>> getUserLogins() {
+        if (!userDataFile.exists()) {
+            try {
+                userDataFile.createNewFile();
+            } catch (Exception e) {
+                throw new RuntimeException(
+                        new DataException(e.getMessage(), "User data file creation", userDataFile)
+                );
+            }
+        }
+
         ArrayList<ArrayList<String>> data = new ArrayList<>();
 
         try (BufferedReader br = new BufferedReader(new FileReader(userDataFile))) {
@@ -599,16 +660,6 @@ public class DataManager {
      */
     public static boolean writeUserSignup(String username, String email,
                                           String password, String type) {
-        if (!userDataFile.exists()) {
-            try {
-                userDataFile.createNewFile();
-            } catch (Exception e) {
-                throw new RuntimeException(
-                        new DataException(e.getMessage(), "User data file creation", userDataFile)
-                );
-            }
-        }
-
         if (username.contains(";") || username.contains(",")
                 || email.contains(";") || email.contains(",")
                 || password.contains(";") || password.contains(",")) {
