@@ -542,17 +542,40 @@ class ServerCore {
                 if (customers.size() > 0) {
                     response += ",;" + store.getName();
                     for (Customer customer : customers) {
-                        response += "," + customer.getUsername() + "~" + store.getQuantityOfProductsBoughtByCustomer((customer));
-                        //System.out.println(customer.getUsername() + " ("
-                        //        + store.getQuantityOfProductsBoughtByCustomer((Customer) user)
-                        //        + " Fruits Purchased)");
+                        response += "," + customer.getUsername() + "~" + store.getQuantityOfProductsBoughtByCustomer(customer);
                     }
                 }
             }
             return response;
         }
 
-        //}
+
+        public String getProductStatsRequest(String[] request) {
+
+            String response = "{getProductStats}";
+            for (Store store : ((Seller) user).getStores()) {
+                ArrayList<Product> products;
+                switch (Integer.parseInt(request[1])) {
+                    case 1:
+                        products = mp.getStoreSalesSortedProducts(store, true);
+                        break;
+                    case 2:
+                        products = mp.getStoreSalesSortedProducts(store, false);
+                        break;
+                    default:
+                        products = store.getProducts();
+                }
+
+                if (products.size() > 0) {
+                    response += ",;" + store.getName();
+                    for (Product product : products) {
+                        response += "," + product.getName() + "~" + store.getNumberOfProductsSold(product);
+                    }
+                }
+            }
+            return response;
+        }
+
 
         //gets all store names of initialized stores
         public String getAllStoresRequest(String[] request) {
