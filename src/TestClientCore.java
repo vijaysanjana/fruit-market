@@ -1205,13 +1205,14 @@ class TestClientCore {
         response = interpretResponse(serverIn.readLine());
 
         //int counter = 0;
-        String showOne = "Your stores:";
+        System.out.println(separator);
+        System.out.println("Your stores:");
 
         if (response.length <= 1) {
-            showOne = showOne + " - No stores found";
+            System.out.println("- No stores found");
         } else {
             for (int i = 1; i < response.length; i++) {
-                showOne = showOne + " - #" + (i) + " " + response[i];
+                System.out.println("- #" + (i) + " " + response[i]);
             }
         }
 
@@ -1226,54 +1227,62 @@ class TestClientCore {
         }
         */
 
-        showOne = showOne + "\nPlease enter: ";
-        showOne = showOne + "\n[Corresponding #] View Store Info";
-        showOne = showOne + "\n[AD] Add New Store";
-        showOne = showOne + "\n[Anything Else] Return to Seller Menu";
+        System.out.println(separator);
+        System.out.println("Please enter: ");
+        System.out.println("[Corresponding #] View Store Info");
+        System.out.println("[AD] Add New Store");
+        System.out.println("[Anything Else] Return to Seller Menu");
 
-        String storeAction = JOptionPane.showInputDialog(showOne);
+        String storeAction = sc.nextLine();
         if (storeAction.matches("-?\\d+(\\.\\d+)?")) {
             if (!((Seller) user).getStores().isEmpty()) {
                 try {
                     int counterAgain = 0;
                     Store store = ((Seller) user).getStores().get(
                             Integer.parseInt(storeAction) - 1);
-                    String showTwo = "Store: " + store.getName() + "\n";
-                    showTwo = showTwo + "Fruits:";
+                    String show = "Store: " + store.getName() + "\n";
+                    show = show + "Fruits:";
                     if (store.getProducts().isEmpty()) {
-                        showTwo = showTwo + " - No fruits found";
+                        show = show + " - No fruits found";
                     } else {
                         for (Product prod : store.getProducts()) {
-                            showTwo = showTwo + " - #" + (counterAgain + 1) + " "
+                            show = show + " - #" + (counterAgain + 1) + " "
                                     + prod.getName();
                             counterAgain++;
                         }
                     }
 
-                    showTwo = showTwo + "\nPlease enter: ";
-                    showTwo = showTwo + "\n[Corresponding #] View Fruit Info";
-                    showTwo = showTwo + "\n[AD] Add New Fruit";
-                    showTwo = showTwo + "\n[IM] Import Items CSV";
-                    showTwo = showTwo + "\n[EX] Export Items CSV";
-                    showTwo = showTwo + "\n[Anything Else] Return to Seller Menu";
+                    System.out.println(separator);
+                    System.out.println("Please enter: ");
+                    System.out.println("[Corresponding #] View Fruit Info");
+                    System.out.println("[AD] Add New Fruit");
+                    System.out.println("[IM] Import Items CSV");
+                    System.out.println("[EX] Export Items CSV");
+                    System.out.println("[Anything Else] Return to Seller Menu");
 
-                    String productPick = JOptionPane.showInputDialog(showTwo);
+                    String productPick = sc.nextLine();
                     if (productPick.matches("-?\\d+(\\.\\d+)?")) {
                         if (!store.getProducts().isEmpty()) {
                             Product prod = store.getProducts().get(
                                     Integer.parseInt(productPick) - 1);
                             showProductInfo(prod);
 
-                            String[] options = {"Change Quantity Available", "Change Description", "Change Price", "Remove Fruit", "Return to Seller Menu"};
-                            int productAction = JOptionPane.showOptionDialog(null, "Please enter: ", "Menu", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+                            System.out.println(separator);
+                            System.out.println("Please enter: ");
+                            System.out.println("[QU] Change Quantity Available");
+                            System.out.println("[DE] Change Description");
+                            System.out.println("[PR] Change Price");
+                            System.out.println("[RM] Remove Fruit");
+                            System.out.println("[Anything Else] Return to Seller Menu");
 
-                            if (productAction == 0) {
+                            String productAction = sc.nextLine();
+                            if (productAction.equalsIgnoreCase("qu")) {
                                 changeProductQuantity(store, prod);
-                            } else if (productAction == 1) {
+                            } else if (productAction.equalsIgnoreCase("de")) {
                                 changeProductDescription(store, prod);
-                            } else if (productAction == 2) {
+                            } else if (productAction.equalsIgnoreCase("pr")) {
                                 changeProductPrice(store, prod);
-                            } else if (productAction == 3) {
+                            } else if (productAction.equalsIgnoreCase("rm")) {
                                 removeProduct(store, prod);
                             } else {
                                 sellerMainMenu();
@@ -1378,6 +1387,7 @@ class TestClientCore {
                     addNewStore();
                 }
             } else {
+                System.out.println("Enter fruit price: ");
                 String temp = JOptionPane.showInputDialog("Enter fruit price");
                 double price = 0;
                 try {
@@ -1493,18 +1503,19 @@ class TestClientCore {
      * @param product
      */
     public static void removeProduct(Store store, Product product) throws IOException {
-        String warning = "WARNING: Are you sure you want to remove this product?\n";
-        warning = warning + "WARNING: All seller data " +
-                "corresponding with this product will be deleted.\n";
-        warning = warning + "WARNING: THIS DECISION IS FINAL";
-        JOptionPane.showMessageDialog(null, warning, "warning", JOptionPane.ERROR_MESSAGE);
+        System.out.println(separator);
+        System.out.println("WARNING: Are you sure you want to remove this product?");
+        System.out.println("WARNING: All seller data " +
+                "corresponding with this product will be deleted.");
+        System.out.println("WARNING: THIS DECISION IS FINAL");
+        System.out.println(separator);
+        System.out.println("Please enter: ");
+        System.out.println("[DELETE] Delete Product (All Caps Required)");
+        System.out.println("[Anything Else] Return to Seller Menu");
+        System.out.println(separator);
 
-
-
-        String[] options = {"Delete Product", "Return to Seller Menu"};
-        int action = JOptionPane.showOptionDialog(null, "Please enter: ", "Menu", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
-
-        if (action == 0) {
+        String action = sc.nextLine();
+        if (action.equals("DELETE")) {
             //FileManager.removeSellerDataProduct((Seller) user, store, product); //FILE MANAGER
 
             mp = new MarketPlace();
@@ -1516,7 +1527,8 @@ class TestClientCore {
                 }
             }
 
-            JOptionPane.showMessageDialog(null, "Successfully deleted " + product.getName() + "Returning to seller menu...", "returning", JOptionPane.INFORMATION_MESSAGE);
+            System.out.println("Successfully deleted " + product.getName());
+            System.out.println("Returning to seller menu...");
             sellerMainMenu();
         } else {
             sellerMainMenu();
@@ -1527,12 +1539,14 @@ class TestClientCore {
      * Displays all shopping carts
      */
     public static void cartedProductsMenu() throws IOException {
-        String show = "All carted items:\n";
+        System.out.println(separator);
+        System.out.println("All carted items:");
         ArrayList<ArrayList<String>> data = null; //(Added "null;" so this could run)
         //FileManager.getAllCarts(); //FILE MANAGER
         for (int j = 0; j < data.size(); j++) {
             ArrayList<String> arr = data.get(j);
-            show = show + " - Customer: " + arr.get(0);
+            System.out.println(separator);
+            System.out.println("- Customer: " + arr.get(0));
             for (int i = 1; i < arr.size(); i++) {
                 String s = arr.get(i);
                 String temp = s.substring(s.indexOf(';') + 1);
@@ -1546,16 +1560,16 @@ class TestClientCore {
                 String price = temp3.substring(0, temp3.indexOf(';'));
 
                 String quantAvail = temp3.substring(temp3.indexOf(';') + 1);
-                show = show + "--- Item: " + name + " (#Held: " + quant + ")";
-                show = show + "----- Description: " + desc;
-                show = show + "----- Price: " + price;
-                show = show + "----- Quantity Available: " + quantAvail;
+                System.out.println("--- Item: " + name + " (#Held: " + quant + ")");
+                System.out.println("----- Description: " + desc);
+                System.out.println("----- Price: " + price);
+                System.out.println("----- Quantity Available: " + quantAvail);
             }
-            show = show + "\n";
         }
 
-
-        JOptionPane.showMessageDialog(null, show, "Carted Items", JOptionPane.INFORMATION_MESSAGE);
+        System.out.println(separator);
+        System.out.println("Type [Anything] to return to Seller Menu");
+        String a = sc.nextLine();
         sellerMainMenu();
     }
 
@@ -1563,28 +1577,31 @@ class TestClientCore {
      * Displays all product sales
      */
     public static void salesMenu() throws IOException {
-        String show = "Your sales:";
+        System.out.println(separator);
+        System.out.println("Your sales:");
 
         ArrayList<ArrayList<Object>> temp = null; //(Added "null;" so this could run)
         //        FileManager.getSellerAllData((Seller) user); //FILE MANAGER
         for (int i = 0; i < temp.size(); i++) {
             ArrayList<Object> arr = temp.get(i);
-            show = show + " - Store: " + arr.get(0);
+            System.out.println(separator);
+            System.out.println("- Store: " + arr.get(0));
             for (int j = 2; j < arr.size(); j += 2) {
                 String q = (String) arr.get(j - 1);
                 Product p = (Product) arr.get(j);
-                show = show + "--- Item: " + p.getName();
-                show = show + "----- Price: " + p.getPrice();
-                show = show + "----- Quantity Sold: " + q;
+                System.out.println("--- Item: " + p.getName());
+                System.out.println("----- Price: " + p.getPrice());
+                System.out.println("----- Quantity Sold: " + q);
 
                 String formatted = String.format("%.2f",
                         Double.parseDouble(String.valueOf(Integer.parseInt(q) * p.getPrice())));
-                show = show + "----- Profit Made: " + formatted;
+                System.out.println("----- Profit Made: " + formatted);
             }
-            show = show + "\n";
         }
 
-        JOptionPane.showMessageDialog(null, show, "Your Sales", JOptionPane.INFORMATION_MESSAGE);
+        System.out.println(separator);
+        System.out.println("Type [Anything] to return to Seller Menu");
+        String a = sc.nextLine();
         sellerMainMenu();
     }
 
@@ -1593,7 +1610,8 @@ class TestClientCore {
      * Prints the farewell message.
      */
     public static void printFarewell() {
-        JOptionPane.showMessageDialog(null, "Thank you for visiting The MarketPlace!\n Come again another day.");
+        System.out.println("Thank you for visiting The MarketPlace!");
+        System.out.println("Come again another day.");
     }
 
     public static String[] interpretResponse(String response) {
