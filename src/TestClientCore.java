@@ -1085,31 +1085,25 @@ class TestClientCore {
      */
     public static void productSalesStatsDashboard(int sortMode) throws IOException {
         String show = "Your Stores: \n";
-        for (Store store : ((Seller) user).getStores()) {
-            show = show + " - " + store.getName();
-            ArrayList<Product> products = new ArrayList<>();
-            switch (sortMode) {
-                case 1:
-                    products = mp.getStoreSalesSortedProducts(store, true);
-                    break;
-                case 2:
-                    products = mp.getStoreSalesSortedProducts(store, false);
-                    break;
-                default:
-                    products = store.getProducts();
-            }
 
-            if (products.size() > 0) {
-                show = show + ", products:";
-                for (Product product : products) {
-                    show = show + " - " + product.getName() + " ("
-                            + store.getNumberOfProductsSold(product) + " Sold)";
-                }
+        request = "{getProductStats}," + sortMode;
+        clientOut.println(request);
+        response = interpretResponse(serverIn.readLine());
+
+        for (int i = 1; i < response.length; i++) {
+            if (response[i].contains(";")) {
+                show = show + " - " + response[i].substring(1);
             } else {
-                show = show + " --- No products found";
+                String productName = response[i].substring(0, response[i].indexOf("~"));
+                String saleQuantity = response[i].substring(response[i].indexOf("~") + 1);
+                show = show + ", products:";
+                show = show + " - " + productName + " ("
+                        + saleQuantity + " Sold)";
             }
             show = show + "\n";
         }
+
+        JOptionPane.showMessageDialog(null, show, "Statistics", JOptionPane.INFORMATION_MESSAGE);
 
         String[] options = {"[1] Sort Products by Sales (High to Low)", "[2] Sort Products by Sales (Low to High)", "[Anything Else] Return to Statistics Dashboard Menu"};
         int productPick = JOptionPane.showOptionDialog(null, "Please enter:", "Choice", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
