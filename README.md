@@ -10,8 +10,8 @@ To compile and run the project, run the ServerCore class first, and then run the
 ## Submission
 
 Sanjana Anand - Submitted Report on Brightspace.
-Jack Jiang - Submitted Vocareum Workspace.
-Sanjana Anand - Submitted Video on Brightspace.
+Nathan Whitacre - Submitted Vocareum Workspace.
+Aadit Sangwan - Submitted Video on Brightspace.
 
 # Classes
 
