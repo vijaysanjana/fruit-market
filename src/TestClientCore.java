@@ -1107,7 +1107,7 @@ class TestClientCore {
 
         JOptionPane.showMessageDialog(null, show, "Statistics", JOptionPane.INFORMATION_MESSAGE);
 
-        String[] options = {"[1] Sort Products by Sales (High to Low)", "[2] Sort Products by Sales (Low to High)", "[Anything Else] Return to Statistics Dashboard Menu"};
+        String[] options = {"Sort Products by Sales (High to Low)", "Sort Products by Sales (Low to High)", "Return to Statistics Dashboard Menu"};
         int productPick = JOptionPane.showOptionDialog(null, "Please enter:", "Choice", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 
         if (productPick == 0) {
@@ -1146,7 +1146,7 @@ class TestClientCore {
 
         JOptionPane.showMessageDialog(null, show, "Statistics", JOptionPane.INFORMATION_MESSAGE);
 
-        String[] options = {"[1] Sort Products by Sales (High to Low)", "[2] Sort Products by Sales (Low to High)", "[Anything Else] Return to Statistics Dashboard Menu"};
+        String[] options = {"Sort Products by Sales (High to Low)", "Sort Products by Sales (Low to High)", "Return to Statistics Dashboard Menu"};
         int productPick = JOptionPane.showOptionDialog(null, "Please enter:", "Choice", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 
         if (productPick == 0) {
