@@ -26,7 +26,8 @@ public class Sale {
         this.product = product;
         this.quantity = 1;
         this.totalCost = product.getPrice();
-        this.name = customer.getUsername() + customer.getPurchases().size();
+        //this.name = customer.getUsername() + customer.getPurchases().size();
+        this.name = customer.getUsername() + product.getName() + 1;
     }
 
     public Sale(Customer customer, Product product, int quantity) {
@@ -34,7 +35,8 @@ public class Sale {
         this.product = product;
         this.quantity = quantity;
         this.totalCost = product.getPrice() * quantity;
-        this.name = customer.getUsername() + customer.getPurchases().size();
+        //this.name = customer.getUsername() + customer.getPurchases().size();
+        this.name = customer.getUsername() + product.getName() + quantity;
     }
 
     public Sale(Customer customer, Product product, int quantity, double totalCost) {
@@ -42,7 +44,8 @@ public class Sale {
         this.product = product;
         this.quantity = quantity;
         this.totalCost = totalCost;
-        this.name = customer.getUsername() + customer.getPurchases().size();
+        //this.name = customer.getUsername() + customer.getPurchases().size();
+        this.name = customer.getUsername() + product.getName() + quantity;
     }
 
 

@@ -285,10 +285,15 @@ class TestClientCore {
      * Allows for navigation of the menu to see marketplace; view, search, and purchase products; and view history.
      */
     public static void customerMainMenu() throws IOException {
+        response = null;
 
         request = "{getTotalHeldProducts}," + userEmail;
+        System.out.println("getTotalHeldProducts Request: " + request);
         clientOut.println(request);
         response = interpretResponse(serverIn.readLine());
+        for (String s : response) {
+            System.out.println("getTotalHeldProducts response: " + s);
+        }
         String totalHeldProducts = response[1];
 
         String[] options = {"Open Marketplace", "Search for Fruit", "View Shopping Cart ("
@@ -790,17 +795,21 @@ class TestClientCore {
      * Accesses cart menu to see shopping cart for users
      */
     public static void cartMenu() throws IOException {
+        String heldProducts = "";
         int counter = 0;
         double allTotal = 0;
         String info = "";
         info += "Your shopping cart:";
+        ArrayList<String> salePrints = new ArrayList<>();
 
         request = "{getCustomerShoppingCart}," + userEmail;
         clientOut.println(request);
         response = interpretResponse(serverIn.readLine());
         ArrayList<String> heldSales = new ArrayList<>();
-        if (response.length != 1)
-            heldSales = (ArrayList<String>) Arrays.asList(interpretListedResponse(response[1]));
+        if (response.length != 1) {
+            heldProducts = response[2];
+            heldSales = new ArrayList<String>(Arrays.asList(interpretListedResponse(response[1])));
+        }
         if (heldSales.isEmpty()) {
             info += "\n- Empty";
         } else {
@@ -815,6 +824,7 @@ class TestClientCore {
                         + " (" + response[3] + " for $"
                         + response[4] + " each | Items Total $"
                         + totalPrice + ")";
+                salePrints.add(response[1] + " (" + response[3] + ")");
             }
         }
 
@@ -836,11 +846,16 @@ class TestClientCore {
 
             String choices = "";
             choices += "\nShopping Cart: ";
-            for (String p : heldSales) {
-                choices += "#" + (heldSales.indexOf(p) + 1) + " " + p;
-                if (heldSales.indexOf(p) != heldSales.size() - 1) // not last item in list
+            for (String s : salePrints) {
+                choices += "#" + (salePrints.indexOf(s) + 1) + " " + s;
+                if (salePrints.indexOf(s) != salePrints.size() - 1) // not last item in list
                     choices += ", ";
             }
+            //for (String p : heldSales) {
+            //    choices += "#" + (heldSales.indexOf(p) + 1) + " " + p;
+            //    if (heldSales.indexOf(p) != heldSales.size() - 1) // not last item in list
+            //        choices += ", ";
+            //}
             if (heldSales.isEmpty())
                 choices += "empty";
             choices += "\nPlease enter: ";
@@ -942,20 +957,30 @@ class TestClientCore {
 
                 request = "{getCustomerShoppingCart}," + userEmail;
                 clientOut.println(request);
-                heldSales = (ArrayList<String>) Arrays.asList(interpretListedResponse(response[1]));
+                response = interpretResponse(serverIn.readLine());
+                heldSales = new ArrayList<String>(Arrays.asList(interpretListedResponse(response[1])));
 
                 int purchaseAction = JOptionPane.showOptionDialog(null, "You are purchasing "
-                        + response[2]
+                        + heldProducts
                         + " fruits for $" + allTotalPrice + ". Would you like to complete the purchase?", "Choose", JOptionPane.YES_NO_OPTION, JOptionPane.NO_OPTION, null, options, options[0]);
                 if (purchaseAction == 0) {
-                    for (String sale : heldSales) { //purchase sales add to customer and store
+                    //for (String sale : heldSales) { //purchase sales add to customer and store
                         request = "{purchaseAllHeldSales}," + userEmail;
                         clientOut.println(request);
-                        serverIn.readLine();
-                    }
+                        //String bruh = serverIn.readLine();
+                        response = interpretResponse(serverIn.readLine());
+                        //try {
+                        //    Thread.sleep(1000);
+                        //} catch (InterruptedException e) {
+                        //}
+                    //}
                     request = "{removeAllProductsFromShoppingCart}," + userEmail;
                     clientOut.println(request);
-                    serverIn.readLine();
+                    //bruh = serverIn.readLine();
+                    response = interpretResponse(serverIn.readLine());
+                    //for (String s : response) {
+                    //    System.out.println("removeAllProductsFromShoppingCart Response: " + s);
+                    //}
                     JOptionPane.showMessageDialog(null, "Returning to customer menu page...");
                     customerMainMenu();
                 } else {

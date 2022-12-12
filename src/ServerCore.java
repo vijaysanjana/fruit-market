@@ -161,6 +161,7 @@ class ServerCore {
                         case "{getCustomerShoppingCart}":
                             response = getCustomerShoppingCartRequest(request);
                             serverOut.println(response);
+                            break;
 
                         case "{getStoreNames}":
                             response = getStoreNamesRequest(request);
