@@ -33,7 +33,7 @@ public class Seller extends User {
         this.stores = stores;
     }
 
-    public void pushToFile() {
+    public synchronized void pushToFile() {
         try {
             File f = new File("userData");
             List<String> lines = Files.readAllLines(f.toPath(), StandardCharsets.UTF_8);
@@ -45,18 +45,18 @@ public class Seller extends User {
     }
 
     //Getter and Setter
-    public ArrayList<Store> getStores() {
+    public synchronized ArrayList<Store> getStores() {
         return stores;
     }
 
-    public void setStores(ArrayList<Store> stores) {
+    public synchronized void setStores(ArrayList<Store> stores) {
         this.stores = stores;
     }
 
 
     //Equals
     @Override
-    public boolean equals(Object o) {
+    public synchronized boolean equals(Object o) {
         if (!(o instanceof Seller)) {
             return false;
         }
@@ -69,7 +69,7 @@ public class Seller extends User {
      *
      * @param store the store to add to the seller
      */
-    public void addStore(Store store) {
+    public synchronized void addStore(Store store) {
         stores.add(store);
     }
 
@@ -79,7 +79,7 @@ public class Seller extends User {
      * @param index the index of the desired store
      * @return the desired store
      */
-    public Store getStore(int index) {
+    public synchronized Store getStore(int index) {
         return stores.get(index);
     }
 
@@ -89,7 +89,7 @@ public class Seller extends User {
      * @param index the index of the desired store
      * @return the removed store
      */
-    public Store removeStore(int index) {
+    public synchronized Store removeStore(int index) {
         return stores.remove(index);
     }
 
@@ -99,14 +99,14 @@ public class Seller extends User {
      * @param store the desired store
      * @return the removed store
      */
-    public Store removeStore(Store store) {
+    public synchronized Store removeStore(Store store) {
         if (stores.contains(store)) {
             return stores.remove(stores.indexOf(store));
         }
         return null;
     }
 
-    public void importProduct() {
+    public synchronized void importProduct() {
         String filePath = JOptionPane.showInputDialog("Enter file path of the file containing products to be imported: ");
         try {
             FileReader f = new FileReader(filePath);
@@ -128,7 +128,7 @@ public class Seller extends User {
         }
     }
 
-    public void exportProducts() throws IOException {
+    public synchronized void exportProducts() throws IOException {
         ArrayList<Product> products = this.getAllProducts();
         String fileName = this.getUsername() + ".csv";
         File f = new File(fileName);
@@ -142,7 +142,7 @@ public class Seller extends User {
         JOptionPane.showMessageDialog(null, "A file titled " + this.getUsername() + ".csv has been created with your products!");
     }
 
-    public ArrayList<Product> getAllProducts() {
+    public synchronized ArrayList<Product> getAllProducts() {
         ArrayList<Product> allProducts = new ArrayList<>();
         for (Store s : stores) {
             ArrayList<Product> products = s.getProducts();
@@ -153,7 +153,7 @@ public class Seller extends User {
         return allProducts;
     }
 
-    public void updateSeller() {
+    public synchronized void updateSeller() {
         try {
             File f = new File(this.getUsername() + ".csv");
             if (f.createNewFile()) {

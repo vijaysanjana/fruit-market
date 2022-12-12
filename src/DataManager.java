@@ -73,7 +73,7 @@ public class DataManager {
      *
      * @param mp
      */
-    public static void loadEverything(MarketPlace mp) {
+    public static synchronized void loadEverything(MarketPlace mp) {
         System.out.println("Loading literally everything");
 
         loadCustomers(mp);
@@ -88,7 +88,7 @@ public class DataManager {
      *
      * @param mp
      */
-    public static void saveEverything(MarketPlace mp) {
+    public static synchronized void saveEverything(MarketPlace mp) {
         System.out.println("Saving literally everything");
 
         for (Seller s : mp.getSellers()) {
@@ -109,7 +109,7 @@ public class DataManager {
      *
      * @param mp
      */
-    private static void loadCustomers(MarketPlace mp) {
+    private static synchronized void loadCustomers(MarketPlace mp) {
         File customerLocation = new File(customerDataFolder + File.separatorChar);
         try {
             if(customerLocation.listFiles() != null) {
@@ -142,7 +142,7 @@ public class DataManager {
      *
      * @param mp
      */
-    private static void loadSellers(MarketPlace mp) {
+    private static synchronized void loadSellers(MarketPlace mp) {
         File sellerLocation = new File(sellerDataFolder + File.separatorChar);
         try {
             if(sellerLocation.listFiles() != null) {
@@ -175,7 +175,7 @@ public class DataManager {
      *
      * @param mp
      */
-    private static void loadStores(MarketPlace mp) {
+    private static synchronized void loadStores(MarketPlace mp) {
         File sellerLocation = new File(sellerDataFolder + File.separatorChar);
         try {
             if(sellerLocation.listFiles() != null) {
@@ -223,7 +223,7 @@ public class DataManager {
      *
      * @param mp
      */
-    private static void loadShoppingCarts(MarketPlace mp) {
+    private static synchronized void loadShoppingCarts(MarketPlace mp) {
         File customerLocation = new File(customerDataFolder + File.separatorChar);
         try {
             if(customerLocation.listFiles() != null) {
@@ -275,7 +275,7 @@ public class DataManager {
      *
      * @param mp
      */
-    private static void loadHistorySales(MarketPlace mp) {
+    private static synchronized void loadHistorySales(MarketPlace mp) {
         File customerLocation = new File(customerDataFolder + File.separatorChar);
         try {
             if(customerLocation.listFiles() != null) {
@@ -352,7 +352,7 @@ public class DataManager {
      *
      * @param seller
      */
-    public static void saveSellerStores(Seller seller) {
+    public static synchronized void saveSellerStores(Seller seller) {
         for (Store s : seller.getStores()) {
             File file = new File(sellerDataFolder + File.separatorChar
                     + seller.getUsername() + File.separatorChar + s.getName() + "_store");
@@ -386,7 +386,7 @@ public class DataManager {
      *
      * @param seller
      */
-    public static void saveSellerSales(Seller seller) {
+    public static synchronized void saveSellerSales(Seller seller) {
         for (Store s : seller.getStores()) {
             File file = new File(sellerDataFolder + File.separatorChar
                     + seller.getUsername() + File.separatorChar + s.getName() + "_sales");
@@ -420,7 +420,7 @@ public class DataManager {
      *
      * @param customer
      */
-    public static void saveCustomerHistory(Customer customer) {
+    public static synchronized void saveCustomerHistory(Customer customer) {
         File file = new File(customerDataFolder + File.separatorChar
                 + customer.getUsername() + File.separatorChar + "purchase_history");
 
@@ -451,7 +451,7 @@ public class DataManager {
      *
      * @param customer
      */
-    public static void saveCustomerCart(Customer customer) {
+    public static synchronized void saveCustomerCart(Customer customer) {
         File file = new File(customerDataFolder + File.separatorChar
                 + customer.getUsername() + File.separatorChar + "shopping_cart");
 
@@ -482,7 +482,7 @@ public class DataManager {
      *
      * @param user
      */
-    private static void createNecessaryFolders(User user) {
+    private static synchronized void createNecessaryFolders(User user) {
         if (new File(customerDataFolder + File.separatorChar).mkdir()) {
             //System.out.println("Customer data folder created");
         }
@@ -510,7 +510,7 @@ public class DataManager {
      * @param store
      * @param file
      */
-    public static void importStoreCSV(Seller seller, Store store, File file) {
+    public static synchronized void importStoreCSV(Seller seller, Store store, File file) {
         ArrayList<String> current = new ArrayList<>();
         File storeFile = new File(sellerDataFolder + File.separatorChar
                 + seller.getUsername() + File.separatorChar + store.getName() + "_store");
@@ -564,7 +564,7 @@ public class DataManager {
      * @param seller
      * @param store
      */
-    public static void exportStoreCSV(Seller seller, Store store) {
+    public static synchronized void exportStoreCSV(Seller seller, Store store) {
         File output = new File(seller.getUsername().replaceAll(" ", "_") + "_"
                 + store.getName().replaceAll(" ", "_") + ".csv");
         try {
@@ -589,7 +589,7 @@ public class DataManager {
      *
      * @param customer
      */
-    public static void exportCustomerHistory(Customer customer) {
+    public static synchronized void exportCustomerHistory(Customer customer) {
         File output = new File(customer.getUsername().replaceAll(" ", "_") + "_"
                 + "purchase_history.csv");
 
@@ -614,7 +614,7 @@ public class DataManager {
      *
      * @return ArrayList<String> {type[0], username[1], email[2], password[3]}
      */
-    public static ArrayList<ArrayList<String>> getUserLogins() {
+    public static synchronized ArrayList<ArrayList<String>> getUserLogins() {
         if (!userDataFile.exists()) {
             try {
                 userDataFile.createNewFile();
@@ -658,7 +658,7 @@ public class DataManager {
      * @param type
      * @return
      */
-    public static boolean writeUserSignup(String username, String email,
+    public static synchronized boolean writeUserSignup(String username, String email,
                                           String password, String type) {
         if (username.contains(";") || username.contains(",")
                 || email.contains(";") || email.contains(",")
@@ -693,7 +693,7 @@ public class DataManager {
      * @param email
      * @param password
      */
-    public static void writeCustomer(String username, String email, String password) {
+    public static synchronized void writeCustomer(String username, String email, String password) {
         try {
             File f = userDataFile;
             List<String> lines = Files.readAllLines(f.toPath(), StandardCharsets.UTF_8);
@@ -714,7 +714,7 @@ public class DataManager {
      * @param email
      * @param password
      */
-    public static void writeSeller(String username, String email, String password) {
+    public static synchronized void writeSeller(String username, String email, String password) {
         try {
             File f = userDataFile;
             List<String> lines = Files.readAllLines(f.toPath(), StandardCharsets.UTF_8);
@@ -733,7 +733,7 @@ public class DataManager {
      *
      * @param user
      */
-    public static void removeAccount(User user) {
+    public static synchronized void removeAccount(User user) {
         File f = null;
         if (user instanceof Customer) {
             f = new File(customerDataFolder + File.separatorChar + user.getUsername());

@@ -22,7 +22,7 @@ public class AccountManager {
      * @param password
      * @return
      */
-    public static User login(MarketPlace mp, String email, String password) {
+    public synchronized static User login(MarketPlace mp, String email, String password) {
         ArrayList<ArrayList<String>> data = DataManager.getUserLogins();
         for (ArrayList<String> arr : data) {
             if (arr.get(2).equalsIgnoreCase(email)) {
@@ -58,7 +58,7 @@ public class AccountManager {
      * @param type
      * @return
      */
-    public static User signup(String username, String email, String password, String type) {
+    public synchronized static User signup(String username, String email, String password, String type) {
         if (DataManager.writeUserSignup(username, email, password, type)) {
             if (type.equalsIgnoreCase("customer")) {
                 return new Customer(username, email, password);

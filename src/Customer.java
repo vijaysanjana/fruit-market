@@ -42,7 +42,6 @@ public class Customer extends User {
      * @param shoppingCart
      * @param purchases
      */
-    //Getters and Setters
     public Customer(String username, String email, String password,
                     ShoppingCart shoppingCart, ArrayList<Sale> purchases) {
         super(username, email, password);
@@ -50,7 +49,7 @@ public class Customer extends User {
         this.purchases = purchases;
     }
 
-    public void pushToFile() {
+    public synchronized void pushToFile() {
         try {
             File f = new File("userData");
             List<String> lines = Files.readAllLines(f.toPath(), StandardCharsets.UTF_8);
@@ -61,19 +60,19 @@ public class Customer extends User {
         }
     }
 
-    public ShoppingCart getShoppingCart() {
+    public synchronized ShoppingCart getShoppingCart() {
         return shoppingCart;
     }
 
-    public void setShoppingCart(ShoppingCart shoppingCart) {
+    public synchronized void setShoppingCart(ShoppingCart shoppingCart) {
         this.shoppingCart = shoppingCart;
     }
 
-    public ArrayList<Sale> getPurchases() {
+    public synchronized ArrayList<Sale> getPurchases() {
         return purchases;
     }
 
-    public void setPurchases(ArrayList<Sale> purchases) {
+    public synchronized void setPurchases(ArrayList<Sale> purchases) {
         this.purchases = purchases;
         int totalPurchasedProducts = 0;
         for (Sale sale : purchases) {
@@ -82,11 +81,11 @@ public class Customer extends User {
         this.totalPurchasedProducts = totalPurchasedProducts;
     }
 
-    public int getTotalPurchasedProducts() {
+    public synchronized int getTotalPurchasedProducts() {
         return totalPurchasedProducts;
     }
 
-    public void setTotalPurchasedProducts(int totalPurchasedProducts) {
+    public synchronized void setTotalPurchasedProducts(int totalPurchasedProducts) {
         this.totalPurchasedProducts = totalPurchasedProducts;
     }
 
@@ -98,7 +97,7 @@ public class Customer extends User {
      */
     //Equals
     @Override
-    public boolean equals(Object o) {
+    public synchronized boolean equals(Object o) {
         if (!(o instanceof Customer)) {
             return false;
         }
@@ -112,7 +111,7 @@ public class Customer extends User {
      *
      * @param sale the sale to add to the purchase history
      */
-    public void addSale(Sale sale) {
+    public synchronized void addSale(Sale sale) {
         totalPurchasedProducts += sale.getQuantity();
         purchases.add(sale);
     }
@@ -123,7 +122,7 @@ public class Customer extends User {
      * @param index the index of the desired sale
      * @return the desired sale
      */
-    public Sale getSale(int index) {
+    public synchronized Sale getSale(int index) {
         return purchases.get(index);
     }
 
@@ -133,7 +132,7 @@ public class Customer extends User {
      * @param index the index of the desired sale
      * @return the removed sale
      */
-    public Sale removeSale(int index) {
+    public synchronized Sale removeSale(int index) {
         return purchases.remove(index);
     }
 
@@ -143,7 +142,7 @@ public class Customer extends User {
      * @param sale the desired sale
      * @return the removed sale
      */
-    public Sale removeSale(Sale sale) {
+    public synchronized Sale removeSale(Sale sale) {
         if (purchases.contains(sale)) {
             return purchases.remove(purchases.indexOf(sale));
         }
@@ -155,7 +154,7 @@ public class Customer extends User {
      *
      * @throws IOException
      */
-    public void exportPurchases() throws IOException {
+    public synchronized void exportPurchases() throws IOException {
         ArrayList<Sale> history = this.getPurchases();
         String fileName = this.getUsername() + ".txt";
         File f = new File(fileName);
