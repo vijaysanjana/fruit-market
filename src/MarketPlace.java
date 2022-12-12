@@ -320,12 +320,12 @@ public class MarketPlace {
     }
 
     //get Store object by store name
-     public synchronized Store getStore(String storeName) {
+    public synchronized Store getStore(String storeName) {
         for (Store s : getStores())
             if (s.getName().equalsIgnoreCase(storeName))
                 return s;
         return null;
-     }
+    }
 
     //gets user object by User's email
     public synchronized User getUser(String email) {

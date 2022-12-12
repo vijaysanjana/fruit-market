@@ -8,6 +8,7 @@ import java.util.*;
 /**
  * Customer class contains the ShoppingCart owned by the Customer and the Customer's purchase history.
  * Customer extends User.
+ *
  * @author Jack, Nathan, Sanjana, Tommy, Aadit
  * @version 11/14/2022
  */

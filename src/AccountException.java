@@ -1,5 +1,6 @@
 /**
  * Exception thrown when account system failed
+ *
  * @author Jack, Nathan, Sanj, Tommy, Adit
  * @version 11/14/2022
  */

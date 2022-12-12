@@ -38,10 +38,10 @@ public class DataManager {
         Seller sel = new Seller("jack", "jack@gmail.com", "pw");
         Customer cus = new Customer("john", "john@gmail.com", "pw");
 
-        for(Store s : mp.getStores()) {
+        for (Store s : mp.getStores()) {
             System.out.println("STORE: " + s.getName());
         }
-        for(Product p : mp.getProducts()) {
+        for (Product p : mp.getProducts()) {
             System.out.println("PROD: " + p.getName());
         }
 
@@ -60,7 +60,7 @@ public class DataManager {
 //            System.out.println("QUANT: " + s.getQuantity());
 //        }
 
-        for(Sale s : mp.getCustomer(0).getPurchases()) {
+        for (Sale s : mp.getCustomer(0).getPurchases()) {
             System.out.println(s.getProduct().getName());
             System.out.println();
         }
@@ -112,7 +112,7 @@ public class DataManager {
     private static synchronized void loadCustomers(MarketPlace mp) {
         File customerLocation = new File(customerDataFolder + File.separatorChar);
         try {
-            if(customerLocation.listFiles() != null) {
+            if (customerLocation.listFiles() != null) {
                 if (customerLocation.listFiles().length != 0) {
                     for (File f : customerLocation.listFiles()) {
                         String customerName = f.getName();
@@ -124,7 +124,7 @@ public class DataManager {
                                 customer = new Customer(logs.get(1), logs.get(2), logs.get(3));
                             }
                         }
-                        if(customer != null) {
+                        if (customer != null) {
                             mp.addCustomer(customer);
                         }
                     }
@@ -145,7 +145,7 @@ public class DataManager {
     private static synchronized void loadSellers(MarketPlace mp) {
         File sellerLocation = new File(sellerDataFolder + File.separatorChar);
         try {
-            if(sellerLocation.listFiles() != null) {
+            if (sellerLocation.listFiles() != null) {
                 if (sellerLocation.listFiles().length != 0) {
                     for (File f : sellerLocation.listFiles()) {
                         String sellerName = f.getName();
@@ -157,7 +157,7 @@ public class DataManager {
                                 seller = new Seller(logs.get(1), logs.get(2), logs.get(3));
                             }
                         }
-                        if(seller != null) {
+                        if (seller != null) {
                             mp.addSeller(seller);
                         }
                     }
@@ -178,10 +178,10 @@ public class DataManager {
     private static synchronized void loadStores(MarketPlace mp) {
         File sellerLocation = new File(sellerDataFolder + File.separatorChar);
         try {
-            if(sellerLocation.listFiles() != null) {
+            if (sellerLocation.listFiles() != null) {
                 if (sellerLocation.listFiles().length != 0) {
                     for (File f : sellerLocation.listFiles()) {
-                        if(f.listFiles() != null) {
+                        if (f.listFiles() != null) {
                             if (f.listFiles().length != 0) {
                                 for (Seller s : mp.getSellers()) {
                                     if (s.getUsername().equalsIgnoreCase(f.getName())) {
@@ -226,10 +226,10 @@ public class DataManager {
     private static synchronized void loadShoppingCarts(MarketPlace mp) {
         File customerLocation = new File(customerDataFolder + File.separatorChar);
         try {
-            if(customerLocation.listFiles() != null) {
+            if (customerLocation.listFiles() != null) {
                 if (customerLocation.listFiles().length != 0) {
                     for (File f : customerLocation.listFiles()) {
-                        if(f.listFiles() != null) {
+                        if (f.listFiles() != null) {
                             if (f.listFiles().length != 0) {
                                 for (Customer c : mp.getCustomers()) {
                                     if (c.getUsername().equalsIgnoreCase(f.getName())) {
@@ -278,10 +278,10 @@ public class DataManager {
     private static synchronized void loadHistorySales(MarketPlace mp) {
         File customerLocation = new File(customerDataFolder + File.separatorChar);
         try {
-            if(customerLocation.listFiles() != null) {
+            if (customerLocation.listFiles() != null) {
                 if (customerLocation.listFiles().length != 0) {
                     for (File f : customerLocation.listFiles()) {
-                        if(f.listFiles() != null) {
+                        if (f.listFiles() != null) {
                             if (f.listFiles().length != 0) {
                                 for (Customer c : mp.getCustomers()) {
                                     if (c.getUsername().equalsIgnoreCase(f.getName())) {
@@ -310,7 +310,7 @@ public class DataManager {
                                                         }
                                                     }
 
-                                                    if(hasProduct && prod != null) {
+                                                    if (hasProduct && prod != null) {
                                                         Sale sale = new Sale(c, prod,
                                                                 Integer.parseInt(hist[1]),
                                                                 Double.parseDouble(hist[2]));
@@ -319,7 +319,7 @@ public class DataManager {
                                                     } else {
                                                         prod = new Product(name, "",
                                                                 (Double.parseDouble(hist[2])
-                                                                        /Integer.parseInt(hist[1])),
+                                                                        / Integer.parseInt(hist[1])),
                                                                 Integer.parseInt(hist[1]));
                                                         Sale sale = new Sale(c, prod,
                                                                 Integer.parseInt(hist[1]),
@@ -659,7 +659,7 @@ public class DataManager {
      * @return
      */
     public static synchronized boolean writeUserSignup(String username, String email,
-                                          String password, String type) {
+                                                       String password, String type) {
         if (username.contains(";") || username.contains(",")
                 || email.contains(";") || email.contains(",")
                 || password.contains(";") || password.contains(",")) {

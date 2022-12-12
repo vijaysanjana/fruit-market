@@ -3,6 +3,12 @@ import java.net.*;
 import java.util.ArrayList;
 
 // Server class
+/**
+ * Main server containing class to control all systems
+ *
+ * @author Jack, Nathan, Sanjana, Tommy, Aadit
+ * @version 12/12/2022
+ */
 class ServerCore {
 
     private static MarketPlace mp = new MarketPlace();

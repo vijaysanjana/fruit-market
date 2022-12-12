@@ -10,6 +10,7 @@ import java.util.List;
 
 /**
  * Account management system to handle logins/signups
+ *
  * @author Jack, Nathan, Sanjana, Tommy, Aadit
  * @version 11/14/2022
  */
@@ -28,16 +29,16 @@ public class AccountManager {
             if (arr.get(2).equalsIgnoreCase(email)) {
                 if (arr.get(3).equals(password)) {
                     if (arr.get(0).equalsIgnoreCase("C")) {
-                        for(Customer c : mp.getCustomers()) {
-                            if(c.getUsername().equalsIgnoreCase(arr.get(1))) {
+                        for (Customer c : mp.getCustomers()) {
+                            if (c.getUsername().equalsIgnoreCase(arr.get(1))) {
                                 mp.addCustomer(c);
                                 return c;
                             }
                         }
                     }
                     if (arr.get(0).equalsIgnoreCase("S")) {
-                        for(Seller s : mp.getSellers()) {
-                            if(s.getUsername().equalsIgnoreCase(arr.get(1))) {
+                        for (Seller s : mp.getSellers()) {
+                            if (s.getUsername().equalsIgnoreCase(arr.get(1))) {
                                 mp.addSeller(s);
                                 return s;
                             }

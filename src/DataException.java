@@ -2,6 +2,7 @@ import java.io.File;
 
 /**
  * Thrown when data read or write failed
+ *
  * @author Jack, Nathan, Sanjana, Tommy, Aadit
  * @version 11/14/2022
  */
