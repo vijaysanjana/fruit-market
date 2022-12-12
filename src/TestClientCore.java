@@ -353,6 +353,7 @@ class TestClientCore {
             response = interpretResponse(serverIn.readLine());
             products = new ArrayList<>();
             for (String listedResponse : response) {
+                System.out.println("finding products in store");
                 if (!listedResponse.equals("{getProducts}")) {
                     products.add(interpretListedResponse(listedResponse)[0]);
                 }
@@ -365,6 +366,8 @@ class TestClientCore {
             if (storeNames.length == 0) {
                 availStores += "\n--- No fruits found";
             } else {
+                if (products.isEmpty())
+                    availStores += "\n--- No fruits found";
                 for (String p : products) {
                     System.out.println("goin through the products");
                     allProducts.add(p);
@@ -580,7 +583,9 @@ class TestClientCore {
             response = interpretResponse(serverIn.readLine());
             ArrayList<String> productNames = new ArrayList<>();
             if (response.length != 1)
-                productNames = (ArrayList<String>) Arrays.asList(interpretListedResponse(response[1]));
+                if (response[1].contains("|"))
+                    productNames.addAll(Arrays.asList(interpretListedResponse(response[1])));
+                else productNames.add(response[1]);
             String results = "";
 
             results += "Your search results (via Fruit Name):";
@@ -608,7 +613,7 @@ class TestClientCore {
             response = interpretResponse(serverIn.readLine());
             ArrayList<String> productNames = new ArrayList<>();
             if (response.length != 1)
-                productNames = (ArrayList<String>) Arrays.asList(interpretListedResponse(response[1]));
+                productNames.addAll(Arrays.asList(interpretListedResponse(response[1])));
             String results = "";
 
             results += "Your search results (via Fruit Description):";
@@ -636,7 +641,7 @@ class TestClientCore {
             response = interpretResponse(serverIn.readLine());
             ArrayList<String> storeNames = new ArrayList<>();
             if (response.length != 1)
-                storeNames = (ArrayList<String>) Arrays.asList(interpretListedResponse(response[1]));
+                storeNames.addAll(Arrays.asList(interpretListedResponse(response[1])));
             ArrayList<String> productsFound = new ArrayList<>();
             String results = "";
 
@@ -674,7 +679,14 @@ class TestClientCore {
 
     public static void addSearchProduct(ArrayList<String> productsFound) throws IOException {
         if (!productsFound.isEmpty()) {
-            String productPick = JOptionPane.showInputDialog("Please enter:" + "\n[Correspond #] View Fruit Info" + "\n[Anything Else] Return to Customer Menu");
+            String temp = "";
+            for (String p : productsFound) {
+                temp += "#" + (productsFound.indexOf(p) + 1) + " " + p;
+                if (productsFound.indexOf(p) != productsFound.size() - 1) // not last item in list
+                    temp += ", ";
+            }
+            String productPick = JOptionPane.showInputDialog(temp + "\nPlease enter:" + "\n[Correspond #] View Fruit " +
+                    "Info" + "\n[Anything Else] Return to Customer Menu");
 
             if (productPick.matches("-?\\d+(\\.\\d+)?")
                     && !(Integer.parseInt(productPick) < 1)) { // TODO: needs testing
@@ -780,14 +792,13 @@ class TestClientCore {
                     }
                 }
             }
+        }
+        String[] options = {"Return to Search Menu", "Return to Customer Menu"};
+        int noProdAction = JOptionPane.showOptionDialog(null, "No fruits available. Please choose one:", "Choice", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+        if (noProdAction == 0) {
+            searchMenu();
         } else {
-            String[] options = {"Return to Search Menu", "Return to Customer Menu"};
-            int noProdAction = JOptionPane.showOptionDialog(null, "No fruits available. Please choose one:", "Choice", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
-            if (noProdAction == 0) {
-                searchMenu();
-            } else {
-                customerMainMenu();
-            }
+            customerMainMenu();
         }
     }
 
@@ -996,24 +1007,27 @@ class TestClientCore {
      * Accesses purchase history menu
      */
     public static void historyMenu() throws IOException {
-        ArrayList<ArrayList<Object>> history = null; //(added "null;" so this could run)
-        //        FileManager.getCustomerData((Customer) user); //FILE MANAGER
+        request = "{getCustomerPurchaseHistory}," + userEmail;
+        clientOut.println(request);
+        response = interpretResponse(serverIn.readLine());
+        ArrayList<String> pastPurchases = new ArrayList<>();
+        if (!response[1].isEmpty())
+            pastPurchases.addAll(Arrays.asList(interpretListedResponse(response[1])));
         String hist = "";
         hist += "Your purchase history:";
-        if (history == null || history.size() == 0) {
+        if (response[2].equals("0")) {
             hist += "\n- No purchases found";
         } else {
-            for (ArrayList<Object> arr : history) {
-                int quant = Integer.parseInt((String) arr.get(0));
-                Product prod = (Product) arr.get(1);
-                hist += "\n- " + prod.getName();
-                hist += "\n--- Price Each: " + prod.getPrice();
-                hist += "\n--- Quantity Purchased: " + quant;
-                hist += "\n--- Total Price: " +
-                        String.format("%.2f", (prod.getPrice() * quant));
+            for (String sale : pastPurchases) {
+                request = "{getSaleByName}," + sale;
+                clientOut.println(request);
+                response = interpretResponse(serverIn.readLine());
+                hist += "\n- " + response[1];
+                hist += "\n--- Price Each: " + response[4];
+                hist += "\n--- Quantity Purchased: " + response[3];
+                hist += "\n--- Total Price: " + response[2];
             }
-            hist += "\nYou have purchased " +
-                    ((Customer) user).getTotalPurchasedProducts() + "fruits in total!";
+            hist += "\nYou have purchased " + pastPurchases.size() + " fruits in total!";
         }
         JOptionPane.showMessageDialog(null, hist);
         String[] options = {"Export Purchase History CSV", "Return to Customer Menu"};
@@ -1038,58 +1052,80 @@ class TestClientCore {
             ArrayList<String> stores = new ArrayList<>();
             switch (sortMode) {
                 case 1:
-                    request = "{getAllStoresRequest}," + true;
+                    request = "{getSalesSortedStores}," + true;
                     clientOut.println(request);
                     response = interpretResponse(serverIn.readLine());
-                    stores = (ArrayList<String>) Arrays.asList(interpretListedResponse(response[1]));
+                    if (response.length == 2)
+                        stores.addAll(Arrays.asList(interpretListedResponse(response[1])));
                     break;
                 case 2:
-                    request = "{getAllStoresRequest}," + false;
+                    request = "{getSalesSortedStores}," + false;
                     clientOut.println(request);
                     response = interpretResponse(serverIn.readLine());
-                    stores = (ArrayList<String>) Arrays.asList(interpretListedResponse(response[1]));
+                    if (response.length == 2)
+                        stores.addAll(Arrays.asList(interpretListedResponse(response[1])));
                     break;
                 case 3:
                     request = "{getUserSalesSortedStores}," + true;
                     clientOut.println(request);
                     response = interpretResponse(serverIn.readLine());
-                    stores = (ArrayList<String>) Arrays.asList(interpretListedResponse(response[1]));
+                    if (response.length == 2)
+                        stores.addAll(Arrays.asList(interpretListedResponse(response[1])));
                     break;
                 case 4:
                     request = "{getUserSalesSortedStores}," + false;
                     clientOut.println(request);
                     response = interpretResponse(serverIn.readLine());
-                    stores = (ArrayList<String>) Arrays.asList(interpretListedResponse(response[1]));
+                    if (response.length == 2)
+                        stores.addAll(Arrays.asList(interpretListedResponse(response[1])));
                     break;
                 default:
-                    request = "{getAllStoresRequest}";
+                    request = "{getAllStores}";
                     clientOut.println(request);
                     response = interpretResponse(serverIn.readLine());
-                    stores = (ArrayList<String>) Arrays.asList(interpretListedResponse(response[1]));
+                    if (response.length == 2)
+                        stores.addAll(Arrays.asList(interpretListedResponse(response[1])));
+                    break;
             }
+            if (stores.isEmpty()) {
+                String[] options = {"Return to Customer Menu", "Logout & Quit"};
 
-            for (String store : stores) {
-                request = "{getQuantityOfProductsBoughtByCustomer}," + userEmail + "," + store;
-                clientOut.println(request);
-                response = interpretResponse(serverIn.readLine());
-                availStores += "\n- " + store;
-                availStores += "\n--- Total Products Sold: " +
-                        response[2];
-                availStores += "\n--- Total Products Sold to You: " + response[1];
-            }
-            String[] options = {"Sort Stores by Total Fruits Sold (High to Low)", "Sort Stores by Total Fruits Sold (Low to High)", "Sort Stores by Total Fruits Sold to You (High to Low)", "Sort Stores by Total Fruits Sold to You (Low to High)", "Return to Customer Menu"};
-            int productPick = JOptionPane.showOptionDialog(null, "Please choose:", "Choice", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+                int noProdAction = JOptionPane.showOptionDialog(null, "There are currently no stores on The " +
+                                "MarketPlace. Please choose one.", "Choice",
+                        JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 
-            if (productPick == 0) {
-                dashboardMenu(1);
-            } else if (productPick == 1) {
-                dashboardMenu(2);
-            } else if (productPick == 2) {
-                dashboardMenu(3);
-            } else if (productPick == 3) {
-                dashboardMenu(4);
+                if (noProdAction == 0) {
+                    customerMainMenu();
+                } else {
+                    printFarewell();
+                }
             } else {
-                customerMainMenu();
+
+                for (String store : stores) {
+                    request = "{getQuantityOfProductsBoughtByCustomer}," + userEmail + "," + store;
+                    clientOut.println(request);
+                    response = interpretResponse(serverIn.readLine());
+                    availStores += "\n- " + store;
+                    availStores += "\n--- Total Products Sold: " +
+                            response[2];
+                    availStores += "\n--- Total Products Sold to You: " + response[1];
+                }
+
+                String[] options = {"Sort Stores by Total Fruits Sold (High to Low)", "Sort Stores by Total Fruits Sold (Low to High)", "Sort Stores by Total Fruits Sold to You (High to Low)", "Sort Stores by Total Fruits Sold to You (Low to High)", "Return to Customer Menu"};
+                int productPick = JOptionPane.showOptionDialog(null, availStores + "\nPlease choose:", "Choice",
+                        JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+
+                if (productPick == 0) {
+                    dashboardMenu(1);
+                } else if (productPick == 1) {
+                    dashboardMenu(2);
+                } else if (productPick == 2) {
+                    dashboardMenu(3);
+                } else if (productPick == 3) {
+                    dashboardMenu(4);
+                } else {
+                    customerMainMenu();
+                }
             }
         } else if (userType.equals("S")) {
             System.out.println("seller detected");

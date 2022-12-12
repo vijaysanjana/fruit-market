@@ -281,6 +281,11 @@ class ServerCore {
                             serverOut.println(response);
                             break;
 
+                        case "{getCustomerPurchaseHistory}":
+                            response = getCustomerPurchaseHistoryRequest(request);
+                            serverOut.println(response);
+                            break;
+
                         default:
                     }
 
@@ -751,7 +756,9 @@ class ServerCore {
 
         //gets Sale info given param(sale name)
         public String getSaleByNameRequest(String[] request) {
+            System.out.println(request[1]);
             Sale sale = mp.getSale(request[1]);
+            System.out.println(sale.getProduct().getName());
             return "{getSaleByName}," + sale.getProduct().getName() + "," + String.format("%.2f",
                     sale.getTotalCost()) + "," + sale.getQuantity() + "," + String.format("%.2f",
                     sale.getProduct().getPrice());
@@ -834,5 +841,18 @@ class ServerCore {
             return "{purchaseAllHeldSales}";
         }
 
+        public String getCustomerPurchaseHistoryRequest(String[] request) {
+            Customer customer = (Customer) mp.getUser(request[1]);
+            int counter = 0;
+            String temp = "";
+            for (Sale sale : customer.getPurchases()) {
+                temp += sale.getName();
+                if (customer.getPurchases().indexOf(sale) != customer.getPurchases().size() - 1)
+                    temp += "|";
+                counter++;
+            }
+            System.out.println(temp);
+            return "{getCustomerPurchaseHistory}," + temp + "," + counter;
+        }
     }
 }
