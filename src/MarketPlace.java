@@ -354,6 +354,11 @@ public class MarketPlace {
                     return s;
                 }
             }
+            for (Sale s : c.getPurchases()) {
+                if (s.getName().equals(saleName)) {
+                    return s;
+                }
+            }
         }
         return null;
         /*

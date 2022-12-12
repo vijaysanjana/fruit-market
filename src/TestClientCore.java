@@ -1020,6 +1020,7 @@ class TestClientCore {
         } else {
             for (String sale : pastPurchases) {
                 request = "{getSaleByName}," + sale;
+                System.out.println(request);
                 clientOut.println(request);
                 response = interpretResponse(serverIn.readLine());
                 hist += "\n- " + response[1];
