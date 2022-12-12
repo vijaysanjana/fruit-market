@@ -347,9 +347,20 @@ public class MarketPlace {
     }
 
     public synchronized Sale getSale(String saleName) {
+
+        for (Customer c : getCustomers()) {
+            for (Sale s : c.getShoppingCart().getHeldPurchases()) {
+                if (s.getName().equals(saleName)) {
+                    return s;
+                }
+            }
+        }
+        return null;
+        /*
         for (Customer c : getCustomers())
             if (saleName.contains(c.getUsername()))
                 return c.getShoppingCart().getHeldPurchases().get(c.getShoppingCart().getHeldPurchases().indexOf(saleName));
         return null;
+        */
     }
 }
