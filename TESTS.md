@@ -16,8 +16,6 @@ Steps:
 Expected result of test: "Your stores" line should have "- #1 watermelon shop" after it.
 Test status: Passed
 
-Expected result of test: "small melon" should be listed as a fruit.
-Test status: passed
 ## Test 2
 Steps:
 1. Click OK
