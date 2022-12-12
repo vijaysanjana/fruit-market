@@ -469,7 +469,7 @@ class TestClientCore {
                             String[] options = {"Add to Shopping Cart", "Return to All Fruits Page"};
                             int productAction = JOptionPane.showOptionDialog(null, "Please choose one.", "Choice", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 
-                            if (productAction == 1) {
+                            if (productAction == 0) {
                                 String purchaseQuantity = JOptionPane.showInputDialog("Please enter a purchase quantity.");
                                 while (!purchaseQuantity.matches("-?\\d+(\\.\\d+)?")
                                         || (Integer.parseInt(purchaseQuantity) < 1)) {
