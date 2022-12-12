@@ -47,7 +47,7 @@ public class Store {
         this.totalSoldProducts = totalSoldProducts;
     }
 
-    public void pushToFile() {
+    public synchronized void pushToFile() {
         try {
             File f = new File("storeData");
             List<String> lines = Files.readAllLines(f.toPath(), StandardCharsets.UTF_8);
@@ -74,35 +74,35 @@ public class Store {
 
 
     //Getters and Setters
-    public String getName() {
+    public synchronized String getName() {
         return name;
     }
 
-    public void setName(String name) {
+    public synchronized void setName(String name) {
         this.name = name;
     }
 
-    public String getDescription() {
+    public synchronized String getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
+    public synchronized void setDescription(String description) {
         this.description = description;
     }
 
-    public ArrayList<Product> getProducts() {
+    public synchronized ArrayList<Product> getProducts() {
         return products;
     }
 
-    public void setProducts(ArrayList<Product> products) {
+    public synchronized void setProducts(ArrayList<Product> products) {
         this.products = products;
     }
 
-    public ArrayList<Sale> getSales() {
+    public synchronized ArrayList<Sale> getSales() {
         return sales;
     }
 
-    public void setSales(ArrayList<Sale> sales) {
+    public synchronized void setSales(ArrayList<Sale> sales) {
         this.sales = sales;
         int totalSoldProducts = 0;
         for (Sale sale : sales) {
@@ -111,11 +111,11 @@ public class Store {
         this.totalSoldProducts = totalSoldProducts;
     }
 
-    public int getTotalSoldProducts() {
+    public synchronized int getTotalSoldProducts() {
         return totalSoldProducts;
     }
 
-    public void setTotalSoldProducts(int totalSoleProducts) {
+    public synchronized void setTotalSoldProducts(int totalSoleProducts) {
         this.totalSoldProducts = totalSoleProducts;
     }
 
@@ -125,7 +125,7 @@ public class Store {
      * @param maxFirst true: sorts from high price to low price, false: sorts from low price to high price
      * @return the sorted list of Products
      */
-    public ArrayList<Product> getPriceSortedProducts(boolean maxFirst) {
+    public synchronized ArrayList<Product> getPriceSortedProducts(boolean maxFirst) {
         ArrayList<Product> copiedProducts = new ArrayList<>();
         for (Product product : products) {
             copiedProducts.add(product);
@@ -155,7 +155,7 @@ public class Store {
      * @param maxFirst true: sorts from high quantity to low quantity, false: sorts from low quantity to high quantity
      * @return the sorted list of Products
      */
-    public ArrayList<Product> getQuantitySortedProducts(boolean maxFirst) {
+    public synchronized ArrayList<Product> getQuantitySortedProducts(boolean maxFirst) {
         ArrayList<Product> copiedProducts = new ArrayList<>();
         for (Product product : products) {
             copiedProducts.add(product);
@@ -185,7 +185,7 @@ public class Store {
      * @param customer the customer to search for sales from
      * @return list of sales from the specified customer
      */
-    public ArrayList<Sale> getSalesFromCustomer(Customer customer) {
+    public synchronized ArrayList<Sale> getSalesFromCustomer(Customer customer) {
         ArrayList<Sale> salesFromCustomer = new ArrayList<>();
         for (Sale sale : sales) {
             if (sale.getCustomer().equals(customer)) {
@@ -201,7 +201,7 @@ public class Store {
      * @param customer the customer to search for sales from
      * @return number of products bought by the specified customers
      */
-    public int getQuantityOfProductsBoughtByCustomer(Customer customer) {
+    public synchronized int getQuantityOfProductsBoughtByCustomer(Customer customer) {
         ArrayList<Sale> salesFromCustomer = getSalesFromCustomer(customer);
         int soldToCustomer = 0;
         for (Sale sale : salesFromCustomer) {
@@ -212,7 +212,7 @@ public class Store {
         return soldToCustomer;
     }
 
-    public ArrayList<Sale> getSalesForProduct(Product product) {
+    public synchronized ArrayList<Sale> getSalesForProduct(Product product) {
         ArrayList<Sale> salesForProduct = new ArrayList<>();
         for (Sale sale : sales) {
             if (sale.getProduct().equals(product)) {
@@ -222,7 +222,7 @@ public class Store {
         return salesForProduct;
     }
 
-    public int getNumberOfProductsSold(Product product) {
+    public synchronized int getNumberOfProductsSold(Product product) {
         ArrayList<Sale> salesForProduct = getSalesForProduct(product);
         int productsSold = 0;
         for (Sale sale : salesForProduct) {
@@ -231,7 +231,7 @@ public class Store {
         return productsSold;
     }
 
-    public ArrayList<Customer> getAllCustomers() {
+    public synchronized ArrayList<Customer> getAllCustomers() {
         ArrayList<Customer> customers = new ArrayList<>();
         for (Sale sale : sales) {
             if (!(customers.contains(sale.getCustomer()))) {
@@ -244,7 +244,7 @@ public class Store {
 
     //Equals
     @Override
-    public boolean equals(Object o) {
+    public synchronized boolean equals(Object o) {
         if (!(o instanceof Store)) {
             return false;
         }
@@ -259,7 +259,7 @@ public class Store {
      *
      * @param product the product to add to the store
      */
-    public void addProduct(Product product) {
+    public synchronized void addProduct(Product product) {
         products.add(product);
     }
 
@@ -269,7 +269,7 @@ public class Store {
      * @param index the index of the desired product
      * @return the desired product
      */
-    public Product getProduct(int index) {
+    public synchronized Product getProduct(int index) {
         return products.get(index);
     }
 
@@ -279,7 +279,7 @@ public class Store {
      * @param index the index of the desired product
      * @return the removed product
      */
-    public Product removeProduct(int index) {
+    public synchronized Product removeProduct(int index) {
         return products.remove(index);
     }
 
@@ -289,7 +289,7 @@ public class Store {
      * @param product the desired product
      * @return the removed product
      */
-    public Product removeProduct(Product product) {
+    public synchronized Product removeProduct(Product product) {
         if (products.contains(product)) {
             return products.remove(products.indexOf(product));
         }
@@ -302,7 +302,7 @@ public class Store {
      *
      * @param sale the sale to add to the ShoppingCart
      */
-    public void addSale(Sale sale) {
+    public synchronized void addSale(Sale sale) {
         totalSoldProducts += sale.getQuantity();
         sales.add(sale);
     }
@@ -313,7 +313,7 @@ public class Store {
      * @param index the index of the desired sale
      * @return the desired sale
      */
-    public Sale getSale(int index) {
+    public synchronized Sale getSale(int index) {
         return sales.get(index);
     }
 
@@ -323,7 +323,7 @@ public class Store {
      * @param index the index of the desired sale
      * @return the removed sale
      */
-    public Sale removeSale(int index) {
+    public synchronized Sale removeSale(int index) {
         return sales.remove(index);
     }
 
@@ -333,7 +333,7 @@ public class Store {
      * @param sale the desired sale
      * @return the removed sale
      */
-    public Sale removeSale(Sale sale) {
+    public synchronized Sale removeSale(Sale sale) {
         if (sales.contains(sale)) {
             return sales.remove(sales.indexOf(sale));
         }

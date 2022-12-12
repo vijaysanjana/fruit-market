@@ -27,23 +27,23 @@ public class MarketPlace {
 
 
     //Getters and Setters
-    public ArrayList<Seller> getSellers() {
+    public synchronized ArrayList<Seller> getSellers() {
         return sellers;
     }
 
-    public void setSellers(ArrayList<Seller> sellers) {
+    public synchronized void setSellers(ArrayList<Seller> sellers) {
         this.sellers = sellers;
     }
 
-    public ArrayList<Customer> getCustomers() {
+    public synchronized ArrayList<Customer> getCustomers() {
         return customers;
     }
 
-    public void setCustomers(ArrayList<Customer> customers) {
+    public synchronized void setCustomers(ArrayList<Customer> customers) {
         this.customers = customers;
     }
 
-    public ArrayList<Store> getStores() {
+    public synchronized ArrayList<Store> getStores() {
         ArrayList<Store> stores = new ArrayList<>();
         for (Seller seller : sellers) {
             for (Store store : seller.getStores()) {
@@ -53,7 +53,7 @@ public class MarketPlace {
         return stores;
     }
 
-    public ArrayList<Product> getProducts() {
+    public synchronized ArrayList<Product> getProducts() {
         ArrayList<Product> products = new ArrayList<>();
         for (Store store : getStores()) {
             for (Product product : store.getProducts()) {
@@ -63,7 +63,7 @@ public class MarketPlace {
         return products;
     }
 
-    public ArrayList<Product> searchProducts(String type, String str) {
+    public synchronized ArrayList<Product> searchProducts(String type, String str) {
         ArrayList<Product> products = getProducts();
         if (type.equalsIgnoreCase("name")) {
             ArrayList<Product> results = new ArrayList<>();
@@ -85,7 +85,7 @@ public class MarketPlace {
         return null;
     }
 
-    public ArrayList<Store> searchStores(String str) {
+    public synchronized ArrayList<Store> searchStores(String str) {
         ArrayList<Store> stores = getStores();
         ArrayList<Store> results = new ArrayList<>();
         for (Store s : stores) {
@@ -96,7 +96,7 @@ public class MarketPlace {
         return results;
     }
 
-    public ArrayList<ShoppingCart> getShoppingCarts() {
+    public synchronized ArrayList<ShoppingCart> getShoppingCarts() {
         ArrayList<ShoppingCart> shoppingCarts = new ArrayList<>();
         for (Customer customer : customers) {
             shoppingCarts.add(customer.getShoppingCart());
@@ -104,7 +104,7 @@ public class MarketPlace {
         return shoppingCarts;
     }
 
-    public ArrayList<Sale> getPurchases() {
+    public synchronized ArrayList<Sale> getPurchases() {
         ArrayList<Sale> purchases = new ArrayList<>();
         for (Customer customer : customers) {
             for (Sale purchase : customer.getPurchases()) {
@@ -121,7 +121,7 @@ public class MarketPlace {
      * @param maxFirst true: sorts from high sales to low sales, false: sorts from low sales to high sales
      * @return the sorted list of Stores
      */
-    public ArrayList<Store> getSalesSortedStores(boolean maxFirst) {
+    public synchronized ArrayList<Store> getSalesSortedStores(boolean maxFirst) {
         ArrayList<Store> copiedStores = new ArrayList<>();
         for (Store store : getStores()) {
             copiedStores.add(store);
@@ -151,7 +151,7 @@ public class MarketPlace {
      * @param maxFirst true: sorts from high sales to low sales, false: sorts from low sales to high sales
      * @return the sorted list of Stores
      */
-    public ArrayList<Store> getUserSalesSortedStores(User user, boolean maxFirst) {
+    public synchronized ArrayList<Store> getUserSalesSortedStores(User user, boolean maxFirst) {
         ArrayList<Store> copiedStores = new ArrayList<>();
         for (Store store : getStores()) {
             copiedStores.add(store);
@@ -174,7 +174,7 @@ public class MarketPlace {
         return sortedStores;
     }
 
-    public ArrayList<Customer> getStoreSalesSortedCustomers(Store store, boolean maxFirst) {
+    public synchronized ArrayList<Customer> getStoreSalesSortedCustomers(Store store, boolean maxFirst) {
         ArrayList<Customer> customers = store.getAllCustomers();
         ArrayList<Customer> copiedCustomers = new ArrayList<>();
         for (Customer customer : customers) {
@@ -198,7 +198,7 @@ public class MarketPlace {
         return sortedCustomers;
     }
 
-    public ArrayList<Product> getStoreSalesSortedProducts(Store store, boolean maxFirst) {
+    public synchronized ArrayList<Product> getStoreSalesSortedProducts(Store store, boolean maxFirst) {
         ArrayList<Product> products = store.getProducts();
         ArrayList<Product> copiedProducts = new ArrayList<>();
         for (Product product : products) {
@@ -225,7 +225,7 @@ public class MarketPlace {
 
     //Equals
     @Override
-    public boolean equals(Object o) {
+    public synchronized boolean equals(Object o) {
         if (!(o instanceof MarketPlace)) {
             return false;
         }
@@ -239,7 +239,7 @@ public class MarketPlace {
      *
      * @param seller the seller to add to the MarketPlace
      */
-    public void addSeller(Seller seller) {
+    public synchronized void addSeller(Seller seller) {
         sellers.add(seller);
     }
 
@@ -249,7 +249,7 @@ public class MarketPlace {
      * @param index the index of the desired seller
      * @return the desired seller
      */
-    public Seller getSeller(int index) {
+    public synchronized Seller getSeller(int index) {
         return sellers.get(index);
     }
 
@@ -259,7 +259,7 @@ public class MarketPlace {
      * @param index the index of the desired seller
      * @return the removed seller
      */
-    public Seller removeSeller(int index) {
+    public synchronized Seller removeSeller(int index) {
         return sellers.remove(index);
     }
 
@@ -269,7 +269,7 @@ public class MarketPlace {
      * @param seller the desired seller
      * @return the removed seller
      */
-    public Seller removeSeller(Seller seller) {
+    public synchronized Seller removeSeller(Seller seller) {
         if (sellers.contains(seller)) {
             return sellers.remove(sellers.indexOf(seller));
         }
@@ -282,7 +282,7 @@ public class MarketPlace {
      *
      * @param customer the customer to add to the MarketPlace
      */
-    public void addCustomer(Customer customer) {
+    public synchronized void addCustomer(Customer customer) {
         customers.add(customer);
     }
 
@@ -292,7 +292,7 @@ public class MarketPlace {
      * @param index the index of the desired customer
      * @return the desired customer
      */
-    public Customer getCustomer(int index) {
+    public synchronized Customer getCustomer(int index) {
         return customers.get(index);
     }
 
@@ -302,7 +302,7 @@ public class MarketPlace {
      * @param index the index of the desired customer
      * @return the removed customer
      */
-    public Customer removeCustomer(int index) {
+    public synchronized Customer removeCustomer(int index) {
         return customers.remove(index);
     }
 
@@ -312,7 +312,7 @@ public class MarketPlace {
      * @param customer the desired customer
      * @return the removed customer
      */
-    public Customer removeCustomer(Customer customer) {
+    public synchronized Customer removeCustomer(Customer customer) {
         if (customers.contains(customer)) {
             return customers.remove(customers.indexOf(customer));
         }
@@ -320,7 +320,7 @@ public class MarketPlace {
     }
 
     //get Store object by store name
-     public Store getStore(String storeName) {
+     public synchronized Store getStore(String storeName) {
         for (Store s : getStores())
             if (s.getName().equalsIgnoreCase(storeName))
                 return s;
@@ -328,7 +328,7 @@ public class MarketPlace {
      }
 
     //gets user object by User's email
-    public User getUser(String email) {
+    public synchronized User getUser(String email) {
         for (User u : getCustomers())
             if (u.getEmail().equalsIgnoreCase(email))
                 return u;
@@ -339,14 +339,14 @@ public class MarketPlace {
     }
 
     //gets product object by product's name
-    public Product getProduct(String productName) {
+    public synchronized Product getProduct(String productName) {
         for (Product p : getProducts())
             if (p.getName().equalsIgnoreCase(productName))
                 return p;
         return null;
     }
 
-    public Sale getSale(String saleName) {
+    public synchronized Sale getSale(String saleName) {
         for (Customer c : getCustomers())
             if (saleName.contains(c.getUsername()))
                 return c.getShoppingCart().getHeldPurchases().get(c.getShoppingCart().getHeldPurchases().indexOf(saleName));

@@ -36,42 +36,42 @@ public class Product {
 
 
     //Getters and Setters
-    public String getName() {
+    public synchronized String getName() {
         return name;
     }
 
-    public void setName(String name) {
+    public synchronized void setName(String name) {
         this.name = name;
     }
 
-    public String getDescription() {
+    public synchronized String getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
+    public synchronized void setDescription(String description) {
         this.description = description;
     }
 
-    public int getQuantity() {
+    public synchronized int getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(int quantity) {
+    public synchronized void setQuantity(int quantity) {
         this.quantity = quantity;
     }
 
-    public double getPrice() {
+    public synchronized double getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public synchronized void setPrice(double price) {
         this.price = price;
     }
 
 
     //Equals
     @Override
-    public boolean equals(Object o) {
+    public synchronized boolean equals(Object o) {
         if (!(o instanceof Product)) {
             return false;
         }
@@ -83,12 +83,12 @@ public class Product {
                 && (pPrice.equalsIgnoreCase(tPrice)) && (p.getQuantity() == this.getQuantity()));
     }
 
-    public String toString() {
+    public synchronized String toString() {
         String s = name + "," + description + "," + quantity + "," + price;
         return s;
     }
 
-    public void pushToFile() {
+    public synchronized void pushToFile() {
         try {
             File f = new File("productData");
             List<String> lines = Files.readAllLines(f.toPath(), StandardCharsets.UTF_8);

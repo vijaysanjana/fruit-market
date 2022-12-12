@@ -47,50 +47,50 @@ public class Sale {
 
 
     //Getters and Setters
-    public Customer getCustomer() {
+    public synchronized Customer getCustomer() {
         return customer;
     }
 
-    public void setCustomer(Customer customer) {
+    public synchronized void setCustomer(Customer customer) {
         this.customer = customer;
     }
 
-    public Product getProduct() {
+    public synchronized Product getProduct() {
         return product;
     }
 
-    public void setProduct(Product product) {
+    public synchronized void setProduct(Product product) {
         this.product = product;
     }
 
-    public int getQuantity() {
+    public synchronized int getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(int quantity) {
+    public synchronized void setQuantity(int quantity) {
         this.quantity = quantity;
         this.totalCost = product.getPrice() * quantity;
     }
 
-    public double getTotalCost() {
+    public synchronized double getTotalCost() {
         return totalCost;
     }
 
-    public void setTotalCost(double totalCost) {
+    public synchronized void setTotalCost(double totalCost) {
         this.totalCost = totalCost;
     }
 
-    public String getName() {
+    public synchronized String getName() {
         return name;
     }
 
-    public void setName(String name) {
+    public synchronized void setName(String name) {
         this.name = name;
     }
 
     //Equals
     @Override
-    public boolean equals(Object o) {
+    public synchronized boolean equals(Object o) {
         if (!(o instanceof Sale)) {
             return false;
         }
@@ -99,7 +99,7 @@ public class Sale {
                 quantity == sale.getQuantity() && totalCost == sale.getTotalCost());
     }
 
-    public void pushToFile() {
+    public synchronized void pushToFile() {
         try {
             File f = new File("saleData");
             List<String> lines = Files.readAllLines(f.toPath(), StandardCharsets.UTF_8);
