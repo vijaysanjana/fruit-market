@@ -286,7 +286,7 @@ class TestClientCore {
      */
     public static void customerMainMenu() throws IOException {
 
-        request = "{getTotalHeldProducts}";
+        request = "{getTotalHeldProducts}," + userEmail;
         clientOut.println(request);
         response = interpretResponse(serverIn.readLine());
         String totalHeldProducts = response[1];
@@ -323,7 +323,12 @@ class TestClientCore {
         request = "{getAllStores}";
         clientOut.println(request);
         response = interpretResponse(serverIn.readLine());
-        String[] storeNames = interpretListedResponse(response[1]);
+        String[] storeNames;
+        if (response.length == 1) {
+            System.out.println("no stores found");
+            storeNames = new String[0];
+        } else
+            storeNames = interpretListedResponse(response[1]);
         ArrayList<String> products = new ArrayList<>(); //temp holder for products
         ArrayList<String> allProducts = new ArrayList<>(); //all products names
         String availStores = "";
@@ -341,6 +346,7 @@ class TestClientCore {
             request = "{getProducts}," + s;
             clientOut.println(request);
             response = interpretResponse(serverIn.readLine());
+            products = new ArrayList<>();
             for (String listedResponse : response) {
                 if (!listedResponse.equals("{getProducts}")) {
                     products.add(interpretListedResponse(listedResponse)[0]);
@@ -373,6 +379,11 @@ class TestClientCore {
 
         if (!products.isEmpty()) {
             String choices = "";
+            for (String p : allProducts) {
+                choices += "#" + (allProducts.indexOf(p) + 1) + " " + p;
+                if (allProducts.indexOf(p) != allProducts.size() - 1) // not last item in list
+                    choices += ", ";
+            }
             choices += "\nPlease enter: ";
             choices += "\n[PH] Sort Fruits by Price (High to Low)";
             choices += "\n[PL] Sort Fruits by Price (Low to High)";
@@ -557,12 +568,14 @@ class TestClientCore {
         String[] options = {"Fruit Name", "Fruit Description", "Store Name", "Return to Customer Menu"};
         int searchAction = JOptionPane.showOptionDialog(null, "What would you like to search for?", "Search", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 
-        if (searchAction == 0) {
+        if (searchAction == 0) { //search by name
             String searchParam = JOptionPane.showInputDialog("Please enter your search parameter.");
             request = "{getSearchProduct}," + "name" + "," + searchParam;
             clientOut.println(request);
             response = interpretResponse(serverIn.readLine());
-            ArrayList<String> productNames = (ArrayList<String>) Arrays.asList(interpretListedResponse(response[1]));
+            ArrayList<String> productNames = new ArrayList<>();
+            if (response.length != 1)
+                productNames = (ArrayList<String>) Arrays.asList(interpretListedResponse(response[1]));
             String results = "";
 
             results += "Your search results (via Fruit Name):";
@@ -582,13 +595,15 @@ class TestClientCore {
             }
             JOptionPane.showMessageDialog(null, results);
             addSearchProduct(productNames);
-        } else if (searchAction == 1) {
+        } else if (searchAction == 1) { //search by description
             String searchParam = JOptionPane.showInputDialog("Please enter your search parameter.");
 
             request = "{getSearchProduct}," + "desc" + "," + searchParam;
             clientOut.println(request);
             response = interpretResponse(serverIn.readLine());
-            ArrayList<String> productNames = (ArrayList<String>) Arrays.asList(interpretListedResponse(response[1]));
+            ArrayList<String> productNames = new ArrayList<>();
+            if (response.length != 1)
+                productNames = (ArrayList<String>) Arrays.asList(interpretListedResponse(response[1]));
             String results = "";
 
             results += "Your search results (via Fruit Description):";
@@ -608,13 +623,15 @@ class TestClientCore {
             }
             JOptionPane.showMessageDialog(null, results);
             addSearchProduct(productNames);
-        } else if (searchAction == 2) {
+        } else if (searchAction == 2) { //search by store name
             String searchParam = JOptionPane.showInputDialog("Please enter your search parameter.");
 
             request = "{getSearchProduct}," + "stores" + "," + searchParam;
             clientOut.println(request);
             response = interpretResponse(serverIn.readLine());
-            ArrayList<String> storeNames = (ArrayList<String>) Arrays.asList(interpretListedResponse(response[1]));
+            ArrayList<String> storeNames = new ArrayList<>();
+            if (response.length != 1)
+                storeNames = (ArrayList<String>) Arrays.asList(interpretListedResponse(response[1]));
             ArrayList<String> productsFound = new ArrayList<>();
             String results = "";
 
@@ -721,41 +738,39 @@ class TestClientCore {
                                 break;
                             }
                         }
-                    } else {
-                        if (response[0].equals("{getProductByName}")) { // TODO: needs testing
-                            showProductInfo(response);
-                            String[] options = {"Add to Shopping Cart", "Return to Search Page"};
-                            int productAction = JOptionPane.showOptionDialog(null, "Please choose one.", "Choice", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
-                            if (productAction == 0) {
-                                String purchaseQuantity = JOptionPane.showInputDialog("Please enter a purchase quantity: ");
-                                while (!purchaseQuantity.matches("-?\\d+(\\.\\d+)?")
-                                        || (Integer.parseInt(purchaseQuantity) < 1)) {
+                    } else { // TODO: needs testing
+                        showProductInfo(response);
+                        String[] options = {"Add to Shopping Cart", "Return to Search Page"};
+                        int productAction = JOptionPane.showOptionDialog(null, "Please choose one.", "Choice", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+                        if (productAction == 0) {
+                            String purchaseQuantity = JOptionPane.showInputDialog("Please enter a purchase quantity: ");
+                            while (!purchaseQuantity.matches("-?\\d+(\\.\\d+)?")
+                                    || (Integer.parseInt(purchaseQuantity) < 1)) {
 
-                                    purchaseQuantity = JOptionPane.showInputDialog("Entered quantity is not a valid integer! " +
-                                            "Please enter a valid quantity: ");
-                                }
-                                while (Integer.parseInt(response[4]) - Integer.parseInt(purchaseQuantity) < 0) {
-                                    purchaseQuantity = JOptionPane.showInputDialog("There is only " + Integer.parseInt(response[4]) + " " +
-                                            "of this fruit available to purchase. Please try a smaller quantity: ");
-                                }
-
-                                request =
-                                        "{addToCustomerShoppingCart}," + userEmail + "," + productsFound.get(Integer.parseInt(productPick) - 1) + "," + purchaseQuantity;
-                                clientOut.println(request);
-                                serverIn.readLine();
-                                request =
-                                        "{subtractProductQuantity}," + response[1] + "," + Integer.parseInt(purchaseQuantity);
-                                clientOut.println(request);
-                                serverIn.readLine();
-                                // TESTING
-
-                                JOptionPane.showConfirmDialog(null, "Successfully added "
-                                        + purchaseQuantity + " to your shopping cart." +
-                                        " Returning to search page...");
-                                searchMenu();
-                            } else {
-                                searchMenu();
+                                purchaseQuantity = JOptionPane.showInputDialog("Entered quantity is not a valid integer! " +
+                                        "Please enter a valid quantity: ");
                             }
+                            while (Integer.parseInt(response[4]) - Integer.parseInt(purchaseQuantity) < 0) {
+                                purchaseQuantity = JOptionPane.showInputDialog("There is only " + Integer.parseInt(response[4]) + " " +
+                                        "of this fruit available to purchase. Please try a smaller quantity: ");
+                            }
+
+                            request =
+                                    "{addToCustomerShoppingCart}," + userEmail + "," + productsFound.get(Integer.parseInt(productPick) - 1) + "," + purchaseQuantity;
+                            clientOut.println(request);
+                            serverIn.readLine();
+                            request =
+                                    "{subtractProductQuantity}," + response[1] + "," + Integer.parseInt(purchaseQuantity);
+                            clientOut.println(request);
+                            serverIn.readLine();
+                            // TESTING
+
+                            JOptionPane.showConfirmDialog(null, "Successfully added "
+                                    + purchaseQuantity + " to your shopping cart." +
+                                    " Returning to search page...");
+                            searchMenu();
+                        } else {
+                            searchMenu();
                         }
                     }
                 }
@@ -783,9 +798,10 @@ class TestClientCore {
         request = "{getCustomerShoppingCart}," + userEmail;
         clientOut.println(request);
         response = interpretResponse(serverIn.readLine());
-        ArrayList<String> heldSales = (ArrayList<String>) Arrays.asList(interpretListedResponse(response[1]));
-
-        if (heldSales.size() == 0) {
+        ArrayList<String> heldSales = new ArrayList<>();
+        if (response.length != 1)
+            heldSales = (ArrayList<String>) Arrays.asList(interpretListedResponse(response[1]));
+        if (heldSales.isEmpty()) {
             info += "\n- Empty";
         } else {
             for (String s : heldSales) {
@@ -802,55 +818,79 @@ class TestClientCore {
             }
         }
 
-        String choices = "";
-        choices += "\nPlease enter: ";
-        choices += "\n[CH] Checkout & Purchase";
-        choices += "\n[Corresponding #] View Fruit Info";
-        choices += "\n[Anything Else] Return to Customer Menu";
-        String cartPick = JOptionPane.showInputDialog(choices);
-        if (cartPick.matches("-?\\d+(\\.\\d+)?")) {
-            while (Integer.parseInt(cartPick) - 1 > heldSales.size()) {
-                cartPick = JOptionPane.showInputDialog("Entered # is not a valid item! Please enter a valid item #: ");
-                if (!cartPick.matches("-?\\d+(\\.\\d+)?")) {
-                    cartPick = "QUIT_MENU_PLEASE";
-                    break;
-                }
-            }
-            if (cartPick.equals("QUIT_MENU_PLEASE")) {
+        System.out.println("bouta print some info"); //TODO: TEST
+        if (heldSales.isEmpty()) {
+            String[] options = {"Return to Customer Menu", "Logout & Quit"};
+
+            int noProdAction = JOptionPane.showOptionDialog(null, "Your shopping cart is empty. Please choose one.",
+                    "Choice",
+                    JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+
+            if (noProdAction == 0) {
                 customerMainMenu();
             } else {
-                request = "{getSaleByName}," + heldSales.get(Integer.parseInt(cartPick) - 1);
-                clientOut.println(request);
-                response = interpretResponse(serverIn.readLine());
-                request = "{getProductByName}," + response[1];
-                clientOut.println(request);
-                String[] currentProduct = interpretResponse(serverIn.readLine());
-                if (response[0].equals("{getSaleByName}")) {
-                    showProductInfo(currentProduct);
-                    String[] options = {"Remove from Shopping Cart", "Change Purchase Quantity", "Return to All Fruits Page"};
-                    int cartAction = JOptionPane.showOptionDialog(null, "Please choose one", "Choice", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+                printFarewell();
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, info);
 
-                    if (cartAction == 0) {
+            String choices = "";
+            choices += "\nShopping Cart: ";
+            for (String p : heldSales) {
+                choices += "#" + (heldSales.indexOf(p) + 1) + " " + p;
+                if (heldSales.indexOf(p) != heldSales.size() - 1) // not last item in list
+                    choices += ", ";
+            }
+            if (heldSales.isEmpty())
+                choices += "empty";
+            choices += "\nPlease enter: ";
+            choices += "\n[CH] Checkout & Purchase";
+            choices += "\n[Corresponding #] View Fruit Info";
+            choices += "\n[Anything Else] Return to Customer Menu";
+            String cartPick = JOptionPane.showInputDialog(choices);
+            if (cartPick.matches("-?\\d+(\\.\\d+)?")) {
+                while (Integer.parseInt(cartPick) - 1 > heldSales.size()) {
+                    cartPick = JOptionPane.showInputDialog("Entered # is not a valid item! Please enter a valid item #: ");
+                    if (!cartPick.matches("-?\\d+(\\.\\d+)?")) {
+                        cartPick = "QUIT_MENU_PLEASE";
+                        break;
+                    }
+                }
+                if (cartPick.equals("QUIT_MENU_PLEASE")) {
+                    customerMainMenu();
+                } else {
+                    request = "{getSaleByName}," + heldSales.get(Integer.parseInt(cartPick) - 1);
+                    clientOut.println(request);
+                    response = interpretResponse(serverIn.readLine());
+                    request = "{getProductByName}," + response[1];
+                    clientOut.println(request);
+                    String[] currentProduct = interpretResponse(serverIn.readLine());
+                    if (response[0].equals("{getSaleByName}")) {
+                        showProductInfo(currentProduct);
+                        String[] options = {"Remove from Shopping Cart", "Change Purchase Quantity", "Return to All Fruits Page"};
+                        int cartAction = JOptionPane.showOptionDialog(null, "Please choose one", "Choice", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 
-                        // TESTING
-                        //p.setQuantity(p.getQuantity() +
-                        //        FileManager.getCustomerShoppingCartQuantity((Customer) user, p)); //FILE MANAGER
-                        //FileManager.updateCustomerShoppingCart((Customer) user, p, 0); //FILE MANAGER
-                        // TESTING
+                        if (cartAction == 0) {
 
-                        request = "{removeProductFromShoppingCart}," + userEmail + "," + currentProduct[1];
-                        clientOut.println(request);
-                        serverIn.readLine();
-                        JOptionPane.showConfirmDialog(null, "Successfully removed " + currentProduct[1]
-                                + " from your shopping cart." +
-                                " Returning to shopping cart page...");
-                        cartMenu();
-                    } else if (cartAction == 1) {
-                        String changeQuantity = JOptionPane.showInputDialog("Please enter a new quantity: ");
-                        while (!changeQuantity.matches("-?\\d+(\\.\\d+)?")) {
-                            changeQuantity = JOptionPane.showInputDialog("Entered quantity is not an integer! " +
-                                    "Please enter a valid quantity: ");
-                        }
+                            // TESTING
+                            //p.setQuantity(p.getQuantity() +
+                            //        FileManager.getCustomerShoppingCartQuantity((Customer) user, p)); //FILE MANAGER
+                            //FileManager.updateCustomerShoppingCart((Customer) user, p, 0); //FILE MANAGER
+                            // TESTING
+
+                            request = "{removeProductFromShoppingCart}," + userEmail + "," + currentProduct[1];
+                            clientOut.println(request);
+                            serverIn.readLine();
+                            JOptionPane.showConfirmDialog(null, "Successfully removed " + currentProduct[1]
+                                    + " from your shopping cart." +
+                                    " Returning to shopping cart page...");
+                            cartMenu();
+                        } else if (cartAction == 1) {
+                            String changeQuantity = JOptionPane.showInputDialog("Please enter a new quantity: ");
+                            while (!changeQuantity.matches("-?\\d+(\\.\\d+)?")) {
+                                changeQuantity = JOptionPane.showInputDialog("Entered quantity is not an integer! " +
+                                        "Please enter a valid quantity: ");
+                            }
                         /* //FILE MANAGER
                         while (p.getQuantity() + (FileManager.getCustomerShoppingCartQuantity((Customer) user, p)
                                 - Integer.parseInt(changeQuantity)) < 0) {
@@ -864,7 +904,7 @@ class TestClientCore {
                         }
                          */
 
-                        // TESTING
+                            // TESTING
                         /* //FILE MANAGER
                         p.setQuantity(p.getQuantity() +
                                 (FileManager.getCustomerShoppingCartQuantity((Customer) user, p)
@@ -873,56 +913,57 @@ class TestClientCore {
                                 p, Integer.parseInt(changeQuantity));
                         // TESTING
                          */
-                        request = "{updateQuantityInShoppingCart}," + userEmail + "," + (Integer.parseInt(cartPick) - 1) + "," + Integer.parseInt(changeQuantity);
-                        clientOut.println(request);
-                        response = interpretResponse(serverIn.readLine());
-                        JOptionPane.showConfirmDialog(null, "Successfully changed purchase quantity to "
-                                + changeQuantity + "." +
-                                " Returning to shopping cart page...");
-                        cartMenu();
-                    } else {
-                        cartMenu();
-                    }
-                } else {
-                    while (currentProduct[0].equals("{getProductByName}")) {
-                        cartPick = JOptionPane.showInputDialog("Entered # is not a valid fruit! " +
-                                "Please enter a valid fruit #: ");
-                        if (!cartPick.matches("-?\\d+(\\.\\d+)?")) {
-                            continue;
+                            request = "{updateQuantityInShoppingCart}," + userEmail + "," + (Integer.parseInt(cartPick) - 1) + "," + Integer.parseInt(changeQuantity);
+                            clientOut.println(request);
+                            response = interpretResponse(serverIn.readLine());
+                            JOptionPane.showConfirmDialog(null, "Successfully changed purchase quantity to "
+                                    + changeQuantity + "." +
+                                    " Returning to shopping cart page...");
+                            cartMenu();
+                        } else {
+                            cartMenu();
                         }
-                        request = "{getProductByName}," + heldSales.get(Integer.parseInt(cartPick) - 1);
-                        clientOut.println(request);
-                        currentProduct = interpretResponse(serverIn.readLine());
+                    } else {
+                        while (currentProduct[0].equals("{getProductByName}")) {
+                            cartPick = JOptionPane.showInputDialog("Entered # is not a valid fruit! " +
+                                    "Please enter a valid fruit #: ");
+                            if (!cartPick.matches("-?\\d+(\\.\\d+)?")) {
+                                continue;
+                            }
+                            request = "{getProductByName}," + heldSales.get(Integer.parseInt(cartPick) - 1);
+                            clientOut.println(request);
+                            currentProduct = interpretResponse(serverIn.readLine());
+                        }
                     }
                 }
-            }
-        } else if (cartPick.equalsIgnoreCase("ch")) {
-            String allTotalPrice = String.format("%.2f", allTotal);
-            String[] options = {"Yes", "Cancel and Return to Menu"};
+            } else if (cartPick.equalsIgnoreCase("ch")) {
+                String allTotalPrice = String.format("%.2f", allTotal);
+                String[] options = {"Yes", "Cancel and Return to Menu"};
 
-            request = "{getCustomerShoppingCart}," + userEmail;
-            clientOut.println(request);
-            heldSales = (ArrayList<String>) Arrays.asList(interpretListedResponse(response[1]));
+                request = "{getCustomerShoppingCart}," + userEmail;
+                clientOut.println(request);
+                heldSales = (ArrayList<String>) Arrays.asList(interpretListedResponse(response[1]));
 
-            int purchaseAction = JOptionPane.showOptionDialog(null, "You are purchasing "
-                    + response[2]
-                    + " fruits for $" + allTotalPrice + ". Would you like to complete the purchase?", "Choose", JOptionPane.YES_NO_OPTION, JOptionPane.NO_OPTION, null, options, options[0]);
-            if (purchaseAction == 0) {
-                for (String sale : heldSales) { //purchase sales add to customer and store
-                    request = "{purchaseAllHeldSales}," + userEmail;
+                int purchaseAction = JOptionPane.showOptionDialog(null, "You are purchasing "
+                        + response[2]
+                        + " fruits for $" + allTotalPrice + ". Would you like to complete the purchase?", "Choose", JOptionPane.YES_NO_OPTION, JOptionPane.NO_OPTION, null, options, options[0]);
+                if (purchaseAction == 0) {
+                    for (String sale : heldSales) { //purchase sales add to customer and store
+                        request = "{purchaseAllHeldSales}," + userEmail;
+                        clientOut.println(request);
+                        serverIn.readLine();
+                    }
+                    request = "{removeAllProductsFromShoppingCart}," + userEmail;
                     clientOut.println(request);
                     serverIn.readLine();
+                    JOptionPane.showMessageDialog(null, "Returning to customer menu page...");
+                    customerMainMenu();
+                } else {
+                    cartMenu();
                 }
-                request = "{removeAllProductsFromShoppingCart}," + userEmail;
-                clientOut.println(request);
-                serverIn.readLine();
-                JOptionPane.showMessageDialog(null, "Returning to customer menu page...");
-                customerMainMenu();
             } else {
-                cartMenu();
+                customerMainMenu();
             }
-        } else {
-            customerMainMenu();
         }
     }
 
@@ -1369,7 +1410,7 @@ class TestClientCore {
                                         }
                                     }
                                     */
-                                    JOptionPane.showMessageDialog(null,"Successfully deleted " + productName +  "\nReturning to seller menu...", "success", JOptionPane.DEFAULT_OPTION);
+                                    JOptionPane.showMessageDialog(null, "Successfully deleted " + productName + "\nReturning to seller menu...", "success", JOptionPane.DEFAULT_OPTION);
                                     sellerMainMenu();
                                 } else {
                                     sellerMainMenu();

@@ -167,7 +167,6 @@ class ServerCore {
                             serverOut.println(response);
                             break;
 
-
                         case "{getProductNames}":
                             response = getProductNamesRequest(request);
                             serverOut.println(response);
@@ -364,7 +363,8 @@ class ServerCore {
         }
 
         public String getTotalHeldProductsRequest(String[] request) {
-            return "{getTotalHeldProducts}," + ((Customer) user).getShoppingCart().getTotalheldProducts();
+            Customer customer = (Customer) mp.getUser(request[1]);
+            return "{getTotalHeldProducts}," + customer.getShoppingCart().getTotalheldProducts();
         }
 
         public String getStoreNamesRequest(String[] request) {
@@ -652,8 +652,7 @@ class ServerCore {
 
         //gets product and its info from given param(product name)
         public String getProductByNameRequest(String[] request) {
-            Store store = mp.getStore(request[1]);
-            Product p = store.getProduct(store.getProducts().indexOf(request[2]));
+            Product p = mp.getProduct(request[1]);
             return "{getProductByName}," + p.getName() + "," + p.getDescription() + "," + String.format("%.2f",
                     p.getPrice()) + "," + p.getQuantity();
         }
@@ -711,19 +710,26 @@ class ServerCore {
         //get the products in search from either name/description/stores given param(search type, phrase being searched)
         public String getSearchProductRequest(String[] request) {
             ArrayList<Product> result = new ArrayList<>();
+            String products = "";
             if (request[1].equals("name")) {
                 result = mp.searchProducts("name", request[2]);
             } else if (request[1].equals("desc")) {
                 result = mp.searchProducts("desc", request[2]);
             } else if (request[1].equals("stores")) {
-                result = mp.searchProducts("stores", request[2]);
+                ArrayList<Store> resultStores = mp.searchStores(request[2]);
+                for (Store p : resultStores) {
+                    if (resultStores.indexOf(p) == resultStores.size() - 1) //last item in list
+                        products += p.getName();
+                    else products += p.getName() + "|";
+                }
             }
-            String products = "";
             for (Product p : result) {
                 if (result.indexOf(p) == result.size() - 1) //last item in list
                     products += p.getName();
                 else products += p.getName() + "|";
             }
+            if (products.isEmpty())
+                return "{getSearchProduct}";
             return "{getSearchProduct}," + products;
         }
 
@@ -736,6 +742,8 @@ class ServerCore {
                 if (list.indexOf(s) == list.size() - 1) response += s.getName();
                 else response += s.getName() + "|";
             }
+            if (response.isEmpty())
+                return "{getCustomerShoppingCart}";
             return "{getCustomerShoppingCart}," + response + "," + customer.getShoppingCart().getTotalheldProducts();
         }
 
