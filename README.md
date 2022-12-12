@@ -5,7 +5,7 @@ A virtual fruit marketplace for Customers and Sellers to buy and list products.
 
 ## Usage
 
-To compile and run the project, run the main method of the **Core** class. // TODO: CHANGE TO APPROPRIATE FILE NAMES
+To compile and run the project, run the ServerCore class first, and then run the ClientCore class.
 
 ## Submission
 
@@ -20,9 +20,6 @@ An AccountException is thrown when the login or sign-up system has failed for th
 ## AccountManager
 
 This class is responsible for the creation of accounts that fall into either a customer or seller role. It contains methods for signing up a new user as well as logging in an existing user.
-
-## Core
-This is the main method of the program, where the user will interact with the virtual Marketplace. The user is prompted to either signup as a new user or login as an existing user. If the user is a Customer, they are asked whether they want to open the full marketplace, search for a product, view their cart, view their purchase history, or logout. If they are a Seller, they are asked whether they want to view their stores or logout. 
 
 ## Customer
 This class extends the User class. While having all the User class' methods inherited, it also contains two new variables, shoppingCart of type ShoppingCart, and an ArrayList< Sale > of purchases. It also contains a method that pushes all the customer's purchases to a file so the data is still retrievable after a session ends. Finally, the Customer has the option to export their purchase history into a .txt format file.
@@ -43,7 +40,10 @@ The Product class contains a product's name, description, price, and quantity av
 This class contains any information pertaining to a sale, such as the buying Customer, the Product that was sold, the number of the Product sold, and the total cost of the sale.
 
 ## Seller
-This class extends the User class. While having all the User class' methods inherited, it also contains an ArrayList< Store > of stores that the user owns. It also contains a method that pushes all the seller's products to a file so the data is still retrievable after a session ends. Finally, the Seller has the option to import and export products in their stores via a .csv file. 
+This class extends the User class. While having all the User class' methods inherited, it also contains an ArrayList< Store > of stores that the user owns. It also contains a method that pushes all the seller's products to a file so the data is still retrievable after a session ends. Finally, the Seller has the option to import and export products in their stores via a .csv file.
+
+## ServerCore
+This class runs on the server computers. It listens for clients connecting to the server socket. Once a connection is established, the class runs a ClientHandler thread that communicates with the ClientCore class, receiving and interpreting requests, updating data on the server computer, and sending a response back to the ClientCore. 
 
 ## ShoppingCart
 This class contains the ShoppingCart's owning Customer and the current purchases waiting to be made.
@@ -53,6 +53,9 @@ The Store class contains the name of the store, the description that the Seller 
 
 ## Test
 This is a tester class that was created which contains junit tests to make sure the application works as intended. The Class contains local tests to individually test the Customer, Sale, Store, Seller, Marketplace, Product, and User classes. Each class tests majority of the methods in the classes using the assertEquals method to ensure all methods are working properly.
+
+## ClientCore
+This class connects with the ServerCore class. Upon the connection, it commences the code and runs the GUI interface, which the user can interact with. The user can login/signup as a Customer or Seller, which each have different menus and functions.
 
 ## User
 This class creates parameters and their respective getter/setter methods that were common to both Customers and Sellers. These parameters are usernames, emails, and passwords.
