@@ -680,14 +680,15 @@ class ServerCore {
         public String addToCustomerShoppingCartRequest(String[] request) {
             Customer customer = (Customer) mp.getUser(request[1]);
             Product product = mp.getProduct(request[2]);
-            customer.addSale(new Sale(customer, product, Integer.parseInt(request[2])));
+            customer.getShoppingCart().addPurchase(new Sale(customer, product, Integer.parseInt(request[3])));
+            //customer.addSale(new Sale(customer, product, Integer.parseInt(request[3])));
             return "{addToCustomerShoppingCart}";
         }
 
         // updates product quantity with given param(product name, quantity)
         public String subtractProductQuantityRequest(String[] request) {
             Product product = mp.getProduct(request[1]);
-            product.setQuantity(Integer.parseInt(request[2]));
+            product.setQuantity(product.getQuantity() - Integer.parseInt(request[2]));
             return "{subtractProductQuantity}";
         }
 
